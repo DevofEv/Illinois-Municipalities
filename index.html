@@ -5,251 +5,534 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Illinois Municipalities Database</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        * {
             margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
             min-height: 100vh;
-            color: #333;
+            color: #2c3e50;
+            line-height: 1.6;
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            backdrop-filter: blur(10px);
+            padding: 20px;
         }
         
-        h1 {
+        .header {
             text-align: center;
-            color: #2c3e50;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+            color: white;
         }
         
-        .search-section {
-            background: #f8f9fa;
-            padding: 25px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            border: 1px solid #e9ecef;
+        .header h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+            background: linear-gradient(45deg, #fff, #f0f8ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .sidebar {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+        
+        .search-section h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .search-controls {
             display: flex;
+            flex-direction: column;
             gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+        
+        .input-group {
+            position: relative;
+        }
+        
+        .input-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
         }
         
         input, select {
+            width: 100%;
             padding: 12px 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
             font-size: 16px;
             transition: all 0.3s ease;
-            min-width: 200px;
+            background: white;
         }
         
         input:focus, select:focus {
             outline: none;
             border-color: #667eea;
-            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
         }
         
         .btn {
-            background: linear-gradient(45deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
+            padding: 12px 24px;
+            border-radius: 12px;
             cursor: pointer;
             font-size: 16px;
+            font-weight: 600;
             transition: all 0.3s ease;
-            min-width: 120px;
+            width: 100%;
+            margin-top: 10px;
         }
         
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
         }
         
-        .stats {
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 15px;
-            margin-bottom: 20px;
+            margin-top: 25px;
         }
         
         .stat-card {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
             padding: 20px;
-            border-radius: 10px;
+            border-radius: 15px;
             text-align: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
         }
         
         .stat-number {
-            font-size: 2em;
-            font-weight: bold;
+            font-size: 2rem;
+            font-weight: 700;
             margin-bottom: 5px;
+            display: block;
         }
         
-        .results-section {
-            background: white;
-            border-radius: 10px;
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .results-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
         }
         
         .results-header {
-            background: #2c3e50;
+            background: linear-gradient(135deg, #2c3e50, #34495e);
             color: white;
-            padding: 15px 25px;
-            font-weight: bold;
-            font-size: 1.1em;
+            padding: 25px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .results-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+        
+        .sort-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .sort-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .sort-btn:hover, .sort-btn.active {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-1px);
         }
         
         .results-list {
             max-height: 600px;
             overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #667eea #f1f3f4;
+        }
+        
+        .results-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .results-list::-webkit-scrollbar-track {
+            background: #f1f3f4;
+        }
+        
+        .results-list::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 4px;
         }
         
         .result-item {
-            padding: 15px 25px;
-            border-bottom: 1px solid #eee;
+            padding: 20px 30px;
+            border-bottom: 1px solid #f0f2f5;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: background 0.3s ease;
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
         
         .result-item:hover {
-            background: #f8f9fa;
+            background: linear-gradient(90deg, #f8fafc, #f1f5f9);
+            transform: translateX(5px);
+            border-left: 4px solid #667eea;
         }
         
         .result-item:last-child {
             border-bottom: none;
         }
         
+        .municipality-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
         .municipality-name {
-            font-weight: bold;
+            font-weight: 700;
             color: #2c3e50;
-            font-size: 1.1em;
+            font-size: 1.2rem;
         }
         
         .municipality-details {
-            color: #666;
-            font-size: 0.9em;
-            margin-top: 3px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
         }
         
         .type-badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.8em;
-            margin-right: 8px;
-            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
-        .type-city { background: #e8f5e8; color: #2d7d32; }
-        .type-village { background: #fff3e0; color: #ef6c00; }
-        .type-town { background: #e3f2fd; color: #1976d2; }
+        .type-city { 
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+        
+        .type-village { 
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+        
+        .type-town { 
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+        }
+        
+        .county-info {
+            color: #6b7280;
+            font-size: 0.95rem;
+        }
+        
+        .population-info {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
         
         .population {
-            background: #e8f4f8;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.9em;
-            color: #2c3e50;
+            background: linear-gradient(135deg, #e0f2fe, #b3e5fc);
+            color: #0277bd;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border: 1px solid #81d4fa;
+        }
+        
+        .population-label {
+            font-size: 0.8rem;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         .no-results {
             text-align: center;
+            padding: 60px 30px;
+            color: #6b7280;
+            font-size: 1.1rem;
+        }
+        
+        .no-results::before {
+            content: '🔍';
+            display: block;
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
             padding: 40px;
-            color: #666;
-            font-style: italic;
+            color: #667eea;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .highlight {
+            background: linear-gradient(120deg, #fbbf24 0%, #f59e0b 100%);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #92400e;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .sidebar {
+                position: static;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 10px;
+            }
+            
+            .stat-card {
+                padding: 15px 10px;
+            }
+            
+            .stat-number {
+                font-size: 1.5rem;
+            }
         }
         
         @media (max-width: 768px) {
-            .search-controls {
-                flex-direction: column;
+            .container {
+                padding: 15px;
             }
             
-            input, select, .btn {
-                min-width: 100%;
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
             
             .result-item {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 10px;
+                gap: 15px;
+                padding: 20px;
+            }
+            
+            .result-item:hover {
+                transform: none;
+                border-left: none;
+                border-top: 4px solid #667eea;
+            }
+            
+            .population-info {
+                text-align: left;
+                width: 100%;
+            }
+            
+            .results-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .sort-controls {
+                justify-content: center;
+                flex-wrap: wrap;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🏛️ Illinois Municipalities Database</h1>
-        
-        <div class="search-section">
-            <div class="search-controls">
-                <input type="text" id="searchInput" placeholder="Search municipalities or counties...">
-                <select id="countyFilter">
-                    <option value="">All Counties</option>
-                </select>
-                <select id="typeFilter">
-                    <option value="">All Types</option>
-                    <option value="City">Cities</option>
-                    <option value="Village">Villages</option>
-                    <option value="Town">Towns</option>
-                </select>
-                <button class="btn" onclick="clearFilters()">Clear Filters</button>
-            </div>
-            
-            <div class="stats">
-                <div class="stat-card">
-                    <div class="stat-number" id="totalMunicipalities">0</div>
-                    <div>Total Municipalities</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="totalCities">0</div>
-                    <div>Cities</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="totalVillages">0</div>
-                    <div>Villages</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="totalTowns">0</div>
-                    <div>Towns</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="filteredResults">0</div>
-                    <div>Filtered Results</div>
-                </div>
-            </div>
+        <div class="header">
+            <h1>🏛️ Illinois Municipalities</h1>
+            <p>Comprehensive database of all cities, villages, and towns in Illinois</p>
         </div>
         
-        <div class="results-section">
-            <div class="results-header">
-                <span id="resultsTitle">Illinois Municipalities</span>
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="search-section">
+                    <h3>🔍 Search & Filter</h3>
+                    
+                    <div class="search-controls">
+                        <div class="input-group">
+                            <label for="searchInput">Search municipalities or counties</label>
+                            <input type="text" id="searchInput" placeholder="Enter name or county...">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="countyFilter">Filter by county</label>
+                            <select id="countyFilter">
+                                <option value="">All Counties</option>
+                            </select>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="typeFilter">Filter by type</label>
+                            <select id="typeFilter">
+                                <option value="">All Types</option>
+                                <option value="City">Cities</option>
+                                <option value="Village">Villages</option>
+                                <option value="Town">Towns</option>
+                            </select>
+                        </div>
+                        
+                        <button class="btn" onclick="clearFilters()">
+                            🔄 Clear All Filters
+                        </button>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <span class="stat-number" id="totalMunicipalities">0</span>
+                            <span class="stat-label">Total</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number" id="totalCities">0</span>
+                            <span class="stat-label">Cities</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number" id="totalVillages">0</span>
+                            <span class="stat-label">Villages</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number" id="totalTowns">0</span>
+                            <span class="stat-label">Towns</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="results-list" id="resultsList">
-                <!-- Results will be populated here -->
+            
+            <div class="results-container">
+                <div class="results-header">
+                    <div class="results-title">
+                        <span id="resultsTitle">Illinois Municipalities</span>
+                        <span id="resultsCount" style="font-size: 0.9rem; opacity: 0.8;">(0 results)</span>
+                    </div>
+                    <div class="sort-controls">
+                        <span style="font-size: 0.9rem; opacity: 0.8;">Sort by:</span>
+                        <button class="sort-btn active" onclick="sortResults('name')">Name</button>
+                        <button class="sort-btn" onclick="sortResults('population')">Population</button>
+                        <button class="sort-btn" onclick="sortResults('county')">County</button>
+                    </div>
+                </div>
+                
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <div>Loading municipalities...</div>
+                </div>
+                
+                <div class="results-list" id="resultsList">
+                    <!-- Results will be populated here -->
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Complete Illinois Municipalities Database - From July 2012 Illinois Counties and Incorporated Municipalities
+        // Complete Illinois Municipalities Database
         const illinoisMunicipalities = [
             {name: "Abingdon", type: "City", county: "Knox", population: 3319},
             {name: "Addieville", type: "Village", county: "Washington", population: 252},
@@ -1551,6 +1834,8 @@
         ];
 
         let filteredData = [...illinoisMunicipalities];
+        let currentSort = 'name';
+        let searchTimeout;
 
         // Initialize the application
         function init() {
@@ -1568,7 +1853,7 @@
             uniqueCounties.forEach(county => {
                 const option = document.createElement('option');
                 option.value = county;
-                option.textContent = county;
+                option.textContent = county + ' County';
                 countyFilter.appendChild(option);
             });
         }
@@ -1583,49 +1868,101 @@
             document.getElementById('totalCities').textContent = cities;
             document.getElementById('totalVillages').textContent = villages;
             document.getElementById('totalTowns').textContent = towns;
-            document.getElementById('filteredResults').textContent = filteredData.length;
+            
+            // Update results count
+            document.getElementById('resultsCount').textContent = `(${filteredData.length} results)`;
         }
 
-        // Display search results
+        // Sort results
+        function sortResults(sortBy) {
+            currentSort = sortBy;
+            
+            // Update active sort button
+            document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            filteredData.sort((a, b) => {
+                switch(sortBy) {
+                    case 'name':
+                        return a.name.localeCompare(b.name);
+                    case 'population':
+                        return b.population - a.population;
+                    case 'county':
+                        return a.county.localeCompare(b.county) || a.name.localeCompare(b.name);
+                    default:
+                        return 0;
+                }
+            });
+            
+            displayResults(filteredData);
+        }
+
+        // Highlight search terms
+        function highlightText(text, searchTerm) {
+            if (!searchTerm) return text;
+            const regex = new RegExp(`(${searchTerm})`, 'gi');
+            return text.replace(regex, '<span class="highlight">$1</span>');
+        }
+
+        // Display search results with enhanced animations
         function displayResults(results) {
             const resultsList = document.getElementById('resultsList');
+            const loading = document.getElementById('loading');
             
-            if (results.length === 0) {
-                resultsList.innerHTML = '<div class="no-results">No municipalities found matching your criteria.</div>';
-                return;
-            }
+            // Show loading
+            loading.style.display = 'block';
+            resultsList.style.opacity = '0.5';
+            
+            setTimeout(() => {
+                loading.style.display = 'none';
+                resultsList.style.opacity = '1';
+                
+                if (results.length === 0) {
+                    resultsList.innerHTML = '<div class="no-results">No municipalities found matching your criteria.</div>';
+                    return;
+                }
 
-            resultsList.innerHTML = results.map(municipality => `
-                <div class="result-item">
-                    <div>
-                        <div class="municipality-name">${municipality.name}</div>
-                        <div class="municipality-details">
-                            <span class="type-badge type-${municipality.type.toLowerCase()}">${municipality.type}</span>
-                            ${municipality.county} County
+                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+                
+                resultsList.innerHTML = results.map((municipality, index) => `
+                    <div class="result-item fade-in" style="animation-delay: ${index * 0.05}s">
+                        <div class="municipality-info">
+                            <div class="municipality-name">${highlightText(municipality.name, searchTerm)}</div>
+                            <div class="municipality-details">
+                                <span class="type-badge type-${municipality.type.toLowerCase()}">${municipality.type}</span>
+                                <span class="county-info">${highlightText(municipality.county, searchTerm)} County</span>
+                            </div>
+                        </div>
+                        <div class="population-info">
+                            <div class="population-label">Population</div>
+                            <div class="population">${municipality.population.toLocaleString()}</div>
                         </div>
                     </div>
-                    <div class="population">${municipality.population.toLocaleString()}</div>
-                </div>
-            `).join('');
+                `).join('');
+            }, 300);
         }
 
-        // Filter municipalities based on search criteria
+        // Filter municipalities with debouncing
         function filterMunicipalities() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const selectedCounty = document.getElementById('countyFilter').value;
-            const selectedType = document.getElementById('typeFilter').value;
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+                const selectedCounty = document.getElementById('countyFilter').value;
+                const selectedType = document.getElementById('typeFilter').value;
 
-            filteredData = illinoisMunicipalities.filter(municipality => {
-                const matchesSearch = municipality.name.toLowerCase().includes(searchTerm) || 
-                                    municipality.county.toLowerCase().includes(searchTerm);
-                const matchesCounty = !selectedCounty || municipality.county === selectedCounty;
-                const matchesType = !selectedType || municipality.type === selectedType;
-                
-                return matchesSearch && matchesCounty && matchesType;
-            });
+                filteredData = illinoisMunicipalities.filter(municipality => {
+                    const matchesSearch = municipality.name.toLowerCase().includes(searchTerm) || 
+                                        municipality.county.toLowerCase().includes(searchTerm);
+                    const matchesCounty = !selectedCounty || municipality.county === selectedCounty;
+                    const matchesType = !selectedType || municipality.type === selectedType;
+                    
+                    return matchesSearch && matchesCounty && matchesType;
+                });
 
-            displayResults(filteredData);
-            updateStats();
+                // Re-sort with current sort method
+                sortResults(currentSort);
+                updateStats();
+            }, 300);
         }
 
         // Clear all filters
@@ -1634,7 +1971,7 @@
             document.getElementById('countyFilter').value = '';
             document.getElementById('typeFilter').value = '';
             filteredData = [...illinoisMunicipalities];
-            displayResults(filteredData);
+            sortResults(currentSort);
             updateStats();
         }
 
@@ -1647,13 +1984,24 @@
             searchInput.addEventListener('input', filterMunicipalities);
             countyFilter.addEventListener('change', filterMunicipalities);
             typeFilter.addEventListener('change', filterMunicipalities);
+            
+            // Add focus effects
+            [searchInput, countyFilter, typeFilter].forEach(element => {
+                element.addEventListener('focus', () => {
+                    element.parentElement.style.transform = 'translateY(-2px)';
+                });
+                element.addEventListener('blur', () => {
+                    element.parentElement.style.transform = 'translateY(0)';
+                });
+            });
         }
 
         // Initialize the application when the page loads
         document.addEventListener('DOMContentLoaded', init);
 
-        // Make clearFilters available globally
+        // Make functions available globally
         window.clearFilters = clearFilters;
+        window.sortResults = sortResults;
     </script>
 </body>
 </html>

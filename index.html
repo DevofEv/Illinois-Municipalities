@@ -2297,15 +2297,3 @@ document.addEventListener('DOMContentLoaded', function() {
 ```
 
 
-   * The CSS variable `--results-header-bg` is now set to `#0056b3` (a darker shade of the accent blue).
-   * The `.results-header` style uses this variable: `background-color: var(--results-header-bg);`.
-
-
-4.  **Multiple Counties & Your List:**
-   * The placeholder for your `illinoisMunicipalities` array is clearly marked. You should paste your complete list there.
-   * The script assumes each entry in your list has a single primary `county` string. If your list has a different structure for counties (e.g., an array of counties), the JavaScript for `populateCountyFilter` and `displayResults` (specifically the `county-info` part) would need further adjustments to handle that. The current code will display the single `county` string you provide for each municipality.
-
-
-Make sure to replace the example subset in `const illinoisMunicipalities` with your full list of 1298 municipalities. The rest of the code structure provides the surrounding logic and styli
-
-

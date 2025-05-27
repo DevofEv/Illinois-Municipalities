@@ -1858,15 +1858,148 @@
 ];
        ];
 
+function getCountyString(county) {
+    return Array.isArray(county) ? county.join(', ') : county;
+}
 
+// Render list
+function renderResults(list) {
+    const resultsList = document.getElementById('resultsList');
+    const resultsCount = document.getElementById('resultsCount');
+    if (!list.length) {
+        resultsList.innerHTML = `
+            <div class="no-results">
+                <svg class="icon"><use xlink:href="#icon-no-results"></use></svg>
+                No results found.
+            </div>`;
+        resultsCount.textContent = '(0 results)';
+        return;
+    }
+    resultsCount.textContent = `(${list.length} result${list.length !== 1 ? 's' : ''})`;
+    resultsList.innerHTML = list.map(m => `
+        <div class="result-item">
+            <div class="municipality-info">
+                <span class="municipality-name">${m.name}</span>
+                <div class="municipality-details">
+                    <span class="type-badge type-${m.type.toLowerCase()}">${m.type}</span>
+                    <span class="county-info">${getCountyString(m.county)} County</span>
+                </div>
+            </div>
+            <div class="population-info">
+                <span class="population">${(m.population ?? 'N/A').toLocaleString ? m.population.toLocaleString() : m.population}</span>
+                <span class="population-label">Population</span>
+            </div>
+        </div>
+    `).join('');
+}
 
+// Populate county dropdown
+function populateCounties() {
+    const countyFilter = document.getElementById('countyFilter');
+    const countiesSet = new Set();
+    illinoisMunicipalities.forEach(m => {
+        if (Array.isArray(m.county)) m.county.forEach(c => countiesSet.add(c));
+        else countiesSet.add(m.county);
+    });
+    const counties = Array.from(countiesSet).sort();
+    countyFilter.innerHTML = `<option value="">All Counties</option>` +
+        counties.map(c => `<option value="${c}">${c}</option>`).join('');
+}
 
-       let filteredData = [];
-       let currentSort = 'name';
-       let searchTimeout;
+// Update statistics counts
+function updateStats(filteredList) {
+    document.getElementById('totalMunicipalities').textContent = illinoisMunicipalities.length;
+    document.getElementById('totalCities').textContent = illinoisMunicipalities.filter(m => m.type === 'City').length;
+    document.getElementById('totalVillages').textContent = illinoisMunicipalities.filter(m => m.type === 'Village').length;
+    document.getElementById('totalTowns').textContent = illinoisMunicipalities.filter(m => m.type === 'Town').length;
+}
 
+// Main filter function
+function filterAndRender() {
+    let query = document.getElementById('searchInput').value.trim().toLowerCase();
+    let county = document.getElementById('countyFilter').value;
+    let type = document.getElementById('typeFilter').value;
 
-       // --- Function to load and merge 2020 population data from API (UPDATES ONLY) ---
+    let filtered = illinoisMunicipalities.filter(m => {
+        // Text search (by name or county)
+        let matchesQuery = !query ||
+            m.name.toLowerCase().includes(query) ||
+            (Array.isArray(m.county)
+                ? m.county.some(c => c.toLowerCase().includes(query))
+                : m.county.toLowerCase().includes(query));
+        // County filter
+        let matchesCounty = !county ||
+            (Array.isArray(m.county) ? m.county.includes(county) : m.county === county);
+        // Type filter
+        let matchesType = !type || m.type === type;
+        return matchesQuery && matchesCounty && matchesType;
+    });
+    // Optionally add sorting here if desired
+    renderResults(filtered);
+}
+
+// Clear filters
+function clearFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('countyFilter').value = '';
+    document.getElementById('typeFilter').value = '';
+    filterAndRender();
+}
+
+// Sorting (Name, Population, County)
+let currentSort = 'name';
+function sortResults(by) {
+    currentSort = by;
+    let btns = document.querySelectorAll('.sort-btn');
+    btns.forEach(btn => btn.classList.remove('active'));
+    btns.forEach(btn => {
+        if (btn.textContent.trim().toLowerCase() === by) btn.classList.add('active');
+    });
+
+    let query = document.getElementById('searchInput').value.trim().toLowerCase();
+    let county = document.getElementById('countyFilter').value;
+    let type = document.getElementById('typeFilter').value;
+
+    let filtered = illinoisMunicipalities.filter(m => {
+        let matchesQuery = !query ||
+            m.name.toLowerCase().includes(query) ||
+            (Array.isArray(m.county)
+                ? m.county.some(c => c.toLowerCase().includes(query))
+                : m.county.toLowerCase().includes(query));
+        let matchesCounty = !county ||
+            (Array.isArray(m.county) ? m.county.includes(county) : m.county === county);
+        let matchesType = !type || m.type === type;
+        return matchesQuery && matchesCounty && matchesType;
+    });
+
+    if (by === 'name') filtered.sort((a, b) => a.name.localeCompare(b.name));
+    else if (by === 'population') filtered.sort((a, b) => (b.population || 0) - (a.population || 0));
+    else if (by === 'county') filtered.sort((a, b) => {
+        let ca = Array.isArray(a.county) ? a.county[0] : a.county;
+        let cb = Array.isArray(b.county) ? b.county[0] : b.county;
+        return ca.localeCompare(cb);
+    });
+
+    renderResults(filtered);
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    populateCounties();
+    updateStats();
+    filterAndRender();
+
+    document.getElementById('searchInput').addEventListener('input', filterAndRender);
+    document.getElementById('countyFilter').addEventListener('change', filterAndRender);
+    document.getElementById('typeFilter').addEventListener('change', filterAndRender);
+
+    // Sorting
+    document.querySelectorAll('.sort-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            sortResults(this.textContent.trim().toLowerCase());
+        });
+    });
+});
        async function loadAndUpdatePopulationDataFromAPI() {
            const censusApiUrl = 'https://api.census.gov/data/2020/dec/dp?get=group(DP1)&for=place:*&in=state:17';
           

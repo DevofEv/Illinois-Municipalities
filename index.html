@@ -1,536 +1,564 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Illinois Municipalities Database</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            min-height: 100vh;
-            color: #2c3e50;
-            line-height: 1.6;
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            color: white;
-        }
-        
-        .header h1 {
-            font-size: clamp(2rem, 5vw, 3.5rem);
-            font-weight: 700;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
-            background: linear-gradient(45deg, #fff, #f0f8ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .header p {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            margin-bottom: 20px;
-        }
-        
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-        
-        .sidebar {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 30px;
-            backdrop-filter: blur(20px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            height: fit-content;
-            position: sticky;
-            top: 20px;
-        }
-        
-        .search-section h3 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            font-size: 1.3rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .search-controls {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-        
-        .input-group {
-            position: relative;
-        }
-        
-        .input-group label {
-            display: block;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #555;
-            margin-bottom: 5px;
-        }
-        
-        input, select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e1e8ed;
-            border-radius: 12px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            background: white;
-        }
-        
-        input:focus, select:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-            transform: translateY(-1px);
-        }
-        
-        .btn {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            width: 100%;
-            margin-top: 10px;
-        }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-        }
-        
-        .btn:active {
-            transform: translateY(0);
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 25px;
-        }
-        
-        .stat-card {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .stat-number {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 5px;
-            display: block;
-        }
-        
-        .stat-label {
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-        
-        .results-container {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            overflow: hidden;
-            backdrop-filter: blur(20px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        
-        .results-header {
-            background: linear-gradient(135deg, #2c3e50, #34495e);
-            color: white;
-            padding: 25px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .results-title {
-            font-size: 1.4rem;
-            font-weight: 600;
-        }
-        
-        .sort-controls {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        
-        .sort-btn {
-            background: rgba(255,255,255,0.2);
-            border: 1px solid rgba(255,255,255,0.3);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s ease;
-        }
-        
-        .sort-btn:hover, .sort-btn.active {
-            background: rgba(255,255,255,0.3);
-            transform: translateY(-1px);
-        }
-        
-        .results-list {
-            max-height: 600px;
-            overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: #667eea #f1f3f4;
-        }
-        
-        .results-list::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        .results-list::-webkit-scrollbar-track {
-            background: #f1f3f4;
-        }
-        
-        .results-list::-webkit-scrollbar-thumb {
-            background: #667eea;
-            border-radius: 4px;
-        }
-        
-        .result-item {
-            padding: 20px 30px;
-            border-bottom: 1px solid #f0f2f5;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .result-item:hover {
-            background: linear-gradient(90deg, #f8fafc, #f1f5f9);
-            transform: translateX(5px);
-            border-left: 4px solid #667eea;
-        }
-        
-        .result-item:last-child {
-            border-bottom: none;
-        }
-        
-        .municipality-info {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        
-        .municipality-name {
-            font-weight: 700;
-            color: #2c3e50;
-            font-size: 1.2rem;
-        }
-        
-        .municipality-details {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        
-        .type-badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .type-city { 
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-        }
-        
-        .type-village { 
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: white;
-        }
-        
-        .type-town { 
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            color: white;
-        }
-        
-        .county-info {
-            color: #6b7280;
-            font-size: 0.95rem;
-        }
-        
-        .population-info {
-            text-align: right;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-        
-        .population {
-            background: linear-gradient(135deg, #e0f2fe, #b3e5fc);
-            color: #0277bd;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            border: 1px solid #81d4fa;
-        }
-        
-        .population-label {
-            font-size: 0.8rem;
-            color: #6b7280;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .no-results {
-            text-align: center;
-            padding: 60px 30px;
-            color: #6b7280;
-            font-size: 1.1rem;
-        }
-        
-        .no-results::before {
-            content: '😢'; /* Changed to a more common emoji */
-            display: block;
-            font-size: 3rem;
-            margin-bottom: 20px;
-        }
-        
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 40px;
-            color: #667eea;
-        }
-        
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f4f6;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .fade-in {
-            animation: fadeIn 0.5s ease-in;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .highlight {
-            background: linear-gradient(120deg, #fbbf24 0%, #f59e0b 100%);
-            padding: 2px 6px;
-            border-radius: 4px;
-            color: #92400e;
-            font-weight: 600;
-        }
-        
-        @media (max-width: 1024px) {
-            .main-content {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            
-            .sidebar {
-                position: static;
-            }
-            
-            .stats-grid {
-                grid-template-columns: repeat(4, 1fr);
-                gap: 10px;
-            }
-            
-            .stat-card {
-                padding: 15px 10px;
-            }
-            
-            .stat-number {
-                font-size: 1.5rem;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-            
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .result-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-                padding: 20px;
-            }
-            
-            .result-item:hover {
-                transform: none;
-                border-left: none;
-                border-top: 4px solid #667eea;
-            }
-            
-            .population-info {
-                text-align: left;
-                width: 100%;
-            }
-            
-            .results-header {
-                flex-direction: column;
-                gap: 15px;
-                text-align: center;
-            }
-            
-            .sort-controls {
-                justify-content: center;
-                flex-wrap: wrap;
-            }
-        }
-    </style>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Illinois Municipalities Database (2020 Population Updates & Modern Design)</title>
+   <style>
+       :root {
+           --primary-bg: #f4f7f6; /* Light grey background */
+           --secondary-bg: #ffffff; /* White for cards/containers */
+           --primary-text: #333333; /* Dark grey for text */
+           --secondary-text: #555555; /* Medium grey for less important text */
+           --accent-color: #007bff; /* A modern blue */
+           --accent-hover-color: #0056b3;
+           --results-header-bg: #0056b3; /* Shade of blue for results header */
+           --border-color: #e0e0e0; /* Light border color */
+           --shadow-color: rgba(0, 0, 0, 0.05);
+       }
+
+
+       * {
+           margin: 0;
+           padding: 0;
+           box-sizing: border-box;
+       }
+      
+       body {
+           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+           background-color: var(--primary-bg);
+           color: var(--primary-text);
+           line-height: 1.6;
+           padding-top: 20px;
+       }
+      
+       .container {
+           max-width: 1400px;
+           margin: 0 auto;
+           padding: 20px;
+       }
+      
+       .header {
+           text-align: center;
+           margin-bottom: 50px;
+       }
+      
+       .header h1 {
+           font-size: clamp(2.2rem, 5vw, 3.2rem);
+           font-weight: 600;
+           margin-bottom: 15px;
+           color: var(--primary-text);
+           display: flex;
+           align-items: center;
+           justify-content: center;
+       }
+
+
+       .header h1 .icon { /* Styling for the new icon */
+           display: inline-block;
+           width: 32px; /* Adjusted size for new icon */
+           height: 32px;
+           margin-right: 12px;
+           vertical-align: middle;
+           fill: var(--accent-color);
+       }
+      
+       .header p {
+           font-size: 1.1rem;
+           color: var(--secondary-text);
+           margin-bottom: 20px;
+       }
+      
+       .main-content {
+           display: grid;
+           grid-template-columns: 300px 1fr;
+           gap: 30px;
+           margin-bottom: 40px;
+       }
+      
+       .sidebar {
+           background: var(--secondary-bg);
+           border-radius: 12px;
+           padding: 25px;
+           box-shadow: 0 4px 15px var(--shadow-color);
+           border: 1px solid var(--border-color);
+           height: fit-content;
+           position: sticky;
+           top: 20px;
+       }
+      
+       .search-section h3 {
+           color: var(--primary-text);
+           margin-bottom: 20px;
+           font-size: 1.2rem;
+           font-weight: 500;
+           display: flex;
+           align-items: center;
+           gap: 8px;
+       }
+       .search-section h3 .icon {
+           width: 20px;
+           height: 20px;
+           fill: var(--accent-color);
+       }
+      
+       .search-controls {
+           display: flex;
+           flex-direction: column;
+           gap: 18px;
+           margin-bottom: 25px;
+       }
+      
+       .input-group label {
+           display: block;
+           font-size: 0.85rem;
+           font-weight: 500;
+           color: var(--secondary-text);
+           margin-bottom: 6px;
+       }
+      
+       input, select {
+           width: 100%;
+           padding: 10px 12px;
+           border: 1px solid var(--border-color);
+           border-radius: 8px;
+           font-size: 0.95rem;
+           background: var(--primary-bg);
+           color: var(--primary-text);
+           transition: border-color 0.2s ease, box-shadow 0.2s ease;
+       }
+      
+       input:focus, select:focus {
+           outline: none;
+           border-color: var(--accent-color);
+           box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
+       }
+      
+       .btn {
+           background-color: var(--accent-color);
+           color: white;
+           border: none;
+           padding: 10px 20px;
+           border-radius: 8px;
+           cursor: pointer;
+           font-size: 0.95rem;
+           font-weight: 500;
+           transition: background-color 0.2s ease;
+           width: 100%;
+           margin-top: 10px;
+           display: flex;
+           align-items: center;
+           justify-content: center;
+           gap: 8px;
+       }
+       .btn .icon {
+           width: 16px;
+           height: 16px;
+           fill: white;
+       }
+
+
+       .btn:hover {
+           background-color: var(--accent-hover-color);
+           transform: translateY(-1px);
+       }
+      
+       .stats-grid {
+           display: grid;
+           grid-template-columns: repeat(2, 1fr);
+           gap: 12px;
+           margin-top: 25px;
+       }
+      
+       .stat-card {
+           background: var(--secondary-bg);
+           color: var(--primary-text);
+           padding: 15px;
+           border-radius: 8px;
+           text-align: center;
+           border: 1px solid var(--border-color);
+           box-shadow: 0 2px 8px var(--shadow-color);
+       }
+      
+       .stat-number {
+           font-size: 1.8rem;
+           font-weight: 600;
+           color: var(--accent-color);
+           margin-bottom: 3px;
+           display: block;
+       }
+      
+       .stat-label {
+           font-size: 0.8rem;
+           color: var(--secondary-text);
+       }
+      
+       .results-container {
+           background: var(--secondary-bg);
+           border-radius: 12px;
+           overflow: hidden;
+           box-shadow: 0 4px 15px var(--shadow-color);
+           border: 1px solid var(--border-color);
+       }
+      
+       .results-header {
+           background-color: var(--results-header-bg);
+           color: white;
+           padding: 20px 25px;
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+       }
+      
+       .results-title {
+           font-size: 1.2rem;
+           font-weight: 500;
+       }
+      
+       .sort-controls {
+           display: flex;
+           gap: 8px;
+           align-items: center;
+       }
+      
+       .sort-btn {
+           background: rgba(255,255,255,0.1);
+           border: 1px solid rgba(255,255,255,0.2);
+           color: white;
+           padding: 6px 12px;
+           border-radius: 6px;
+           cursor: pointer;
+           font-size: 0.85rem;
+           transition: background-color 0.2s ease;
+       }
+      
+       .sort-btn:hover, .sort-btn.active {
+           background: rgba(255,255,255,0.25);
+       }
+      
+       .results-list {
+           max-height: 650px;
+           overflow-y: auto;
+           scrollbar-width: thin;
+           scrollbar-color: var(--accent-color) var(--primary-bg);
+       }
+      
+       .results-list::-webkit-scrollbar {
+           width: 6px;
+       }
+      
+       .results-list::-webkit-scrollbar-track {
+           background: var(--primary-bg);
+       }
+      
+       .results-list::-webkit-scrollbar-thumb {
+           background: var(--accent-color);
+           border-radius: 3px;
+       }
+      
+       .result-item {
+           padding: 18px 25px;
+           border-bottom: 1px solid var(--border-color);
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+           transition: background-color 0.2s ease;
+           cursor: pointer;
+       }
+      
+       .result-item:hover {
+           background-color: #e9ecef;
+           transform: none;
+           border-left: none;
+       }
+      
+       .result-item:last-child {
+           border-bottom: none;
+       }
+      
+       .municipality-info {
+           display: flex;
+           flex-direction: column;
+           gap: 5px;
+       }
+      
+       .municipality-name {
+           font-weight: 500;
+           color: var(--primary-text);
+           font-size: 1.1rem;
+       }
+      
+       .municipality-details {
+           display: flex;
+           align-items: center;
+           gap: 10px;
+           flex-wrap: wrap;
+       }
+      
+       .type-badge {
+           padding: 3px 10px;
+           border-radius: 15px;
+           font-size: 0.75rem;
+           font-weight: 500;
+           text-transform: capitalize;
+           letter-spacing: 0.2px;
+           border: 1px solid transparent;
+       }
+      
+       .type-city {
+           background-color: #e6f7ff; color: #096dd9; border-color: #91d5ff;
+       }
+       .type-village {
+           background-color: #fffbe6; color: #d48806; border-color: #ffe58f;
+       }
+       .type-town {
+           background-color: #f6ffed; color: #389e0d; border-color: #b7eb8f;
+       }
+      
+       .county-info {
+           color: var(--secondary-text);
+           font-size: 0.85rem;
+       }
+      
+       .population-info {
+           text-align: right;
+           display: flex;
+           flex-direction: column;
+           gap: 3px;
+       }
+      
+       .population {
+           background-color: transparent;
+           color: var(--accent-color);
+           padding: 0;
+           border-radius: 0;
+           font-size: 1rem;
+           font-weight: 500;
+           border: none;
+       }
+      
+       .population-label {
+           font-size: 0.75rem;
+           color: var(--secondary-text);
+           text-transform: uppercase;
+           letter-spacing: 0.5px;
+       }
+      
+       .no-results {
+           text-align: center;
+           padding: 50px 30px;
+           color: var(--secondary-text);
+           font-size: 1rem;
+       }
+      
+       .no-results .icon {
+           display: block;
+           width: 48px;
+           height: 48px;
+           margin: 0 auto 15px;
+           fill: var(--border-color);
+       }
+      
+       .loading {
+           display: none;
+           text-align: center;
+           padding: 40px;
+           color: var(--accent-color);
+           font-size: 1rem;
+       }
+      
+       .spinner {
+           width: 32px;
+           height: 32px;
+           border: 3px solid var(--border-color);
+           border-top: 3px solid var(--accent-color);
+           border-radius: 50%;
+           animation: spin 0.8s linear infinite;
+           margin: 0 auto 15px;
+       }
+      
+       @keyframes spin {
+           0% { transform: rotate(0deg); }
+           100% { transform: rotate(360deg); }
+       }
+      
+       .fade-in {
+           animation: fadeIn 0.3s ease-out;
+       }
+      
+       @keyframes fadeIn {
+           from { opacity: 0; transform: translateY(10px); }
+           to { opacity: 1; transform: translateY(0); }
+       }
+      
+       .highlight {
+           background-color: rgba(0, 123, 255, 0.15);
+           padding: 1px 4px;
+           border-radius: 4px;
+           color: var(--accent-hover-color);
+           font-weight: 500;
+       }
+      
+       @media (max-width: 1024px) {
+           .main-content {
+               grid-template-columns: 1fr;
+           }
+           .sidebar {
+               position: static;
+               margin-bottom: 30px;
+           }
+       }
+      
+       @media (max-width: 768px) {
+           body { padding-top: 10px; }
+           .container { padding: 10px; }
+           .header { margin-bottom: 30px; }
+           .header h1 { font-size: clamp(1.8rem, 5vw, 2.5rem); }
+           .header p { font-size: 1rem; }
+
+
+           .main-content { gap: 20px; }
+           .sidebar { padding: 20px; }
+           .results-header { padding: 15px 20px; flex-direction: column; gap: 10px; text-align: center;}
+           .results-title { font-size: 1.1rem; }
+           .sort-controls { justify-content: center; flex-wrap: wrap; }
+          
+           .result-item {
+               flex-direction: column;
+               align-items: flex-start;
+               gap: 10px;
+               padding: 15px;
+           }
+           .population-info { text-align: left; width: 100%; }
+           .stats-grid { grid-template-columns: repeat(2, 1fr); }
+           .stat-number { font-size: 1.5rem; }
+       }
+
+
+   </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🗺️ Illinois Municipalities</h1> <p>Comprehensive database of all cities, villages, and towns in Illinois</p>
-        </div>
-        
-        <div class="main-content">
-            <div class="sidebar">
-                <div class="search-section">
-                    <h3>🔍 Search & Filter</h3> <div class="search-controls">
-                        <div class="input-group">
-                            <label for="searchInput">Search municipalities or counties</label>
-                            <input type="text" id="searchInput" placeholder="Enter name or county...">
-                        </div>
-                        
-                        <div class="input-group">
-                            <label for="countyFilter">Filter by county</label>
-                            <select id="countyFilter">
-                                <option value="">All Counties</option>
-                            </select>
-                        </div>
-                        
-                        <div class="input-group">
-                            <label for="typeFilter">Filter by type</label>
-                            <select id="typeFilter">
-                                <option value="">All Types</option>
-                                <option value="City">Cities</option>
-                                <option value="Village">Villages</option>
-                                <option value="Town">Towns</option>
-                            </select>
-                        </div>
-                        
-                        <button class="btn" onclick="clearFilters()">
-                            🧹 Clear All Filters </button>
-                    </div>
-                    
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <span class="stat-number" id="totalMunicipalities">0</span>
-                            <span class="stat-label">Total</span>
-                        </div>
-                        <div class="stat-card">
-                            <span class="stat-number" id="totalCities">0</span>
-                            <span class="stat-label">Cities</span>
-                        </div>
-                        <div class="stat-card">
-                            <span class="stat-number" id="totalVillages">0</span>
-                            <span class="stat-label">Villages</span>
-                        </div>
-                        <div class="stat-card">
-                            <span class="stat-number" id="totalTowns">0</span>
-                            <span class="stat-label">Towns</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="results-container">
-                <div class="results-header">
-                    <div class="results-title">
-                        <span id="resultsTitle">Illinois Municipalities</span>
-                        <span id="resultsCount" style="font-size: 0.9rem; opacity: 0.8;">(0 results)</span>
-                    </div>
-                    <div class="sort-controls">
-                        <span style="font-size: 0.9rem; opacity: 0.8;">Sort by:</span>
-                        <button class="sort-btn active" onclick="sortResults('name')">Name</button>
-                        <button class="sort-btn" onclick="sortResults('population')">Population</button>
-                        <button class="sort-btn" onclick="sortResults('county')">County</button>
-                    </div>
-                </div>
-                
-                <div class="loading" id="loading">
-                    <div class="spinner"></div>
-                    <div>Loading municipalities...</div>
-                </div>
-                
-                <div class="results-list" id="resultsList">
-                    </div>
-            </div>
-        </div>
-    </div>
+   <svg width="0" height="0" style="position:absolute; display:none;">
+       <symbol id="icon-location-pin" viewBox="0 0 24 24"> <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+       </symbol>
+       <symbol id="icon-search" viewBox="0 0 24 24">
+           <path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z" />
+       </symbol>
+       <symbol id="icon-clear" viewBox="0 0 24 24">
+           <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" />
+       </symbol>
+       <symbol id="icon-no-results" viewBox="0 0 24 24">
+           <path d="M12,2C6.48,2 2,6.48 2,12s4.48,10 10,10 10,-4.48 10,-10S17.52,2 12,2zM12,20c-4.41,0 -8,-3.59 -8,-8s3.59,-8 8,-8 8,3.59 8,8 -3.59,8 -8,8zM10.5,10.5L7.21,7.21 8.62,5.79 12,9.17l3.38,-3.38 1.41,1.41L13.41,10.5l3.38,3.38 -1.41,1.41L12,11.91l-3.38,3.38 -1.41,-1.41L10.5,10.5z"/>
+       </symbol>
+   </svg>
 
-    <script>
-        // Complete Illinois Municipalities Database
-        // Note: County field is now an array for municipalities in multiple counties.
-        const illinoisMunicipalities = [
-            {name: "Abingdon", type: "City", county: "Knox", population: 3319},
+
+   <div class="container">
+       <div class="header">
+           <h1>
+               <svg class="icon" aria-hidden="true"><use xlink:href="#icon-location-pin"></use></svg> Illinois Municipalities
+           </h1>
+           <p>Comprehensive database of cities, villages, and towns in Illinois (Populations updated with 2020 Census Data where available)</p>
+       </div>
+      
+       <div class="main-content">
+           <div class="sidebar">
+               <div class="search-section">
+                   <h3>
+                       <svg class="icon" aria-hidden="true"><use xlink:href="#icon-search"></use></svg>
+                       Search & Filter
+                   </h3>
+                  
+                   <div class="search-controls">
+                       <div class="input-group">
+                           <label for="searchInput">Search municipalities or counties</label>
+                           <input type="text" id="searchInput" placeholder="e.g., Chicago or Cook">
+                       </div>
+                      
+                       <div class="input-group">
+                           <label for="countyFilter">Filter by county</label>
+                           <select id="countyFilter">
+                               <option value="">All Counties</option>
+                           </select>
+                       </div>
+                      
+                       <div class="input-group">
+                           <label for="typeFilter">Filter by type</label>
+                           <select id="typeFilter">
+                               <option value="">All Types</option>
+                               <option value="City">Cities</option>
+                               <option value="Village">Villages</option>
+                               <option value="Town">Towns</option>
+                           </select>
+                       </div>
+                      
+                       <button class="btn" onclick="clearFilters()">
+                           <svg class="icon" aria-hidden="true"><use xlink:href="#icon-clear"></use></svg>
+                           Clear Filters
+                       </button>
+                   </div>
+                  
+                   <div class="stats-grid">
+                       <div class="stat-card">
+                           <span class="stat-number" id="totalMunicipalities">0</span>
+                           <span class="stat-label">Total</span>
+                       </div>
+                       <div class="stat-card">
+                           <span class="stat-number" id="totalCities">0</span>
+                           <span class="stat-label">Cities</span>
+                       </div>
+                       <div class="stat-card">
+                           <span class="stat-number" id="totalVillages">0</span>
+                           <span class="stat-label">Villages</span>
+                       </div>
+                       <div class="stat-card">
+                           <span class="stat-number" id="totalTowns">0</span>
+                           <span class="stat-label">Towns</span>
+                       </div>
+                   </div>
+               </div>
+           </div>
+          
+           <div class="results-container">
+               <div class="results-header">
+                   <div class="results-title">
+                       <span id="resultsTitle">Illinois Municipalities</span>
+                       <span id="resultsCount" style="font-size: 0.9rem; opacity: 0.8;">(0 results)</span>
+                   </div>
+                   <div class="sort-controls">
+                       <span style="font-size: 0.9rem; opacity: 0.8;">Sort by:</span>
+                       <button class="sort-btn active" onclick="sortResults('name')">Name</button>
+                       <button class="sort-btn" onclick="sortResults('population')">Population</button>
+                       <button class="sort-btn" onclick="sortResults('county')">County</button>
+                   </div>
+               </div>
+              
+               <div class="loading" id="loading">
+                   <div class="spinner"></div>
+                   <div>Loading 2020 Census data and municipalities...</div>
+               </div>
+              
+               <div class="results-list" id="resultsList">
+                   </div>
+           </div>
+       </div>
+   </div>
+
+
+   <script>
+       // ===================================================================================
+       // PASTE YOUR FULL `illinoisMunicipalities` ARRAY HERE
+       // This array should contain your municipalities with their names, types,
+       // and primary counties. The population figures will be updated from the 2020 Census if a match is found.
+       // Example structure:
+       // const illinoisMunicipalities = [
+       //     {name: "Abingdon", type: "City", county: "Knox", population: 3319}, // Population will be updated
+       //     {name: "Addison", type: "Village", county: "DuPage", population: 36942},
+       //     // ... and so on for all your municipalities
+       // ];
+       // ===================================================================================
+       const illinoisMunicipalities = [
+           {name: "Abingdon", type: "City", county: "Knox", population: 3319},
             {name: "Addieville", type: "Village", county: "Washington", population: 252},
             {name: "Addison", type: "Village", county: "DuPage", population: 36942},
             {name: "Adeline", type: "Village", county: "Ogle", population: 85},
@@ -1827,204 +1855,448 @@
             {name: "Yorkville", type: "City", county: "Kendall", population: 16921},
             {name: "Zeigler", type: "City", county: "Franklin", population: 1801},
             {name: "Zion", type: "City", county: "Lake", population: 24413}
-        ];
+];
 
-        let filteredData = [...illinoisMunicipalities];
-        let currentSort = 'name';
-        let searchTimeout;
+    let filteredData = [];
+    let currentSort = 'name'; // Default sort
+    let searchTimeout;
 
-        // Initialize the application
-        function init() {
-            populateCountyFilter();
-            updateStats();
-            // Initial sort and display
-            sortResults(currentSort); 
-            setupEventListeners();
+    function getCountyString(county) {
+        if (Array.isArray(county)) {
+            return county.join(', ');
         }
+        return county || 'Unknown'; // Handles null, undefined, empty string
+    }
 
-        // Populate county filter dropdown
-        function populateCountyFilter() {
-            const countyFilter = document.getElementById('countyFilter');
-            const countySet = new Set();
-            illinoisMunicipalities.forEach(municipality => {
-                if (Array.isArray(municipality.county)) {
-                    municipality.county.forEach(c => countySet.add(c));
-                } else {
-                    countySet.add(municipality.county);
-                }
-            });
-            const uniqueCounties = [...countySet].sort();
-            
-            uniqueCounties.forEach(county => {
-                const option = document.createElement('option');
-                option.value = county;
-                option.textContent = county + ' County';
-                countyFilter.appendChild(option);
-            });
-        }
-
-        // Update statistics
-        function updateStats() {
-            const cities = illinoisMunicipalities.filter(m => m.type === 'City').length;
-            const villages = illinoisMunicipalities.filter(m => m.type === 'Village').length;
-            const towns = illinoisMunicipalities.filter(m => m.type === 'Town').length;
-            
-            document.getElementById('totalMunicipalities').textContent = illinoisMunicipalities.length;
-            document.getElementById('totalCities').textContent = cities;
-            document.getElementById('totalVillages').textContent = villages;
-            document.getElementById('totalTowns').textContent = towns;
-            
-            // Update results count based on the currently filtered data
-            document.getElementById('resultsCount').textContent = `(${filteredData.length} results)`;
-        }
-
-        // Sort results
-        function sortResults(sortBy) {
-            currentSort = sortBy;
-            
-            // Update active sort button
-            document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('active'));
-            const activeButton = Array.from(document.querySelectorAll('.sort-btn')).find(btn => btn.textContent.toLowerCase() === sortBy);
-            if (activeButton) {
-                activeButton.classList.add('active');
-            } else if (event && event.target && event.target.classList.contains('sort-btn')) {
-                 event.target.classList.add('active');
-            }
-
-
-            filteredData.sort((a, b) => {
-                let valA, valB;
-                switch(sortBy) {
-                    case 'name':
-                        return a.name.localeCompare(b.name);
-                    case 'population':
-                        return b.population - a.population; // Sort descending by population
-                    case 'county':
-                        valA = Array.isArray(a.county) ? a.county.join(', ') : a.county;
-                        valB = Array.isArray(b.county) ? b.county.join(', ') : b.county;
-                        return valA.localeCompare(valB) || a.name.localeCompare(b.name); // Secondary sort by name
-                    default:
-                        return 0;
-                }
-            });
-            
-            displayResults(filteredData);
-        }
-
-        // Highlight search terms
-        function highlightText(text, searchTerm) {
-            if (!searchTerm || typeof text !== 'string') return text;
+    function highlightText(text, searchTerm) {
+        const textStr = String(text || ""); // Ensure text is a string
+        if (!searchTerm || !textStr) return textStr;
+        try {
             // Escape special characters in searchTerm for RegExp
             const escapedSearchTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             const regex = new RegExp(`(${escapedSearchTerm})`, 'gi');
-            return text.replace(regex, '<span class="highlight">$1</span>');
+            return textStr.replace(regex, '<span class="highlight">$1</span>');
+        } catch (e) {
+            console.error("Error in highlightText regex:", e);
+            return textStr; // Fallback to unhighlighted text on regex error
+        }
+    }
+
+    /**
+     * Displays a non-blocking message on the page.
+     * @param {string} message - The message to display.
+     * @param {'info'|'warning'|'error'} type - The type of message.
+     */
+    function showUIMessage(message, type = 'info') {
+        let messageBox = document.getElementById('ui-message-box');
+        if (!messageBox) {
+            messageBox = document.createElement('div');
+            messageBox.id = 'ui-message-box';
+            // Basic styling for the message box
+            Object.assign(messageBox.style, {
+                position: 'fixed',
+                top: '20px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                padding: '12px 20px',
+                borderRadius: '8px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                zIndex: '1001', // Ensure it's above other content
+                display: 'none',
+                fontSize: '0.9rem',
+                border: '1px solid transparent'
+            });
+            document.body.appendChild(messageBox);
         }
 
-        // Display search results with enhanced animations
-        function displayResults(results) {
-            const resultsList = document.getElementById('resultsList');
-            const loading = document.getElementById('loading');
-            
-            loading.style.display = 'block';
-            resultsList.innerHTML = ''; // Clear previous results immediately
-            
-            setTimeout(() => { 
-                loading.style.display = 'none';
-                
-                if (results.length === 0) {
-                    resultsList.innerHTML = '<div class="no-results">No municipalities found matching your criteria.</div>';
-                    return;
-                }
+        messageBox.textContent = message;
+        if (type === 'error') {
+            messageBox.style.backgroundColor = '#f8d7da';
+            messageBox.style.color = '#721c24';
+            messageBox.style.borderColor = '#f5c6cb';
+        } else if (type === 'warning') {
+            messageBox.style.backgroundColor = '#fff3cd';
+            messageBox.style.color = '#856404';
+            messageBox.style.borderColor = '#ffeeba';
+        } else { // info
+            messageBox.style.backgroundColor = '#d1ecf1';
+            messageBox.style.color = '#0c5460';
+            messageBox.style.borderColor = '#bee5eb';
+        }
+        messageBox.style.display = 'block';
 
-                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-                
-                resultsList.innerHTML = results.map((municipality, index) => {
-                    const countyDisplay = Array.isArray(municipality.county) ? municipality.county.join(', ') : municipality.county;
-                    const countyLabel = Array.isArray(municipality.county) && municipality.county.length > 1 ? 'Counties' : 'County';
-                    
-                    return `
-                    <div class="result-item fade-in" style="animation-delay: ${index * 0.02}s"> 
-                        <div class="municipality-info">
-                            <div class="municipality-name">${highlightText(municipality.name, searchTerm)}</div>
-                            <div class="municipality-details">
-                                <span class="type-badge type-${municipality.type.toLowerCase()}">${municipality.type}</span>
-                                <span class="county-info">${highlightText(countyDisplay, searchTerm)} ${countyLabel}</span>
-                            </div>
-                        </div>
-                        <div class="population-info">
-                            <div class="population-label">Population</div>
-                            <div class="population">${municipality.population.toLocaleString()}</div>
+        // Clear any existing timeout
+        if (messageBox.hideTimeout) {
+            clearTimeout(messageBox.hideTimeout);
+        }
+        messageBox.hideTimeout = setTimeout(() => {
+            messageBox.style.display = 'none';
+        }, 5000); // Auto-hide after 5 seconds
+    }
+
+
+    // --- Core Application Logic ---
+
+    /**
+     * Fetches 2020 Census population data and updates the illinoisMunicipalities array.
+     * @returns {Promise<boolean>} True if successful or fallback, false on critical error.
+     */
+    async function loadAndUpdatePopulationDataFromAPI() {
+        const censusApiUrl = 'https://api.census.gov/data/2020/dec/dp?get=NAME,DP1_0001C&for=place:*&in=state:17'; // Get only NAME and Total Population
+        const loadingElement = document.getElementById('loading');
+        if(loadingElement) loadingElement.style.display = 'block';
+
+        try {
+            console.log('Fetching 2020 Census data from API: ' + censusApiUrl);
+            const response = await fetch(censusApiUrl);
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Failed to fetch data from Census API:', response.status, response.statusText, errorText);
+                showUIMessage(`Could not load 2020 population data (Status: ${response.status}). Using existing data.`, 'warning');
+                return true; // Proceed with existing data
+            }
+            const censusJson = await response.json();
+
+            if (!censusJson || censusJson.length < 2) {
+                console.error('Census API returned no data or invalid data format.');
+                showUIMessage('Census API returned no data. Using existing data.', 'warning');
+                return true; // Proceed with existing data
+            }
+
+            const header = censusJson[0];
+            const dataRows = censusJson.slice(1);
+
+            const populationVarApi = 'DP1_0001C';
+            const nameVarApi = 'NAME';
+
+            const populationIndex = header.indexOf(populationVarApi);
+            const nameIndex = header.indexOf(nameVarApi);
+
+            if (populationIndex === -1 || nameIndex === -1) {
+                console.error(`Required columns ('${populationVarApi}' or '${nameVarApi}') not found in API response. Header:`, header);
+                showUIMessage('Census API data format unexpected. Using existing data.', 'warning');
+                return true; // Proceed with existing data
+            }
+
+            let updatedCount = 0;
+            let notFoundInApiCount = 0;
+            const apiDataMap = new Map();
+
+            dataRows.forEach(apiRow => {
+                const apiNameFull = apiRow[nameIndex];
+                const apiPopulationStr = apiRow[populationIndex];
+                if (!apiNameFull || apiPopulationStr === undefined) return;
+
+                let censusNameNormalized = apiNameFull.toLowerCase();
+                // Normalize Census name: remove type suffixes and ", illinois"
+                censusNameNormalized = censusNameNormalized.replace(/ (city|town|village|cdp), illinois$/, '').trim();
+                censusNameNormalized = censusNameNormalized.replace(/, illinois$/, '').trim(); // General fallback
+
+                const population = parseInt(apiPopulationStr, 10);
+                if (!isNaN(population)) {
+                    apiDataMap.set(censusNameNormalized, population);
+                }
+            });
+
+            illinoisMunicipalities.forEach(localMunicipality => {
+                const normalizedLocalName = localMunicipality.name.toLowerCase().trim();
+                if (apiDataMap.has(normalizedLocalName)) {
+                    localMunicipality.population = apiDataMap.get(normalizedLocalName);
+                    updatedCount++;
+                } else {
+                    notFoundInApiCount++;
+                }
+            });
+
+            console.log(`Updated ${updatedCount} municipalities with 2020 population data from API.`);
+            if (notFoundInApiCount > 0) {
+                console.log(`${notFoundInApiCount} municipalities from your list were not found in the API response or had no population data; their existing population data is retained.`);
+            }
+            if (updatedCount === 0 && illinoisMunicipalities.length > 0 && apiDataMap.size > 0) {
+                console.warn("No municipalities were updated. This might indicate issues with name matching logic.");
+            }
+            return true;
+
+        } catch (error) {
+            console.error('Error loading or processing 2020 population data from API:', error);
+            showUIMessage('Error fetching population data. Using existing data.', 'error');
+            return true; // Proceed with existing data
+        } finally {
+            if(loadingElement) loadingElement.style.display = 'none';
+        }
+    }
+
+    /**
+     * Populates the county filter dropdown with unique counties from the municipalities list.
+     */
+    function populateCountyFilter() {
+        const countyFilter = document.getElementById('countyFilter');
+        if (!countyFilter) return;
+
+        const allCounties = illinoisMunicipalities.flatMap(m =>
+            Array.isArray(m.county) ? m.county : (m.county || "Unknown")
+        );
+        const uniqueCounties = [...new Set(allCounties.filter(c => c && c !== "Unknown"))].sort();
+
+        // Clear existing options except the first "All Counties" one
+        while (countyFilter.options.length > 1) {
+            countyFilter.remove(1);
+        }
+
+        uniqueCounties.forEach(county => {
+            const option = document.createElement('option');
+            option.value = county;
+            option.textContent = county;
+            countyFilter.appendChild(option);
+        });
+    }
+
+    /**
+     * Updates the statistics displayed on the page (total municipalities, cities, villages, towns, and results count).
+     */
+    function updateStats() {
+        const totalMunicipalitiesElement = document.getElementById('totalMunicipalities');
+        const totalCitiesElement = document.getElementById('totalCities');
+        const totalVillagesElement = document.getElementById('totalVillages');
+        const totalTownsElement = document.getElementById('totalTowns');
+        const resultsCountElement = document.getElementById('resultsCount');
+
+        if (totalMunicipalitiesElement) {
+             totalMunicipalitiesElement.textContent = illinoisMunicipalities.length;
+        }
+        if (totalCitiesElement) {
+            totalCitiesElement.textContent = illinoisMunicipalities.filter(m => m.type === 'City').length;
+        }
+        if (totalVillagesElement) {
+            totalVillagesElement.textContent = illinoisMunicipalities.filter(m => m.type === 'Village').length;
+        }
+        if (totalTownsElement) {
+            totalTownsElement.textContent = illinoisMunicipalities.filter(m => m.type === 'Town').length;
+        }
+        if (resultsCountElement) {
+            resultsCountElement.textContent = `(${filteredData.length} result${filteredData.length !== 1 ? 's' : ''})`;
+        }
+    }
+
+    /**
+     * Displays the filtered and sorted list of municipalities in the results area.
+     * @param {object[]} results - The array of municipality objects to display.
+     */
+    function displayResults(results) {
+        const resultsList = document.getElementById('resultsList');
+        const loading = document.getElementById('loading'); // Re-check if needed here, or manage globally
+        if (!resultsList) return;
+
+        if(loading) loading.style.display = 'block';
+        resultsList.innerHTML = ''; // Clear previous results
+        resultsList.style.opacity = '0.5'; // Visual cue for loading
+
+        // Use a short timeout to allow the browser to render the cleared list and loading state
+        setTimeout(() => {
+            if(loading) loading.style.display = 'none';
+            resultsList.style.opacity = '1';
+
+            if (results.length === 0) {
+                resultsList.innerHTML = `
+                    <div class="no-results">
+                        <svg class="icon" aria-hidden="true"><use xlink:href="#icon-no-results"></use></svg>
+                        No municipalities found matching your criteria.
+                    </div>`;
+                return;
+            }
+
+            const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+            const fragment = document.createDocumentFragment(); // For performance
+
+            results.forEach((municipality, index) => {
+                const item = document.createElement('div');
+                item.className = 'result-item fade-in';
+                item.style.animationDelay = `${index * 0.015}s`; // Faster animation
+
+                const countyDisplayString = getCountyString(municipality.county);
+
+                item.innerHTML = `
+                    <div class="municipality-info">
+                        <span class="municipality-name">${highlightText(municipality.name, searchTerm)}</span>
+                        <div class="municipality-details">
+                            <span class="type-badge type-${(municipality.type || 'unknown').toLowerCase()}">${municipality.type || 'N/A'}</span>
+                            <span class="county-info">${highlightText(countyDisplayString, searchTerm)}${countyDisplayString !== 'Unknown' ? ' County' : ''}</span>
                         </div>
                     </div>
-                `}).join('');
-            }, 50); // Shorter delay for quicker display
+                    <div class="population-info">
+                        <span class="population">${(municipality.population !== undefined && municipality.population !== null) ? municipality.population.toLocaleString() : 'N/A'}</span>
+                        <span class="population-label">Population</span>
+                    </div>
+                `;
+                fragment.appendChild(item);
+            });
+            resultsList.appendChild(fragment);
+        }, 20); // Small delay for rendering
+    }
+
+    /**
+     * Sorts the `filteredData` array based on the specified criteria and updates the display.
+     * @param {string} sortBy - The criteria to sort by ('name', 'population', 'county').
+     */
+    function sortResults(sortBy) {
+        currentSort = sortBy;
+
+        // Update active state of sort buttons
+        document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('active'));
+        const activeSortButton = Array.from(document.querySelectorAll('.sort-btn')).find(
+            btn => btn.textContent.trim().toLowerCase() === sortBy.toLowerCase()
+        );
+        if (activeSortButton) {
+            activeSortButton.classList.add('active');
         }
 
-        // Filter municipalities with debouncing
-        function filterMunicipalities() {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-                const selectedCounty = document.getElementById('countyFilter').value;
-                const selectedType = document.getElementById('typeFilter').value;
+        filteredData.sort((a, b) => {
+            if (sortBy === 'name') {
+                return (a.name || "").localeCompare(b.name || "");
+            }
+            if (sortBy === 'population') {
+                return (b.population || 0) - (a.population || 0);
+            }
+            if (sortBy === 'county') {
+                const countyA = getCountyString(a.county).toLowerCase();
+                const countyB = getCountyString(b.county).toLowerCase();
+                if (countyA === countyB) {
+                    return (a.name || "").localeCompare(b.name || ""); // Secondary sort by name
+                }
+                return countyA.localeCompare(countyB);
+            }
+            return 0;
+        });
+        displayResults(filteredData);
+    }
 
-                filteredData = illinoisMunicipalities.filter(municipality => {
-                    const nameMatches = municipality.name.toLowerCase().includes(searchTerm);
-                    
-                    let countySearchMatches = false;
-                    if (Array.isArray(municipality.county)) {
-                        countySearchMatches = municipality.county.some(c => c.toLowerCase().includes(searchTerm));
-                    } else {
-                        countySearchMatches = municipality.county.toLowerCase().includes(searchTerm);
-                    }
-                    const matchesSearch = nameMatches || countySearchMatches;
+    /**
+     * Filters the `illinoisMunicipalities` list based on current search and filter inputs,
+     * then sorts and updates the display.
+     */
+    function filterMunicipalities() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+            const selectedCounty = document.getElementById('countyFilter').value;
+            const selectedType = document.getElementById('typeFilter').value;
 
-                    let countyFilterMatches = false;
-                    if (!selectedCounty) { 
-                        countyFilterMatches = true;
-                    } else {
-                        if (Array.isArray(municipality.county)) {
-                            countyFilterMatches = municipality.county.includes(selectedCounty);
-                        } else {
-                            countyFilterMatches = municipality.county === selectedCounty;
-                        }
+            filteredData = illinoisMunicipalities.filter(municipality => {
+                const nameMatches = (municipality.name || "").toLowerCase().includes(searchTerm);
+                const countyString = getCountyString(municipality.county).toLowerCase();
+                const countyMatchesSearch = countyString.includes(searchTerm);
+                const matchesSearch = searchTerm === "" || nameMatches || countyMatchesSearch;
+
+                const municipalityCounties = Array.isArray(municipality.county) ? municipality.county : [municipality.county || ""];
+                const matchesCountyFilter = !selectedCounty || municipalityCounties.includes(selectedCounty);
+
+                const matchesTypeFilter = !selectedType || municipality.type === selectedType;
+
+                return matchesSearch && matchesCountyFilter && matchesTypeFilter;
+            });
+
+            sortResults(currentSort); // This will call displayResults
+            updateStats(); // Update counts after filtering
+        }, 250); // Debounce search input
+    }
+
+    /**
+     * Clears all filters and search inputs, then re-renders the full list.
+     */
+    function clearAllFilters() { // Renamed to avoid conflict if HTML onclick is `clearFilters()`
+        document.getElementById('searchInput').value = '';
+        document.getElementById('countyFilter').value = '';
+        document.getElementById('typeFilter').value = '';
+        filteredData = [...illinoisMunicipalities];
+        sortResults(currentSort); // Sort and display the full list
+        updateStats();
+    }
+
+    /**
+     * Sets up event listeners for search inputs and filter dropdowns.
+     */
+    function setupEventListeners() {
+        const searchInput = document.getElementById('searchInput');
+        const countyFilter = document.getElementById('countyFilter');
+        const typeFilter = document.getElementById('typeFilter');
+        const clearButton = document.querySelector('.btn[onclick="clearFilters()"]'); // Find the clear button
+
+        if (searchInput) searchInput.addEventListener('input', filterMunicipalities);
+        if (countyFilter) countyFilter.addEventListener('change', filterMunicipalities);
+        if (typeFilter) typeFilter.addEventListener('change', filterMunicipalities);
+
+        // If the HTML uses onclick="clearFilters()", we need to ensure window.clearFilters points to the correct function.
+        // The original HTML had onclick="clearFilters()".
+        // It's better to handle this in JS if possible, but for now, let's ensure it works.
+        if (clearButton) {
+             // Remove the inline onclick and add a proper event listener
+            clearButton.removeAttribute('onclick');
+            clearButton.addEventListener('click', clearAllFilters);
+        }
+
+
+        // Focus/blur styling for inputs (optional, but was in original)
+        [searchInput, countyFilter, typeFilter].forEach(element => {
+            if (element) {
+                element.addEventListener('focus', () => {
+                    if (element.parentElement && element.parentElement.classList.contains('input-group')) {
+                         // You might want to add a specific class for focus styling
                     }
-                    const matchesCounty = countyFilterMatches;
-                    const matchesType = !selectedType || municipality.type === selectedType;
-                    
-                    return matchesSearch && matchesCounty && matchesType;
                 });
+                element.addEventListener('blur', () => {
+                     if (element.parentElement && element.parentElement.classList.contains('input-group')) {
+                        // Remove focus styling class
+                    }
+                });
+            }
+        });
+    }
 
-                sortResults(currentSort); 
-                updateStats(); 
-            }, 250); // Slightly reduced debounce time
+    /**
+     * Initializes the application: loads data, populates filters, sets up listeners, and renders the initial list.
+     */
+    async function initializeApp() {
+        const loadingElement = document.getElementById('loading');
+        if (loadingElement) loadingElement.style.display = 'block';
+
+        // Check if illinoisMunicipalities is defined and has data
+        if (typeof illinoisMunicipalities === 'undefined' || illinoisMunicipalities.length === 0) {
+            console.error("The 'illinoisMunicipalities' array is not defined or is empty. Make sure it's loaded before this script.");
+            if (loadingElement) loadingElement.style.display = 'none';
+            resultsList.innerHTML = `
+                <div class="no-results">
+                    <svg class="icon"><use xlink:href="#icon-no-results"></use></svg>
+                    Error: Municipality data not found.
+                </div>`;
+            return;
         }
 
-        // Clear all filters
-        function clearFilters() {
-            document.getElementById('searchInput').value = '';
-            document.getElementById('countyFilter').value = '';
-            document.getElementById('typeFilter').value = '';
-            filteredData = [...illinoisMunicipalities];
-            sortResults(currentSort); 
-            updateStats(); 
-        }
 
-        // Set up event listeners
-        function setupEventListeners() {
-            const searchInput = document.getElementById('searchInput');
-            const countyFilter = document.getElementById('countyFilter');
-            const typeFilter = document.getElementById('typeFilter');
+        await loadAndUpdatePopulationDataFromAPI(); // Update populations
 
-            searchInput.addEventListener('input', filterMunicipalities);
-            countyFilter.addEventListener('change', filterMunicipalities);
-            typeFilter.addEventListener('change', filterMunicipalities);
-        }
+        filteredData = [...illinoisMunicipalities]; // Initialize with all data
 
-        document.addEventListener('DOMContentLoaded', init);
+        populateCountyFilter();
+        updateStats(); // Initial stats based on full list
+        sortResults(currentSort); // Sort and display initial list
+        setupEventListeners();
 
-        window.clearFilters = clearFilters;
-        window.sortResults = sortResults;
-    </script>
+        if (loadingElement) loadingElement.style.display = 'none';
+    }
+
+    // --- Global Event Listeners & Initializations ---
+    document.addEventListener('DOMContentLoaded', initializeApp);
+
+    // Expose functions to global scope if they are called by inline HTML event attributes like onclick
+    // The sort buttons in HTML use onclick="sortResults('name')", etc.
+    window.sortResults = sortResults;
+    // The clear button in HTML uses onclick="clearFilters()".
+    // It's better to assign this via JS (see setupEventListeners), but this ensures compatibility if HTML is not changed.
+    window.clearFilters = clearAllFilters;
+
+</script>
 </body>
 </html>
+```
+
+

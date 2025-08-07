@@ -68,6 +68,22 @@
            color: var(--secondary-text);
            margin-bottom: 20px;
        }
+
+       /* Header actions toolbar */
+       .header-actions {
+           display: flex;
+           justify-content: center;
+           gap: 10px;
+           flex-wrap: wrap;
+           margin-top: 10px;
+       }
+
+       .btn-ghost {
+           background: transparent;
+           border: 1px solid var(--border-color);
+           color: var(--primary-text);
+       }
+       .btn.small { padding: 6px 10px; font-size: 0.85rem; }
       
        .main-content {
            display: grid;
@@ -278,9 +294,22 @@
       
        .municipality-info {
            display: flex;
-           flex-direction: column;
-           gap: 5px;
+           align-items: flex-start;
+           gap: 12px;
        }
+
+       .favorite-btn {
+           background: transparent;
+           border: none;
+           cursor: pointer;
+           padding: 2px;
+           border-radius: 6px;
+           display: inline-flex;
+           align-items: center;
+           justify-content: center;
+       }
+       .favorite-btn:hover { background: rgba(0,0,0,0.05); }
+       .favorite-btn .icon { width: 18px; height: 18px; fill: #f0ad4e; }
       
        .municipality-name {
            font-weight: 500;
@@ -398,6 +427,21 @@
            color: var(--accent-hover-color);
            font-weight: 500;
        }
+
+       /* Dark theme overrides via CSS variables */
+       body.dark-theme {
+           --primary-bg: #0f141a;
+           --secondary-bg: #121a23;
+           --primary-text: #e6edf3;
+           --secondary-text: #a9b4bf;
+           --accent-color: #2f81f7;
+           --accent-hover-color: #1f6feb;
+           --results-header-bg: #0b4ea2;
+           --border-color: #273444;
+           --shadow-color: rgba(0,0,0,0.4);
+       }
+       body.dark-theme .result-item:hover { background-color: rgba(255,255,255,0.06); }
+       body.dark-theme .btn-ghost { color: var(--secondary-text); border-color: var(--border-color); }
       
        @media (max-width: 1024px) {
            .main-content {
@@ -450,6 +494,22 @@
        <symbol id="icon-no-results" viewBox="0 0 24 24">
            <path d="M12,2C6.48,2 2,6.48 2,12s4.48,10 10,10 10,-4.48 10,-10S17.52,2 12,2zM12,20c-4.41,0 -8,-3.59 -8,-8s3.59,-8 8,-8 8,3.59 8,8 -3.59,8 -8,8zM10.5,10.5L7.21,7.21 8.62,5.79 12,9.17l3.38,-3.38 1.41,1.41L13.41,10.5l3.38,3.38 -1.41,1.41L12,11.91l-3.38,3.38 -1.41,-1.41L10.5,10.5z"/>
        </symbol>
+       <!-- New icons -->
+       <symbol id="icon-star" viewBox="0 0 24 24">
+           <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+       </symbol>
+       <symbol id="icon-star-filled" viewBox="0 0 24 24">
+           <path d="M12 17.27L18.18 21 16.54 13.97 22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27z" fill="currentColor"/>
+       </symbol>
+       <symbol id="icon-download" viewBox="0 0 24 24">
+           <path d="M5 20h14v-2H5m14-9h-4V3H9v6H5l7 7 7-7z"/>
+       </symbol>
+       <symbol id="icon-moon" viewBox="0 0 24 24">
+           <path d="M12.74 2a9 9 0 1 0 9.26 11.45A7 7 0 0 1 12.74 2z"/>
+       </symbol>
+       <symbol id="icon-sun" viewBox="0 0 24 24">
+           <path d="M3.55,18.54L4.96,17.13L3.55,15.72L2.14,17.13L3.55,18.54M11,22H13V19H11V22M18.36,18.54L19.77,17.13L18.36,15.72L16.95,17.13L18.36,18.54M22,11H19V13H22V11M4,11H2V13H4V11M3.55,8.28L2.14,6.87L3.55,5.46L4.96,6.87L3.55,8.28M11,5H13V2H11V5M16.95,6.87L18.36,5.46L19.77,6.87L18.36,8.28L16.95,6.87M12,8A4,4 0 1,0 16,12A4,4 0 0,0 12,8Z"/>
+       </symbol>
    </svg>
 
 
@@ -459,6 +519,20 @@
                <svg class="icon" aria-hidden="true"><use xlink:href="#icon-location-pin"></use></svg> Illinois Municipalities
            </h1>
            <p>Comprehensive database of cities, villages, and towns in Illinois (Populations updated with 2020 Census Data where available)</p>
+           <div class="header-actions">
+               <button id="themeToggle" class="btn btn-ghost small" title="Toggle dark mode">
+                   <svg class="icon" aria-hidden="true"><use xlink:href="#icon-moon"></use></svg>
+                   <span>Theme</span>
+               </button>
+               <button id="exportCsvBtn" class="btn btn-ghost small" title="Export current results to CSV">
+                   <svg class="icon" aria-hidden="true"><use xlink:href="#icon-download"></use></svg>
+                   <span>Export CSV</span>
+               </button>
+               <button id="shareLinkBtn" class="btn btn-ghost small" title="Copy shareable link">
+                   <svg class="icon" aria-hidden="true"><use xlink:href="#icon-search"></use></svg>
+                   <span>Share link</span>
+               </button>
+           </div>
        </div>
       
        <div class="main-content">
@@ -490,6 +564,21 @@
                                <option value="Village">Villages</option>
                                <option value="Town">Towns</option>
                            </select>
+                       </div>
+
+                       <!-- New: Population range -->
+                       <div class="input-group">
+                           <label>Population range</label>
+                           <div style="display:flex; gap:10px;">
+                               <input type="number" id="minPop" placeholder="Min" min="0">
+                               <input type="number" id="maxPop" placeholder="Max" min="0">
+                           </div>
+                       </div>
+
+                       <!-- New: Favorites only -->
+                       <div class="input-group" style="display:flex; align-items:center; gap:10px;">
+                           <input type="checkbox" id="favoritesOnly" style="width:auto;">
+                           <label for="favoritesOnly" style="margin:0;">Show favorites only</label>
                        </div>
                       
                        <button class="btn" onclick="clearFilters()">
@@ -1483,7 +1572,6 @@
             {name: "Peoria Heights", type: "Village", county: "Peoria", population: 6156},
             {name: "Peotone", type: "Village", county: "Will", population: 4142},
             {name: "Percy", type: "Village", county: "Randolph", population: 970},
-            {name: "Perry", type: "Village", county: "Pike", population: 397},
             {name: "Peru", type: "City", county: "LaSalle", population: 10295},
             {name: "Pesotum", type: "Village", county: "Champaign", population: 551},
             {name: "Petersburg", type: "City", county: "Menard", population: 2260},
@@ -1860,6 +1948,145 @@
     let filteredData = [];
     let currentSort = 'name'; // Default sort
     let searchTimeout;
+    let favoritesSet = new Set(JSON.parse(localStorage.getItem('im_favorites') || '[]'));
+
+    function initThemeFromStorage() {
+        const saved = localStorage.getItem('im_theme');
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const useDark = saved ? saved === 'dark' : prefersDark;
+        document.body.classList.toggle('dark-theme', useDark);
+        const themeToggleIcon = document.querySelector('#themeToggle .icon use');
+        if (themeToggleIcon) themeToggleIcon.setAttribute('xlink:href', useDark ? '#icon-sun' : '#icon-moon');
+    }
+
+    function toggleTheme() {
+        const isDark = document.body.classList.toggle('dark-theme');
+        localStorage.setItem('im_theme', isDark ? 'dark' : 'light');
+        const themeToggleIcon = document.querySelector('#themeToggle .icon use');
+        if (themeToggleIcon) themeToggleIcon.setAttribute('xlink:href', isDark ? '#icon-sun' : '#icon-moon');
+    }
+
+    function saveFavorites() {
+        localStorage.setItem('im_favorites', JSON.stringify(Array.from(favoritesSet)));
+    }
+
+    function exportToCSV() {
+        const rows = [ ['Name','Type','County','Population'] ];
+        filteredData.forEach(m => {
+            const county = getCountyString(m.county);
+            rows.push([m.name || '', m.type || '', county, (m.population ?? '')]);
+        });
+        const escapeCsv = (val) => {
+            const s = String(val);
+            if (/[",\n]/.test(s)) return '"' + s.replace(/"/g,'""') + '"';
+            return s;
+        };
+        const csv = rows.map(r => r.map(escapeCsv).join(',')).join('\n');
+        const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'illinois_municipalities_results.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showUIMessage('CSV exported for current results.', 'info');
+    }
+
+    function copyShareLink() {
+        updateURLFromState();
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            showUIMessage('Sharable link copied to clipboard.', 'info');
+        }).catch(() => {
+            showUIMessage('Could not copy link. You can copy from the address bar.', 'warning');
+        });
+    }
+
+    function getFilterInputs() {
+        const searchTerm = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
+        const selectedCounty = document.getElementById('countyFilter')?.value || '';
+        const selectedType = document.getElementById('typeFilter')?.value || '';
+        const minPopStr = document.getElementById('minPop')?.value || '';
+        const maxPopStr = document.getElementById('maxPop')?.value || '';
+        const favoritesOnly = document.getElementById('favoritesOnly')?.checked || false;
+        const minPop = minPopStr === '' ? null : Number(minPopStr);
+        const maxPop = maxPopStr === '' ? null : Number(maxPopStr);
+        return { searchTerm, selectedCounty, selectedType, minPop, maxPop, favoritesOnly };
+    }
+
+    function updateURLFromState() {
+        const { searchTerm, selectedCounty, selectedType, minPop, maxPop, favoritesOnly } = getFilterInputs();
+        const params = new URLSearchParams();
+        if (searchTerm) params.set('q', searchTerm);
+        if (selectedCounty) params.set('county', selectedCounty);
+        if (selectedType) params.set('type', selectedType);
+        if (currentSort && currentSort !== 'name') params.set('sort', currentSort);
+        if (minPop !== null) params.set('min', String(minPop));
+        if (maxPop !== null) params.set('max', String(maxPop));
+        if (favoritesOnly) params.set('fav', '1');
+        const isDark = document.body.classList.contains('dark-theme');
+        if (isDark) params.set('theme','dark');
+        const qs = params.toString();
+        const newUrl = qs ? `${location.pathname}?${qs}` : location.pathname;
+        window.history.replaceState(null, '', newUrl);
+    }
+
+    function applyFiltersFromQuery() {
+        const params = new URLSearchParams(location.search);
+        const q = params.get('q') || '';
+        const county = params.get('county') || '';
+        const type = params.get('type') || '';
+        const sort = params.get('sort') || 'name';
+        const min = params.get('min');
+        const max = params.get('max');
+        const fav = params.get('fav');
+        const theme = params.get('theme');
+        if (theme === 'dark') {
+            document.body.classList.add('dark-theme');
+        }
+        const searchInput = document.getElementById('searchInput');
+        const countyFilter = document.getElementById('countyFilter');
+        const typeFilter = document.getElementById('typeFilter');
+        const minPop = document.getElementById('minPop');
+        const maxPop = document.getElementById('maxPop');
+        const favoritesOnly = document.getElementById('favoritesOnly');
+        if (searchInput) searchInput.value = q;
+        if (countyFilter) countyFilter.value = county;
+        if (typeFilter) typeFilter.value = type;
+        if (minPop && min !== null && min !== undefined) minPop.value = min;
+        if (maxPop && max !== null && max !== undefined) maxPop.value = max;
+        if (favoritesOnly) favoritesOnly.checked = fav === '1';
+        currentSort = sort;
+        // Update sort button active state
+        document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('active'));
+        const activeSortButton = Array.from(document.querySelectorAll('.sort-btn')).find(
+            btn => btn.textContent.trim().toLowerCase() === sort.toLowerCase()
+        );
+        if (activeSortButton) activeSortButton.classList.add('active');
+        const themeToggleIcon = document.querySelector('#themeToggle .icon use');
+        if (themeToggleIcon) themeToggleIcon.setAttribute('xlink:href', document.body.classList.contains('dark-theme') ? '#icon-sun' : '#icon-moon');
+    }
+
+    function recomputeAndRender() {
+        const { searchTerm, selectedCounty, selectedType, minPop, maxPop, favoritesOnly } = getFilterInputs();
+        filteredData = illinoisMunicipalities.filter(municipality => {
+            const name = (municipality.name || '').toLowerCase();
+            const countyString = getCountyString(municipality.county).toLowerCase();
+            const matchesSearch = !searchTerm || name.includes(searchTerm) || countyString.includes(searchTerm);
+            const municipalityCounties = Array.isArray(municipality.county) ? municipality.county : [municipality.county || ""];
+            const matchesCountyFilter = !selectedCounty || municipalityCounties.includes(selectedCounty);
+            const matchesTypeFilter = !selectedType || municipality.type === selectedType;
+            const pop = municipality.population ?? null;
+            const matchesMin = (minPop === null) || (pop !== null && pop >= minPop);
+            const matchesMax = (maxPop === null) || (pop !== null && pop <= maxPop);
+            const matchesFav = !favoritesOnly || favoritesSet.has(municipality.name);
+            return matchesSearch && matchesCountyFilter && matchesTypeFilter && matchesMin && matchesMax && matchesFav;
+        });
+        sortResults(currentSort);
+        updateStats();
+        updateURLFromState();
+    }
 
     function getCountyString(county) {
         if (Array.isArray(county)) {
@@ -1933,9 +2160,6 @@
             messageBox.style.display = 'none';
         }, 5000); // Auto-hide after 5 seconds
     }
-
-
-    // --- Core Application Logic ---
 
     /**
      * Fetches 2020 Census population data and updates the illinoisMunicipalities array.
@@ -2112,11 +2336,16 @@
                 const item = document.createElement('div');
                 item.className = 'result-item fade-in';
                 item.style.animationDelay = `${index * 0.015}s`; // Faster animation
+                item.dataset.name = municipality.name || '';
 
                 const countyDisplayString = getCountyString(municipality.county);
+                const isFav = favoritesSet.has(municipality.name);
 
                 item.innerHTML = `
                     <div class="municipality-info">
+                        <button class="favorite-btn" title="Toggle favorite" aria-label="Toggle favorite">
+                            <svg class="icon" aria-hidden="true"><use xlink:href="${isFav ? '#icon-star-filled' : '#icon-star'}"></use></svg>
+                        </button>
                         <span class="municipality-name">${highlightText(municipality.name, searchTerm)}</span>
                         <div class="municipality-details">
                             <span class="type-badge type-${(municipality.type || 'unknown').toLowerCase()}">${municipality.type || 'N/A'}</span>
@@ -2177,26 +2406,7 @@
     function filterMunicipalities() {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
-            const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
-            const selectedCounty = document.getElementById('countyFilter').value;
-            const selectedType = document.getElementById('typeFilter').value;
-
-            filteredData = illinoisMunicipalities.filter(municipality => {
-                const nameMatches = (municipality.name || "").toLowerCase().includes(searchTerm);
-                const countyString = getCountyString(municipality.county).toLowerCase();
-                const countyMatchesSearch = countyString.includes(searchTerm);
-                const matchesSearch = searchTerm === "" || nameMatches || countyMatchesSearch;
-
-                const municipalityCounties = Array.isArray(municipality.county) ? municipality.county : [municipality.county || ""];
-                const matchesCountyFilter = !selectedCounty || municipalityCounties.includes(selectedCounty);
-
-                const matchesTypeFilter = !selectedType || municipality.type === selectedType;
-
-                return matchesSearch && matchesCountyFilter && matchesTypeFilter;
-            });
-
-            sortResults(currentSort); // This will call displayResults
-            updateStats(); // Update counts after filtering
+            recomputeAndRender();
         }, 250); // Debounce search input
     }
 
@@ -2207,9 +2417,13 @@
         document.getElementById('searchInput').value = '';
         document.getElementById('countyFilter').value = '';
         document.getElementById('typeFilter').value = '';
+        const minPop = document.getElementById('minPop'); if (minPop) minPop.value = '';
+        const maxPop = document.getElementById('maxPop'); if (maxPop) maxPop.value = '';
+        const favOnly = document.getElementById('favoritesOnly'); if (favOnly) favOnly.checked = false;
         filteredData = [...illinoisMunicipalities];
-        sortResults(currentSort); // Sort and display the full list
+        sortResults(currentSort);
         updateStats();
+        updateURLFromState();
     }
 
     /**
@@ -2220,10 +2434,19 @@
         const countyFilter = document.getElementById('countyFilter');
         const typeFilter = document.getElementById('typeFilter');
         const clearButton = document.querySelector('.btn[onclick="clearFilters()"]'); // Find the clear button
+        const minPop = document.getElementById('minPop');
+        const maxPop = document.getElementById('maxPop');
+        const favoritesOnly = document.getElementById('favoritesOnly');
+        const exportBtn = document.getElementById('exportCsvBtn');
+        const shareBtn = document.getElementById('shareLinkBtn');
+        const themeToggle = document.getElementById('themeToggle');
 
         if (searchInput) searchInput.addEventListener('input', filterMunicipalities);
         if (countyFilter) countyFilter.addEventListener('change', filterMunicipalities);
         if (typeFilter) typeFilter.addEventListener('change', filterMunicipalities);
+        if (minPop) minPop.addEventListener('input', filterMunicipalities);
+        if (maxPop) maxPop.addEventListener('input', filterMunicipalities);
+        if (favoritesOnly) favoritesOnly.addEventListener('change', filterMunicipalities);
 
         // If the HTML uses onclick="clearFilters()", we need to ensure window.clearFilters points to the correct function.
         // The original HTML had onclick="clearFilters()".
@@ -2250,6 +2473,36 @@
                 });
             }
         });
+
+        // Results list favorite toggling via event delegation
+        const resultsList = document.getElementById('resultsList');
+        if (resultsList) {
+            resultsList.addEventListener('click', (e) => {
+                const btn = e.target.closest('.favorite-btn');
+                if (!btn) return;
+                const item = btn.closest('.result-item');
+                if (!item) return;
+                const name = item.dataset.name;
+                if (!name) return;
+                if (favoritesSet.has(name)) {
+                    favoritesSet.delete(name);
+                } else {
+                    favoritesSet.add(name);
+                }
+                saveFavorites();
+                // Update icon
+                const use = btn.querySelector('use');
+                if (use) use.setAttribute('xlink:href', favoritesSet.has(name) ? '#icon-star-filled' : '#icon-star');
+                // If filtering by favorites-only, re-run filter to hide/show
+                if (document.getElementById('favoritesOnly')?.checked) {
+                    recomputeAndRender();
+                }
+            });
+        }
+
+        if (exportBtn) exportBtn.addEventListener('click', exportToCSV);
+        if (shareBtn) shareBtn.addEventListener('click', copyShareLink);
+        if (themeToggle) themeToggle.addEventListener('click', toggleTheme);
     }
 
     /**
@@ -2259,6 +2512,7 @@
         const loadingElement = document.getElementById('loading');
         if (loadingElement) loadingElement.style.display = 'block';
 
+        initThemeFromStorage();
         // Check if illinoisMunicipalities is defined and has data
         if (typeof illinoisMunicipalities === 'undefined' || illinoisMunicipalities.length === 0) {
             console.error("The 'illinoisMunicipalities' array is not defined or is empty. Make sure it's loaded before this script.");
@@ -2277,8 +2531,10 @@
         filteredData = [...illinoisMunicipalities]; // Initialize with all data
 
         populateCountyFilter();
-        updateStats(); // Initial stats based on full list
-        sortResults(currentSort); // Sort and display initial list
+        applyFiltersFromQuery();
+        updateStats();
+        sortResults(currentSort);
+        recomputeAndRender(); // Render immediately based on any pre-filled filters
         setupEventListeners();
 
         if (loadingElement) loadingElement.style.display = 'none';
@@ -2294,7 +2550,7 @@
     // It's better to assign this via JS (see setupEventListeners), but this ensures compatibility if HTML is not changed.
     window.clearFilters = clearAllFilters;
 
-</script>
+ </script>
 </body>
 </html>
 ```

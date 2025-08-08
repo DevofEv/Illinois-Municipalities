@@ -7,6 +7,7 @@ export interface FilterState {
   types: Array<Municipality["type"]>;
   populationMin: number;
   populationMax: number;
+  sortOrder: "asc" | "desc";
 }
 
 interface FilterPanelProps {
@@ -106,6 +107,20 @@ export function FilterPanel({ data, filters, onFilterChange, clearFilters }: Fil
             />
           </label>
         </div>
+      </fieldset>
+
+      <fieldset className="space-y-2">
+        <legend className="font-medium">Sort</legend>
+        <select
+          id="sort-order"
+          value={filters.sortOrder}
+          onChange={(e) => onFilterChange({ sortOrder: e.target.value as FilterState["sortOrder"] })}
+          className="w-full p-2 border rounded"
+          aria-label="Sort order"
+        >
+          <option value="asc">Name: A → Z</option>
+          <option value="desc">Name: Z → A</option>
+        </select>
       </fieldset>
 
       <div className="mt-6 p-3 bg-gray-50 rounded">

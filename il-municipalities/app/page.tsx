@@ -6,7 +6,6 @@ import type { Municipality } from "@/types/municipality";
 import { SearchBar } from "@/components/features/SearchBar/SearchBar";
 import { FilterPanel, type FilterState } from "@/components/features/FilterPanel/FilterPanel";
 import { MunicipalityList } from "@/components/features/MunicipalityList/MunicipalityList";
-import Link from "next/link";
 
 export default function Home() {
   const allData = (data as unknown as Municipality[]) ?? [];
@@ -18,16 +17,21 @@ export default function Home() {
     types: [],
     populationMin: 0,
     populationMax: 3_000_000,
+    sortOrder: "asc",
   }), []);
   const [filters, setFilters] = useState<FilterState>(defaultFilters);
 
   const effectiveData = useMemo(() => {
-    return filtered.filter((m) => {
+    const filteredData = filtered.filter((m) => {
       if (filters.county && m.county !== filters.county) return false;
       if (filters.types.length && !filters.types.includes(m.type)) return false;
       if (m.population.current < filters.populationMin || m.population.current > filters.populationMax) return false;
       return true;
     });
+
+    const sorted = [...filteredData].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
+    if (filters.sortOrder === "desc") sorted.reverse();
+    return sorted;
   }, [filtered, filters]);
 
   return (

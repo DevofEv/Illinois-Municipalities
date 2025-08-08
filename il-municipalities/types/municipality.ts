@@ -1,4 +1,4 @@
-import type * as GeoJSON from 'geojson';
+type Geometry = { type: string; coordinates: any };
 
 export interface Municipality {
   id: string;
@@ -16,7 +16,7 @@ export interface Municipality {
     lat: number;
     lng: number;
   };
-  boundaries?: GeoJSON.Geometry;
+  boundaries?: Geometry;
   landArea: number; // square miles
   waterArea: number;
   totalArea: number;

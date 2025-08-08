@@ -1,7 +1,6 @@
 const CACHE_NAME = 'il-municipalities-v1';
 const urlsToCache = [
   '/',
-  '/map',
   '/compare',
   '/data/municipalities.json',
   '/manifest.json'

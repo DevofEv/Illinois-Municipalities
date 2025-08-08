@@ -5,13 +5,12 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
     remotePatterns: [
-      { protocol: "https", hostname: "api.census.gov" },
-      { protocol: "https", hostname: "tile.openstreetmap.org" }
+      { protocol: "https", hostname: "api.census.gov" }
     ]
   },
   experimental: {
     optimizeCss: true,
-    optimizePackageImports: ["leaflet", "fuse.js", "lodash-es"]
+    optimizePackageImports: ["fuse.js", "lodash-es"]
   }
 };
 

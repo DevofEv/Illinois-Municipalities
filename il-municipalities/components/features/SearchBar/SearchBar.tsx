@@ -8,12 +8,14 @@ import type { Municipality } from "@/types/municipality";
 interface SearchBarProps {
   data: Municipality[];
   onSearch: (results: Municipality[]) => void;
+  onCountySelect?: (county: string) => void;
   placeholder?: string;
 }
 
-export function SearchBar({ data, onSearch, placeholder }: SearchBarProps) {
+export function SearchBar({ data, onSearch, onCountySelect, placeholder }: SearchBarProps) {
   const [query, setQuery] = useState("");
   const [isAdvanced, setIsAdvanced] = useState(false);
+  const [countySuggestions, setCountySuggestions] = useState<string[]>([]);
 
   const fuse = useMemo(() => {
     return new Fuse<Municipality>(data, {
@@ -27,6 +29,8 @@ export function SearchBar({ data, onSearch, placeholder }: SearchBarProps) {
       useExtendedSearch: true,
     });
   }, [data]);
+
+  const allCounties = useMemo(() => Array.from(new Set(data.map((d) => d.county))).sort(), [data]);
 
   const parseAdvancedQuery = useCallback((q: string) => {
     const tokens = {
@@ -65,14 +69,13 @@ export function SearchBar({ data, onSearch, placeholder }: SearchBarProps) {
   useEffect(() => {
     if (!query) {
       onSearch(data);
+      setCountySuggestions([]);
       return;
     }
 
-    let results: Municipality[];
-
     if (isAdvanced) {
       const tokens = parseAdvancedQuery(query);
-      results = data.filter((m) => {
+      const results = data.filter((m) => {
         if (tokens.county && !m.county.toLowerCase().includes(tokens.county.toLowerCase())) {
           return false;
         }
@@ -88,13 +91,16 @@ export function SearchBar({ data, onSearch, placeholder }: SearchBarProps) {
         }
         return true;
       });
-    } else {
-      const fuseResults = fuse.search(query);
-      results = fuseResults.map((r) => r.item);
+      onSearch(results);
+      setCountySuggestions(tokens.county ? [tokens.county] : []);
+      return;
     }
 
-    onSearch(results);
-  }, [query, isAdvanced, data, fuse, onSearch, parseAdvancedQuery]);
+    const fuseResults = fuse.search(query);
+    onSearch(fuseResults.map((r) => r.item));
+    const localCounties = allCounties.filter((c) => c.toLowerCase().includes(query.toLowerCase())).slice(0, 10);
+    setCountySuggestions(localCounties);
+  }, [query, isAdvanced, data, fuse, onSearch, parseAdvancedQuery, allCounties]);
 
   return (
     <div className="space-y-2">
@@ -118,6 +124,24 @@ export function SearchBar({ data, onSearch, placeholder }: SearchBarProps) {
           </button>
         )}
       </div>
+
+      {!isAdvanced && countySuggestions.length > 0 && (
+        <div className="border rounded-lg p-2 text-sm bg-white">
+          <div className="mb-1 text-gray-600">Counties</div>
+          <ul className="flex flex-wrap gap-2">
+            {countySuggestions.map((c) => (
+              <li key={c}>
+                <button
+                  className="px-2 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded"
+                  onClick={() => onCountySelect?.(c)}
+                >
+                  {c}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <button
         onClick={() => setIsAdvanced(!isAdvanced)}

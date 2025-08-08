@@ -1,0 +1,47 @@
+{
+  "id": "springfield",
+  "name": "Springfield",
+  "type": "City",
+  "county": "Sangamon",
+  "population": {
+    "current": 114214,
+    "census_2020": 114394,
+    "census_2010": 116250,
+    "census_2000": 111454,
+    "estimate_year": 2023,
+    "growth_rate": -0.001358
+  },
+  "geography": {},
+  "economics": {
+    "median_household_income": 62419,
+    "median_family_income": 86647,
+    "per_capita_income": 39648,
+    "median_home_value": 147700,
+    "median_rent": 913,
+    "poverty_rate": null,
+    "unemployment_rate": 0.066
+  },
+  "demographics": {
+    "median_age": 40.1,
+    "racial_composition": {
+      "white": 0.6967534627979057,
+      "black": 0.2010348993993731,
+      "asian": 0.03042534190204353,
+      "hispanic": 0.031020715498975608,
+      "other": 0.040766
+    },
+    "education": {
+      "high_school_graduate": null,
+      "bachelors_degree": 0.347,
+      "graduate_degree": null
+    }
+  },
+  "government": {},
+  "history": {},
+  "links": {},
+  "_meta": {
+    "place": "72000",
+    "fetched_at": "2025-08-08T04:51:07.435Z",
+    "source": "census+state"
+  }
+}

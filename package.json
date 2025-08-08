@@ -1,0 +1,38 @@
+{
+  "name": "workspace",
+  "version": "1.0.0",
+  "main": "index.js",
+  "description": "Illinois Municipalities directory with detailed profiles",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "export": "next export",
+    "lint": "next lint",
+    "fetch-data": "node scripts/fetch-municipality-data.js",
+    "test": "echo \"No tests yet\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DevofEv/Illinois-Municipalities.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DevofEv/Illinois-Municipalities/issues"
+  },
+  "homepage": "https://github.com/DevofEv/Illinois-Municipalities#readme",
+  "dependencies": {
+    "chart.js": "^4.4.3",
+    "next": "^14.2.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "swr": "^2.2.5"
+  },
+  "devDependencies": {
+    "@types/node": "24.2.0",
+    "@types/react": "19.1.9",
+    "typescript": "5.9.2"
+  }
+}

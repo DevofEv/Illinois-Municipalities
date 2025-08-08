@@ -1,0 +1,61 @@
+:root {
+  --bg: #ffffff;
+  --text: #111827;
+  --muted: #6b7280;
+  --primary: #3B82F6;
+  --surface: #f9fafb;
+  --border: #e5e7eb;
+}
+
+html, body {
+  padding: 0;
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", "Apple Color Emoji", "Segoe UI Emoji";
+}
+
+* { box-sizing: border-box; }
+
+.container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+
+.grid { display: grid; gap: 16px; }
+.grid.cols-2 { grid-template-columns: 1fr 1fr; }
+.grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+
+.card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+.card h3 { margin: 0 0 8px; font-size: 18px; }
+
+.badge { display: inline-block; padding: 2px 8px; border-radius: 999px; background: #eef2ff; color: #3730a3; font-size: 12px; }
+
+.tabs { display: flex; gap: 8px; border-bottom: 1px solid var(--border); overflow-x: auto; }
+.tab { padding: 10px 12px; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; white-space: nowrap; }
+.tab.active { color: var(--text); border-bottom-color: var(--primary); }
+
+.stat { display: flex; flex-direction: column; gap: 2px; }
+.stat .label { color: var(--muted); font-size: 12px; }
+.stat .value { font-weight: 600; }
+
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.button { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; color: var(--text); text-decoration: none; cursor: pointer; }
+.button.primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+.chart-container { width: 100%; height: 400px; }
+
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+@media (max-width: 1024px) {
+  .grid.cols-3 { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 768px) {
+  .grid.cols-2, .grid.cols-3 { grid-template-columns: 1fr; }
+  .header { flex-direction: column; text-align: center; }
+  .chart-container { height: 300px; }
+}
+
+@media print {
+  .navigation, .actions, .interactive, .tabs { display: none !important; }
+  .chart-container { page-break-inside: avoid; }
+  body { color: #000; }
+}

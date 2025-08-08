@@ -1,0 +1,16 @@
+{
+  "population": {
+    "current_avg": 648760.6
+  },
+  "economics": {
+    "median_household_income_avg": 91395.4,
+    "per_capita_income_avg": 51029.2,
+    "median_home_value_avg": 326200,
+    "median_rent_avg": 1420.2,
+    "poverty_rate_avg": null,
+    "unemployment_rate_avg": 0.06
+  },
+  "demographics": {
+    "median_age_avg": 37.58
+  }
+}

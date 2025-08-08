@@ -1,0 +1,47 @@
+{
+  "id": "aurora",
+  "name": "Aurora",
+  "type": "City",
+  "county": "Kane",
+  "population": {
+    "current": 181405,
+    "census_2020": 180542,
+    "census_2010": 197899,
+    "census_2000": 142990,
+    "estimate_year": 2023,
+    "growth_rate": -0.006672
+  },
+  "geography": {},
+  "economics": {
+    "median_household_income": 85943,
+    "median_family_income": 97491,
+    "per_capita_income": 38064,
+    "median_home_value": 241600,
+    "median_rent": 1462,
+    "poverty_rate": null,
+    "unemployment_rate": 0.056
+  },
+  "demographics": {
+    "median_age": 35.4,
+    "racial_composition": {
+      "white": 0.3325321793776357,
+      "black": 0.10327168490394421,
+      "asian": 0.1067445770513492,
+      "hispanic": 0.42345029078581076,
+      "other": 0.034001
+    },
+    "education": {
+      "high_school_graduate": null,
+      "bachelors_degree": 0.352,
+      "graduate_degree": null
+    }
+  },
+  "government": {},
+  "history": {},
+  "links": {},
+  "_meta": {
+    "place": "03012",
+    "fetched_at": "2025-08-08T04:51:10.459Z",
+    "source": "census+state"
+  }
+}

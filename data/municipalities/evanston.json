@@ -1,0 +1,47 @@
+{
+  "id": "evanston",
+  "name": "Evanston",
+  "type": "City",
+  "county": "Cook",
+  "population": {
+    "current": 77181,
+    "census_2020": 78110,
+    "census_2010": 74486,
+    "census_2000": 74239,
+    "estimate_year": 2023,
+    "growth_rate": 0.002738
+  },
+  "geography": {},
+  "economics": {
+    "median_household_income": 93188,
+    "median_family_income": 146789,
+    "per_capita_income": 63888,
+    "median_home_value": 454600,
+    "median_rent": 1625,
+    "poverty_rate": null,
+    "unemployment_rate": 0.061
+  },
+  "demographics": {
+    "median_age": 37.6,
+    "racial_composition": {
+      "white": 0.5835762687708115,
+      "black": 0.16085565100218965,
+      "asian": 0.09155102939842708,
+      "hispanic": 0.11289047822650652,
+      "other": 0.051127
+    },
+    "education": {
+      "high_school_graduate": null,
+      "bachelors_degree": 0.693,
+      "graduate_degree": null
+    }
+  },
+  "government": {},
+  "history": {},
+  "links": {},
+  "_meta": {
+    "place": "24582",
+    "fetched_at": "2025-08-08T04:51:11.994Z",
+    "source": "census+state"
+  }
+}

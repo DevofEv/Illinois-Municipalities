@@ -1,0 +1,47 @@
+{
+  "id": "chicago",
+  "name": "Chicago",
+  "type": "City",
+  "county": "Cook",
+  "population": {
+    "current": 2721914,
+    "census_2020": 2746388,
+    "census_2010": 2695598,
+    "census_2000": 2896016,
+    "estimate_year": 2023,
+    "growth_rate": 0.000748
+  },
+  "geography": {},
+  "economics": {
+    "median_household_income": 71673,
+    "median_family_income": 87343,
+    "per_capita_income": 45840,
+    "median_home_value": 304500,
+    "median_rent": 1314,
+    "poverty_rate": null,
+    "unemployment_rate": 0.082
+  },
+  "demographics": {
+    "median_age": 35.3,
+    "racial_composition": {
+      "white": 0.3274464218928298,
+      "black": 0.28356994379690176,
+      "asian": 0.06918844607140416,
+      "hispanic": 0.28954110967503016,
+      "other": 0.030254
+    },
+    "education": {
+      "high_school_graduate": null,
+      "bachelors_degree": 0.424,
+      "graduate_degree": null
+    }
+  },
+  "government": {},
+  "history": {},
+  "links": {},
+  "_meta": {
+    "place": "14000",
+    "fetched_at": "2025-08-08T04:51:05.928Z",
+    "source": "census+state"
+  }
+}

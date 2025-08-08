@@ -7,7 +7,10 @@
     "type": "City",
     "county": "Cook",
     "incorporationStatus": "Incorporated",
-    "coordinates": { "lat": 41.8781, "lng": -87.6298 },
+    "coordinates": {
+      "lat": 41.8781,
+      "lng": -87.6298
+    },
     "landArea": 227.34,
     "waterArea": 7.31,
     "totalArea": 234.65,
@@ -24,12 +27,28 @@
       "medianHouseholdIncome": 65000,
       "medianHomeValue": 320000,
       "povertyRate": 0.18,
-      "unemploymentRate": 0.06
+      "unemploymentRate": 0.06,
+      "perCapitaIncome": 39000
     },
-    "government": { "type": "Mayor-Council", "website": "https://www.chicago.gov" },
+    "government": {
+      "type": "Mayor-Council",
+      "website": "https://www.chicago.gov"
+    },
     "lastUpdated": "2025-01-01T00:00:00.000Z",
     "dataSource": "Sample",
-    "searchTokens": "chicago cook city"
+    "searchTokens": "chicago cook city",
+    "demographics": {
+      "medianAge": 35
+    },
+    "taxes": {
+      "salesTaxRate": 0.1025
+    },
+    "infrastructure": {},
+    "history": {
+      "founded": 1833,
+      "incorporated": 1837
+    },
+    "links": {}
   },
   {
     "id": "1711000",
@@ -39,8 +58,11 @@
     "type": "City",
     "county": "Sangamon",
     "incorporationStatus": "Incorporated",
-    "coordinates": { "lat": 39.7817, "lng": -89.6501 },
-    "landArea": 54.0,
+    "coordinates": {
+      "lat": 39.7817,
+      "lng": -89.6501
+    },
+    "landArea": 54,
     "waterArea": 2.2,
     "totalArea": 56.2,
     "elevation": 558,
@@ -56,11 +78,27 @@
       "medianHouseholdIncome": 60000,
       "medianHomeValue": 160000,
       "povertyRate": 0.15,
-      "unemploymentRate": 0.05
+      "unemploymentRate": 0.05,
+      "perCapitaIncome": 39000
     },
-    "government": { "type": "Mayor-Council", "website": "https://www.springfield.il.us" },
+    "government": {
+      "type": "Mayor-Council",
+      "website": "https://www.springfield.il.us"
+    },
     "lastUpdated": "2025-01-01T00:00:00.000Z",
     "dataSource": "Sample",
-    "searchTokens": "springfield sangamon city"
+    "searchTokens": "springfield sangamon city",
+    "demographics": {
+      "medianAge": 35
+    },
+    "taxes": {
+      "salesTaxRate": 0.1025
+    },
+    "infrastructure": {},
+    "history": {
+      "founded": 1833,
+      "incorporated": 1837
+    },
+    "links": {}
   }
 ]

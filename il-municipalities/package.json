@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "prebuild": "node scripts/fetch-census-data.js",
+    "prebuild": "node scripts/fetch-census-data.js && node scripts/fetch-municipality-data.js",
     "build": "next build",
     "start": "next start",
     "export": "next export",
+    "fetch-data": "node scripts/fetch-census-data.js && node scripts/fetch-municipality-data.js",
     "lint": "next lint"
   },
   "dependencies": {

@@ -6,6 +6,7 @@ import type { Municipality } from "@/types/municipality";
 import { SearchBar } from "@/components/features/SearchBar/SearchBar";
 import { FilterPanel, type FilterState } from "@/components/features/FilterPanel/FilterPanel";
 import { MunicipalityList } from "@/components/features/MunicipalityList/MunicipalityList";
+import Link from "next/link";
 
 export default function Home() {
   const allData = (data as unknown as Municipality[]) ?? [];
@@ -32,14 +33,17 @@ export default function Home() {
   return (
     <main className="p-6 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
       <section className="md:col-span-2 space-y-4">
+
         <SearchBar
           data={allData}
           onSearch={setFiltered}
           onCountySelect={(county) => setFilters((prev) => ({ ...prev, county }))}
         />
+
         <MunicipalityList data={effectiveData} selectedIds={selectedIds} onSelect={(id) => {
           setSelectedIds((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
         }} />
+        <div className="text-xs text-gray-500">Tip: Click a municipality to open its profile.</div>
       </section>
       <aside>
         <FilterPanel

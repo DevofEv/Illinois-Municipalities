@@ -1,0 +1,9 @@
+{
+  "municipalities": [
+    {"name":"Chicago","lat":41.8781,"lng":-87.6298,"population":2695598,"type":"City","county":["Cook","DuPage"],"density":11841.8,"incorporated":1837},
+    {"name":"Springfield","lat":39.7817,"lng":-89.6501,"population":116250,"type":"City","county":"Sangamon","density":1874.0,"incorporated":1840},
+    {"name":"Peoria","lat":40.6936,"lng":-89.5890,"population":115007,"type":"City","county":"Peoria","density":2427.4,"incorporated":1845},
+    {"name":"Rockford","lat":42.2711,"lng":-89.0937,"population":152871,"type":"City","county":"Winnebago","density":2329.3,"incorporated":1852},
+    {"name":"Naperville","lat":41.7508,"lng":-88.1535,"population":141853,"type":"City","county":["DuPage","Will"],"density":3789.0,"incorporated":1890}
+  ]
+}

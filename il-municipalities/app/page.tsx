@@ -33,10 +33,13 @@ export default function Home() {
   return (
     <main className="p-6 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
       <section className="md:col-span-2 space-y-4">
-        <div className="flex items-center justify-between">
-          <SearchBar data={allData} onSearch={setFiltered} />
-          <Link href="/map" className="px-3 py-2 rounded border whitespace-nowrap">🗺️ Map</Link>
-        </div>
+
+        <SearchBar
+          data={allData}
+          onSearch={setFiltered}
+          onCountySelect={(county) => setFilters((prev) => ({ ...prev, county }))}
+        />
+
         <MunicipalityList data={effectiveData} selectedIds={selectedIds} onSelect={(id) => {
           setSelectedIds((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
         }} />

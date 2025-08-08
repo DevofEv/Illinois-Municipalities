@@ -387,7 +387,8 @@
            gap: 12px;
        }
 
-       .favorite-btn {
+       .favorite-btn,
+       .compare-btn {
            background: transparent;
            border: none;
            cursor: pointer;
@@ -397,15 +398,16 @@
            align-items: center;
            justify-content: center;
        }
-       .favorite-btn:hover { background: rgba(0,0,0,0.05); }
-       .favorite-btn .icon { width: 18px; height: 18px; fill: #f0ad4e; }
-      
+       .favorite-btn:hover, .compare-btn:hover { background: rgba(0,0,0,0.05); }
+       .favorite-btn .icon { width: 18px; height: 18px; fill: #e74c3c; }
+       .compare-btn .icon { width: 18px; height: 18px; fill: #f0ad4e; }
+       
        .municipality-name {
            font-weight: 500;
            color: var(--primary-text);
            font-size: 1.1rem;
        }
-      
+       
        .municipality-details {
            display: flex;
            align-items: center;
@@ -545,6 +547,7 @@
        }
    
    </style>
+   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" integrity="sha384-SrWb3Qh9d3u0n8tFhAqH8bRbS5a0JQ9fK9hB7xH7m3a9J1oP3TScjlB8bQ9WJYxw" crossorigin="anonymous"></script>
 </head>
 <body>
    <svg width="0" height="0" style="position:absolute; display:none;">
@@ -560,12 +563,18 @@
            <path d="M12,2C6.48,2 2,6.48 2,12s4.48,10 10,10 10,-4.48 10,-10S17.52,2 12,2zM12,20c-4.41,0 -8,-3.59 -8,-8s3.59,-8 8,-8 8,3.59 8,8 -3.59,8 -8,8zM10.5,10.5L7.21,7.21 8.62,5.79 12,9.17l3.38,-3.38 1.41,1.41L13.41,10.5l3.38,3.38 -1.41,1.41L12,11.91l-3.38,3.38 -1.41,-1.41L10.5,10.5z"/>
        </symbol>
        <!-- New icons -->
-       <symbol id="icon-star" viewBox="0 0 24 24">
-           <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
-       </symbol>
-       <symbol id="icon-star-filled" viewBox="0 0 24 24">
-           <path d="M12 17.27L18.18 21 16.54 13.97 22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27z" fill="currentColor"/>
-       </symbol>
+             <symbol id="icon-star" viewBox="0 0 24 24">
+          <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+      </symbol>
+      <symbol id="icon-star-filled" viewBox="0 0 24 24">
+          <path d="M12 17.27L18.18 21 16.54 13.97 22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27z" fill="currentColor"/>
+      </symbol>
+      <symbol id="icon-heart" viewBox="0 0 24 24">
+          <path d="M12.1 8.64l-.1.1-.11-.11C10.14 6.6 7.1 6.6 5.14 8.56s-2 5.14 0 7.1L12 22l6.86-6.34c2-1.96 2-5.14 0-7.1-1.96-1.96-5-1.96-6.86 0z"/>
+      </symbol>
+      <symbol id="icon-heart-filled" viewBox="0 0 24 24">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 6 4 4 6.5 4c1.74 0 3.41 1 4.22 2.44C11.09 5 12.76 4 14.5 4 17 4 19 6 19 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="currentColor"/>
+      </symbol>
        <symbol id="icon-download" viewBox="0 0 24 24">
            <path d="M5 20h14v-2H5m14-9h-4V3H9v6H5l7 7 7-7z"/>
        </symbol>
@@ -770,6 +779,15 @@
        </div>
    </div>
 
+   <div id="comparisonBadge" class="comparison-badge" aria-live="polite" style="display:none; position: fixed; bottom: 90px; right: 18px; z-index: 1000;">
+       <button id="openComparisonBtn" class="feedback-fab" style="background:#ffbf00; color:#222; display:inline-flex; align-items:center; gap:8px;">
+           <svg class="icon" aria-hidden="true"><use xlink:href="#icon-star"></use></svg>
+           <span id="comparisonCountLabel">0 selected</span>
+       </button>
+       <div style="margin-top:6px; display:flex; gap:6px; justify-content:flex-end;">
+           <button id="clearSelectionsBtn" class="btn-secondary small" style="padding:6px 10px;">Clear all</button>
+       </div>
+   </div>
 
    <script>
        // ===================================================================================
@@ -2344,7 +2362,10 @@
                 item.innerHTML = `
                     <div class="municipality-info">
                         <button class="favorite-btn" title="Toggle favorite" aria-label="Toggle favorite">
-                            <svg class="icon" aria-hidden="true"><use xlink:href="${isFav ? '#icon-star-filled' : '#icon-star'}"></use></svg>
+                            <svg class="icon" aria-hidden="true"><use xlink:href="${isFav ? '#icon-heart-filled' : '#icon-heart'}"></use></svg>
+                        </button>
+                        <button class="compare-btn" title="Add to comparison" aria-label="Add to comparison">
+                            <svg class="icon" aria-hidden="true"><use xlink:href="#icon-star"></use></svg>
                         </button>
                         <span class="municipality-name">${highlightText(municipality.name, searchTerm)}</span>
                         <div class="municipality-details">
@@ -2360,6 +2381,14 @@
                 fragment.appendChild(item);
             });
             resultsList.appendChild(fragment);
+            // After render, set compare star states
+            resultsList.querySelectorAll('.result-item').forEach(item => {
+                const name = item.dataset.name;
+                if (!name) return;
+                const id = slugifyMunicipalityId(name);
+                const use = item.querySelector('.compare-btn use');
+                if (use) use.setAttribute('xlink:href', comparisonState.selected.includes(id) ? '#icon-star-filled' : '#icon-star');
+            });
         }, 20); // Small delay for rendering
     }
 
@@ -2484,28 +2513,48 @@
             clearButton.addEventListener('click', clearAllFilters);
         }
 
+        // Pre-mark compare stars for already selected
+        document.getElementById('resultsList')?.querySelectorAll('.result-item').forEach(item => {
+            const name = item.dataset.name;
+            if (!name) return;
+            const id = slugifyMunicipalityId(name);
+            if (comparisonState.selected.includes(id)) {
+                const use = item.querySelector('.compare-btn use');
+                if (use) use.setAttribute('xlink:href', '#icon-star-filled');
+            }
+        });
+
         // Results list favorite toggling via event delegation
         const resultsList = document.getElementById('resultsList');
         if (resultsList) {
             resultsList.addEventListener('click', (e) => {
-                const btn = e.target.closest('.favorite-btn');
-                if (!btn) return;
-                const item = btn.closest('.result-item');
+                const favBtn = e.target.closest('.favorite-btn');
+                const cmpBtn = e.target.closest('.compare-btn');
+                if (!favBtn && !cmpBtn) return;
+                const item = e.target.closest('.result-item');
                 if (!item) return;
                 const name = item.dataset.name;
                 if (!name) return;
-                if (favoritesSet.has(name)) {
-                    favoritesSet.delete(name);
-                } else {
-                    favoritesSet.add(name);
+                if (favBtn) {
+                    if (favoritesSet.has(name)) {
+                        favoritesSet.delete(name);
+                    } else {
+                        favoritesSet.add(name);
+                    }
+                    saveFavorites();
+                    const use = favBtn.querySelector('use');
+                    if (use) use.setAttribute('xlink:href', favoritesSet.has(name) ? '#icon-heart-filled' : '#icon-heart');
+                    if (document.getElementById('favoritesOnly')?.checked) {
+                        recomputeAndRender();
+                    }
                 }
-                saveFavorites();
-                // Update icon
-                const use = btn.querySelector('use');
-                if (use) use.setAttribute('xlink:href', favoritesSet.has(name) ? '#icon-star-filled' : '#icon-star');
-                // If filtering by favorites-only, re-run filter to hide/show
-                if (document.getElementById('favoritesOnly')?.checked) {
-                    recomputeAndRender();
+                if (cmpBtn) {
+                    const toggled = toggleComparisonByName(name);
+                    if (toggled) {
+                        const use = cmpBtn.querySelector('use');
+                        const id = slugifyMunicipalityId(name);
+                        if (use) use.setAttribute('xlink:href', comparisonState.selected.includes(id) ? '#icon-star-filled' : '#icon-star');
+                    }
                 }
             });
         }
@@ -2518,6 +2567,12 @@
         if (feedbackClose) feedbackClose.addEventListener('click', closeFeedbackModal);
         if (feedbackCancel) feedbackCancel.addEventListener('click', closeFeedbackModal);
         if (feedbackForm) feedbackForm.addEventListener('submit', submitFeedback);
+
+        // Comparison badge actions
+        const openComparisonBtn = document.getElementById('openComparisonBtn');
+        const clearSelectionsBtn = document.getElementById('clearSelectionsBtn');
+        if (openComparisonBtn) openComparisonBtn.addEventListener('click', () => openComparisonView());
+        if (clearSelectionsBtn) clearSelectionsBtn.addEventListener('click', clearAllSelections);
 
         // Close modal when clicking outside content
         const feedbackModal = document.getElementById('feedbackModal');
@@ -2552,6 +2607,10 @@
 
         await loadAndUpdatePopulationDataFromAPI(); // Update populations
 
+        // Initialize comparison state
+        loadComparisonState();
+        updateComparisonBadge();
+
         filteredData = [...illinoisMunicipalities]; // Initialize with all data
 
         populateCountyFilter();
@@ -2560,6 +2619,7 @@
         sortResults(currentSort);
         recomputeAndRender(); // Render immediately based on any pre-filled filters
         setupEventListeners();
+        renderComparisonFromURL();
 
         if (loadingElement) loadingElement.style.display = 'none';
     }
@@ -2687,8 +2747,287 @@
         });
     }
 
- </script>
-</body>
-</html>
+    const MAX_COMPARISON = 10;
+    const STORAGE_KEY_COMPARISONS = 'municipalityComparisons';
+    let comparisonState = {
+        selected: [],
+        lastUpdated: new Date().toISOString(),
+        savedComparisons: []
+    };
+
+    function loadComparisonState() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY_COMPARISONS);
+            if (!raw) return;
+            const parsed = JSON.parse(raw);
+            // Migration with defaults
+            comparisonState.selected = Array.isArray(parsed.selected) ? parsed.selected.slice(0, MAX_COMPARISON) : [];
+            comparisonState.lastUpdated = parsed.lastUpdated || new Date().toISOString();
+            comparisonState.savedComparisons = Array.isArray(parsed.savedComparisons) ? parsed.savedComparisons.slice(0, 20) : [];
+        } catch (e) {
+            console.warn('Failed to parse comparison storage; resetting.', e);
+        }
+    }
+
+    function persistComparisonState() {
+        try {
+            comparisonState.lastUpdated = new Date().toISOString();
+            const payload = {
+                selected: comparisonState.selected,
+                lastUpdated: comparisonState.lastUpdated,
+                savedComparisons: (comparisonState.savedComparisons || []).slice(0, 20)
+            };
+            localStorage.setItem(STORAGE_KEY_COMPARISONS, JSON.stringify(payload));
+        } catch (e) {
+            console.warn('Failed to persist comparison storage.', e);
+        }
+    }
+
+    function slugifyMunicipalityId(name) {
+        return (name || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    }
+
+    function toggleComparisonByName(name) {
+        const id = slugifyMunicipalityId(name);
+        const idx = comparisonState.selected.indexOf(id);
+        if (idx >= 0) {
+            comparisonState.selected.splice(idx, 1);
+        } else {
+            if (comparisonState.selected.length >= MAX_COMPARISON) {
+                showUIMessage(`You can compare up to ${MAX_COMPARISON} municipalities.`, 'warning');
+                return false;
+            }
+            comparisonState.selected.push(id);
+        }
+        persistComparisonState();
+        updateComparisonBadge();
+        return true;
+    }
+
+    function clearAllSelections() {
+        comparisonState.selected = [];
+        persistComparisonState();
+        updateComparisonBadge();
+        // Update star icons in list
+        document.querySelectorAll('.compare-btn use').forEach(u => u.setAttribute('xlink:href', '#icon-star'));
+    }
+
+    function updateComparisonBadge() {
+        const badge = document.getElementById('comparisonBadge');
+        const label = document.getElementById('comparisonCountLabel');
+        if (!badge || !label) return;
+        const count = comparisonState.selected.length;
+        label.textContent = `${count} selected`;
+        badge.style.display = count > 0 ? 'block' : 'none';
+    }
+
+    function getSelectedMunicipalities() {
+        const idSet = new Set(comparisonState.selected);
+        return illinoisMunicipalities.filter(m => idSet.has(slugifyMunicipalityId(m.name)));
+    }
+
+    // Cross-tab sync
+    window.addEventListener('storage', (e) => {
+        if (e.key === STORAGE_KEY_COMPARISONS) {
+            loadComparisonState();
+            updateComparisonBadge();
+        }
+    });
+
+    function openComparisonView(extraParams = {}) {
+        if (!comparisonState.selected.length) {
+            showUIMessage('Select municipalities to compare.', 'info');
+            return;
+        }
+        const params = new URLSearchParams();
+        params.set('ids', comparisonState.selected.join(','));
+        if (extraParams.view) params.set('view', extraParams.view);
+        if (extraParams.metrics) params.set('metrics', extraParams.metrics.join(','));
+        if (extraParams.sort) params.set('sort', extraParams.sort);
+        const base = location.origin + location.pathname; // single-page
+        const url = `${base}#compare?${params.toString()}`;
+        location.hash = `compare?${params.toString()}`;
+        renderComparisonFromURL();
+    }
+
+    function parseHashQuery() {
+        if (!location.hash.startsWith('#compare')) return null;
+        const queryIndex = location.hash.indexOf('?');
+        const qs = queryIndex >= 0 ? location.hash.slice(queryIndex + 1) : '';
+        const params = new URLSearchParams(qs);
+        const ids = (params.get('ids') || '').split(',').filter(Boolean);
+        const view = params.get('view') || 'table';
+        const metrics = (params.get('metrics') || '').split(',').filter(Boolean);
+        const sort = params.get('sort') || '';
+        return { ids, view, metrics, sort };
+    }
+
+    function renderComparisonFromURL() {
+        const state = parseHashQuery();
+        const containerId = 'comparisonContainer';
+        let container = document.getElementById(containerId);
+        if (!state) {
+            if (container) container.remove();
+            return;
+        }
+        if (!container) {
+            container = document.createElement('div');
+            container.id = containerId;
+            container.setAttribute('role', 'region');
+            container.setAttribute('aria-label', 'Municipality comparison dashboard');
+            container.style.marginTop = '20px';
+            const parent = document.querySelector('.container');
+            (parent || document.body).appendChild(container);
+        }
+        renderComparisonDashboard(container, state);
+    }
+
+    function renderComparisonDashboard(container, state) {
+        const selectedIds = new Set(state.ids);
+        const selected = illinoisMunicipalities.filter(m => selectedIds.has(slugifyMunicipalityId(m.name)));
+        if (selected.length < 2) {
+            container.innerHTML = `<div class="no-results">Select at least 2 municipalities to compare</div>`;
+            return;
+        }
+        const header = `
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <button class="btn-secondary" onclick="location.hash='';" aria-label="Back to list">← Back to List</button>
+                <strong>Comparing ${selected.length} Municipalities</strong>
+            </div>
+            <div style="display:flex; gap:8px;">
+                <button class="btn-secondary" onclick="clearAllSelections(); location.hash='';" aria-label="Clear all selections">Clear All</button>
+                <button class="btn-secondary" onclick="navigator.clipboard.writeText(location.href); showUIMessage('Link copied');" aria-label="Share comparison">Share</button>
+                <button class="btn-secondary" onclick="exportComparisonCSV();" aria-label="Export CSV">Export</button>
+            </div>
+        </div>`;
+
+        const isChart = state.view === 'chart';
+        const tabs = `
+            <div style="padding:14px 16px; border-bottom:1px solid var(--border-color); display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                <button class="sort-btn ${state.view==='table' ? 'active':''}" onclick="location.hash='compare?ids=${state.ids.join(',')}&view=table'">Table</button>
+                <button class="sort-btn ${state.view==='chart' ? 'active':''}" onclick="location.hash='compare?ids=${state.ids.join(',')}&view=chart'">Charts</button>
+                <button class="sort-btn ${state.view==='rank' ? 'active':''}" onclick="location.hash='compare?ids=${state.ids.join(',')}&view=rank'">Rankings</button>
+                ${isChart ? `<span style='margin-left:auto; font-size:0.9rem;'>Metric:</span>
+                    <select id='chartMetric' style='padding:6px 10px; border:1px solid var(--border-color); border-radius:8px;'>
+                        <option value='population' selected>Population</option>
+                    </select>` : ''}
+            </div>`;
+
+        let bodyHtml = '';
+        if (isChart) {
+            bodyHtml = `
+                <div style="padding:16px; min-height:320px;">
+                    <div style="position:relative; height:360px;">
+                        <canvas id="comparisonChart" aria-label="Comparison chart"></canvas>
+                    </div>
+                </div>`;
+        } else {
+            const columns = ['Population'];
+            const rowsHtml = selected.map(m => `
+                <tr>
+                    <td style="font-weight:600;">${m.name}</td>
+                    <td>${m.population != null ? m.population.toLocaleString() : 'N/A'}</td>
+                </tr>
+            `).join('');
+            bodyHtml = `
+                <div style="padding:16px;">
+                    <table style="width:100%; border-collapse:collapse;">
+                        <thead>
+                            <tr>
+                                <th style="text-align:left; padding:8px; border-bottom:1px solid var(--border-color);">Municipality</th>
+                                ${columns.map(c => `<th style='text-align:right; padding:8px; border-bottom:1px solid var(--border-color);'>${c}</th>`).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rowsHtml}
+                        </tbody>
+                    </table>
+                </div>`;
+        }
+
+        container.innerHTML = `
+            ${header}
+            <div style="background:var(--secondary-bg); border:1px solid var(--border-color); border-radius:12px; overflow:hidden;">
+                ${tabs}
+                ${bodyHtml}
+            </div>
+        `;
+
+        if (isChart && window.Chart) {
+            const ctx = document.getElementById('comparisonChart').getContext('2d');
+            const labels = selected.map(m => m.name);
+            const values = selected.map(m => m.population || 0);
+            if (window._comparisonChart) {
+                window._comparisonChart.destroy();
+            }
+            window._comparisonChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Population',
+                        data: values,
+                        backgroundColor: 'rgba(47, 129, 247, 0.6)',
+                        borderColor: 'rgba(47, 129, 247, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => (context.parsed.y || 0).toLocaleString()
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { callback: (value) => Number(value).toLocaleString() }
+                        }
+                    }
+                }
+            });
+            const chartMetric = document.getElementById('chartMetric');
+            if (chartMetric) chartMetric.addEventListener('change', () => {
+                // For now only population; hook for future metrics
+                renderComparisonFromURL();
+            });
+        }
+    }
+
+    function exportComparisonCSV() {
+        const state = parseHashQuery();
+        if (!state) return;
+        const selectedIds = new Set(state.ids);
+        const selected = illinoisMunicipalities.filter(m => selectedIds.has(slugifyMunicipalityId(m.name)));
+        const rows = [ ['Municipality','Population'] ];
+        selected.forEach(m => rows.push([m.name, m.population != null ? m.population.toLocaleString() : 'N/A']));
+        const csv = rows.map(r => r.map(v => /[",\n]/.test(String(v)) ? `"${String(v).replace(/"/g,'""')}"` : v).join(',')).join('\n');
+        const blob = new Blob(['\ufeff'+csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        const date = new Date().toISOString().slice(0,10);
+        link.download = `municipality-comparison-${date}.csv`;
+        link.click();
+        URL.revokeObjectURL(url);
+    }
+
+        window.addEventListener('hashchange', renderComparisonFromURL);
+  </script>
+  <style>
+    /* Comparison dashboard styles */
+    #comparisonContainer table th, #comparisonContainer table td { border-bottom: 1px solid var(--border-color); }
+    #comparisonContainer table th, #comparisonContainer table td { padding: 8px; }
+    #comparisonContainer table th { text-align: left; }
+    #comparisonContainer table td:last-child, #comparisonContainer table th:last-child { text-align: right; }
+  </style>
+ </body>
+ </html>
 
 

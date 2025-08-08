@@ -387,7 +387,8 @@
            gap: 12px;
        }
 
-       .favorite-btn {
+       .favorite-btn,
+       .compare-btn {
            background: transparent;
            border: none;
            cursor: pointer;
@@ -397,15 +398,16 @@
            align-items: center;
            justify-content: center;
        }
-       .favorite-btn:hover { background: rgba(0,0,0,0.05); }
-       .favorite-btn .icon { width: 18px; height: 18px; fill: #f0ad4e; }
-      
+       .favorite-btn:hover, .compare-btn:hover { background: rgba(0,0,0,0.05); }
+       .favorite-btn .icon { width: 18px; height: 18px; fill: #e74c3c; }
+       .compare-btn .icon { width: 18px; height: 18px; fill: #f0ad4e; }
+       
        .municipality-name {
            font-weight: 500;
            color: var(--primary-text);
            font-size: 1.1rem;
        }
-      
+       
        .municipality-details {
            display: flex;
            align-items: center;
@@ -584,12 +586,14 @@
        }
    
    </style>
+
    <!-- Leaflet and plugins CSS -->
    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
    <link rel="stylesheet" href="https://unpkg.com/leaflet.fullscreen@2.4.0/Control.FullScreen.css" />
    <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+
 </head>
 <body>
    <svg width="0" height="0" style="position:absolute; display:none;">
@@ -605,12 +609,18 @@
            <path d="M12,2C6.48,2 2,6.48 2,12s4.48,10 10,10 10,-4.48 10,-10S17.52,2 12,2zM12,20c-4.41,0 -8,-3.59 -8,-8s3.59,-8 8,-8 8,3.59 8,8 -3.59,8 -8,8zM10.5,10.5L7.21,7.21 8.62,5.79 12,9.17l3.38,-3.38 1.41,1.41L13.41,10.5l3.38,3.38 -1.41,1.41L12,11.91l-3.38,3.38 -1.41,-1.41L10.5,10.5z"/>
        </symbol>
        <!-- New icons -->
-       <symbol id="icon-star" viewBox="0 0 24 24">
-           <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
-       </symbol>
-       <symbol id="icon-star-filled" viewBox="0 0 24 24">
-           <path d="M12 17.27L18.18 21 16.54 13.97 22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27z" fill="currentColor"/>
-       </symbol>
+             <symbol id="icon-star" viewBox="0 0 24 24">
+          <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+      </symbol>
+      <symbol id="icon-star-filled" viewBox="0 0 24 24">
+          <path d="M12 17.27L18.18 21 16.54 13.97 22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27z" fill="currentColor"/>
+      </symbol>
+      <symbol id="icon-heart" viewBox="0 0 24 24">
+          <path d="M12.1 8.64l-.1.1-.11-.11C10.14 6.6 7.1 6.6 5.14 8.56s-2 5.14 0 7.1L12 22l6.86-6.34c2-1.96 2-5.14 0-7.1-1.96-1.96-5-1.96-6.86 0z"/>
+      </symbol>
+      <symbol id="icon-heart-filled" viewBox="0 0 24 24">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 6 4 4 6.5 4c1.74 0 3.41 1 4.22 2.44C11.09 5 12.76 4 14.5 4 17 4 19 6 19 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="currentColor"/>
+      </symbol>
        <symbol id="icon-download" viewBox="0 0 24 24">
            <path d="M5 20h14v-2H5m14-9h-4V3H9v6H5l7 7 7-7z"/>
        </symbol>
@@ -832,6 +842,15 @@
        </div>
    </div>
 
+   <div id="comparisonBadge" class="comparison-badge" aria-live="polite" style="display:none; position: fixed; bottom: 90px; right: 18px; z-index: 1000;">
+       <button id="openComparisonBtn" class="feedback-fab" style="background:#ffbf00; color:#222; display:inline-flex; align-items:center; gap:8px;">
+           <svg class="icon" aria-hidden="true"><use xlink:href="#icon-star"></use></svg>
+           <span id="comparisonCountLabel">0 selected</span>
+       </button>
+       <div style="margin-top:6px; display:flex; gap:6px; justify-content:flex-end;">
+           <button id="clearSelectionsBtn" class="btn-secondary small" style="padding:6px 10px;">Clear all</button>
+       </div>
+   </div>
 
    <script>
        // ===================================================================================
@@ -2428,7 +2447,10 @@
                 item.innerHTML = `
                     <div class="municipality-info">
                         <button class="favorite-btn" title="Toggle favorite" aria-label="Toggle favorite">
-                            <svg class="icon" aria-hidden="true"><use xlink:href="${isFav ? '#icon-star-filled' : '#icon-star'}"></use></svg>
+                            <svg class="icon" aria-hidden="true"><use xlink:href="${isFav ? '#icon-heart-filled' : '#icon-heart'}"></use></svg>
+                        </button>
+                        <button class="compare-btn" title="Add to comparison" aria-label="Add to comparison">
+                            <svg class="icon" aria-hidden="true"><use xlink:href="#icon-star"></use></svg>
                         </button>
                         <span class="municipality-name">${highlightText(municipality.name, searchTerm)}</span>
                         <div class="municipality-details">
@@ -2449,6 +2471,14 @@
                 fragment.appendChild(item);
             });
             resultsList.appendChild(fragment);
+            // After render, set compare star states
+            resultsList.querySelectorAll('.result-item').forEach(item => {
+                const name = item.dataset.name;
+                if (!name) return;
+                const id = slugifyMunicipalityId(name);
+                const use = item.querySelector('.compare-btn use');
+                if (use) use.setAttribute('xlink:href', comparisonState.selected.includes(id) ? '#icon-star-filled' : '#icon-star');
+            });
         }, 20); // Small delay for rendering
     }
 
@@ -2573,28 +2603,48 @@
             clearButton.addEventListener('click', clearAllFilters);
         }
 
+        // Pre-mark compare stars for already selected
+        document.getElementById('resultsList')?.querySelectorAll('.result-item').forEach(item => {
+            const name = item.dataset.name;
+            if (!name) return;
+            const id = slugifyMunicipalityId(name);
+            if (comparisonState.selected.includes(id)) {
+                const use = item.querySelector('.compare-btn use');
+                if (use) use.setAttribute('xlink:href', '#icon-star-filled');
+            }
+        });
+
         // Results list favorite toggling via event delegation
         const resultsList = document.getElementById('resultsList');
         if (resultsList) {
             resultsList.addEventListener('click', (e) => {
-                const btn = e.target.closest('.favorite-btn');
-                if (!btn) return;
-                const item = btn.closest('.result-item');
+                const favBtn = e.target.closest('.favorite-btn');
+                const cmpBtn = e.target.closest('.compare-btn');
+                if (!favBtn && !cmpBtn) return;
+                const item = e.target.closest('.result-item');
                 if (!item) return;
                 const name = item.dataset.name;
                 if (!name) return;
-                if (favoritesSet.has(name)) {
-                    favoritesSet.delete(name);
-                } else {
-                    favoritesSet.add(name);
+                if (favBtn) {
+                    if (favoritesSet.has(name)) {
+                        favoritesSet.delete(name);
+                    } else {
+                        favoritesSet.add(name);
+                    }
+                    saveFavorites();
+                    const use = favBtn.querySelector('use');
+                    if (use) use.setAttribute('xlink:href', favoritesSet.has(name) ? '#icon-heart-filled' : '#icon-heart');
+                    if (document.getElementById('favoritesOnly')?.checked) {
+                        recomputeAndRender();
+                    }
                 }
-                saveFavorites();
-                // Update icon
-                const use = btn.querySelector('use');
-                if (use) use.setAttribute('xlink:href', favoritesSet.has(name) ? '#icon-star-filled' : '#icon-star');
-                // If filtering by favorites-only, re-run filter to hide/show
-                if (document.getElementById('favoritesOnly')?.checked) {
-                    recomputeAndRender();
+                if (cmpBtn) {
+                    const toggled = toggleComparisonByName(name);
+                    if (toggled) {
+                        const use = cmpBtn.querySelector('use');
+                        const id = slugifyMunicipalityId(name);
+                        if (use) use.setAttribute('xlink:href', comparisonState.selected.includes(id) ? '#icon-star-filled' : '#icon-star');
+                    }
                 }
             });
         }
@@ -2607,6 +2657,12 @@
         if (feedbackClose) feedbackClose.addEventListener('click', closeFeedbackModal);
         if (feedbackCancel) feedbackCancel.addEventListener('click', closeFeedbackModal);
         if (feedbackForm) feedbackForm.addEventListener('submit', submitFeedback);
+
+        // Comparison badge actions
+        const openComparisonBtn = document.getElementById('openComparisonBtn');
+        const clearSelectionsBtn = document.getElementById('clearSelectionsBtn');
+        if (openComparisonBtn) openComparisonBtn.addEventListener('click', () => openComparisonView());
+        if (clearSelectionsBtn) clearSelectionsBtn.addEventListener('click', clearAllSelections);
 
         // Close modal when clicking outside content
         const feedbackModal = document.getElementById('feedbackModal');
@@ -2641,6 +2697,10 @@
 
         await loadAndUpdatePopulationDataFromAPI(); // Update populations
 
+        // Initialize comparison state
+        loadComparisonState();
+        updateComparisonBadge();
+
         filteredData = [...illinoisMunicipalities]; // Initialize with all data
 
         populateCountyFilter();
@@ -2649,6 +2709,7 @@
         sortResults(currentSort);
         recomputeAndRender(); // Render immediately based on any pre-filled filters
         setupEventListeners();
+        renderComparisonFromURL();
 
         if (loadingElement) loadingElement.style.display = 'none';
     }
@@ -2776,6 +2837,7 @@
         });
     }
 
+
  </script>
     <!-- Leaflet and plugins JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -2901,5 +2963,6 @@
     </script>
 </body>
 </html>
+
 
 

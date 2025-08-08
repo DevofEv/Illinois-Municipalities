@@ -84,7 +84,96 @@
            color: var(--primary-text);
        }
        .btn.small { padding: 6px 10px; font-size: 0.85rem; }
-      
+
+       /* New: compact icon buttons and floating actions */
+       .icon-btn {
+           background: transparent;
+           border: 1px solid rgba(255,255,255,0.35);
+           color: inherit;
+           padding: 6px;
+           border-radius: 8px;
+           cursor: pointer;
+           display: inline-flex;
+           align-items: center;
+           justify-content: center;
+           transition: background-color 0.2s ease, border-color 0.2s ease;
+       }
+       .icon-btn .icon { width: 16px; height: 16px; }
+       .icon-btn:hover { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.5); }
+
+       .results-tools { display: flex; align-items: center; gap: 10px; }
+       .results-actions { display: flex; align-items: center; gap: 8px; }
+
+       .theme-toggle-fab {
+           position: fixed;
+           top: 12px;
+           right: 12px;
+           width: 38px;
+           height: 38px;
+           border-radius: 10px;
+           border: 1px solid var(--border-color);
+           background: var(--secondary-bg);
+           box-shadow: 0 4px 12px var(--shadow-color);
+           display: inline-flex;
+           align-items: center;
+           justify-content: center;
+           cursor: pointer;
+           z-index: 1000;
+       }
+       .theme-toggle-fab .icon { width: 18px; height: 18px; fill: var(--primary-text); }
+
+       .feedback-fab {
+           position: fixed;
+           bottom: 18px;
+           right: 18px;
+           background: var(--accent-color);
+           color: #fff;
+           border: none;
+           padding: 10px 14px;
+           border-radius: 999px;
+           display: inline-flex;
+           align-items: center;
+           gap: 8px;
+           box-shadow: 0 6px 18px var(--shadow-color);
+           cursor: pointer;
+           z-index: 1000;
+           font-size: 0.9rem;
+       }
+       .feedback-fab:hover { background: var(--accent-hover-color); }
+       .feedback-fab .icon { width: 16px; height: 16px; fill: #fff; }
+
+       .modal-overlay {
+           position: fixed;
+           inset: 0;
+           background: rgba(0,0,0,0.45);
+           display: none;
+           align-items: center;
+           justify-content: center;
+           z-index: 1100;
+       }
+       .modal-overlay.open { display: flex; }
+       .modal {
+           width: min(560px, 92vw);
+           background: var(--secondary-bg);
+           color: var(--primary-text);
+           border: 1px solid var(--border-color);
+           border-radius: 12px;
+           box-shadow: 0 10px 30px var(--shadow-color);
+       }
+       .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--border-color); }
+       .modal-title { font-weight: 600; }
+       .modal-close { background: transparent; border: none; cursor: pointer; padding: 6px; border-radius: 6px; }
+       .modal-close .icon { width: 18px; height: 18px; fill: var(--primary-text); }
+       .modal-body { padding: 16px; display: grid; gap: 12px; }
+       .modal-footer { display: flex; justify-content: flex-end; gap: 10px; padding: 12px 16px; border-top: 1px solid var(--border-color); }
+       .btn-secondary { background: transparent; color: var(--primary-text); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 8px; cursor: pointer; }
+
+       .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+       .modal-body textarea { min-height: 120px; resize: vertical; }
+
+       body.dark-theme .icon-btn { border-color: rgba(255,255,255,0.3); }
+       body.dark-theme .modal { background: var(--secondary-bg); color: var(--primary-text); }
+
        .main-content {
            display: grid;
            grid-template-columns: 300px 1fr;
@@ -143,7 +232,7 @@
            color: var(--primary-text);
            transition: border-color 0.2s ease, box-shadow 0.2s ease;
        }
-      
+       
        input:focus, select:focus {
            outline: none;
            border-color: var(--accent-color);
@@ -403,37 +492,21 @@
            border-top: 3px solid var(--accent-color);
            border-radius: 50%;
            animation: spin 0.8s linear infinite;
-           margin: 0 auto 15px;
+           margin: 0 auto 10px;
        }
-      
-       @keyframes spin {
-           0% { transform: rotate(0deg); }
-           100% { transform: rotate(360deg); }
-       }
-      
-       .fade-in {
-           animation: fadeIn 0.3s ease-out;
-       }
-      
-       @keyframes fadeIn {
-           from { opacity: 0; transform: translateY(10px); }
-           to { opacity: 1; transform: translateY(0); }
-       }
-      
+
        .highlight {
            background-color: rgba(0, 123, 255, 0.15);
            padding: 1px 4px;
            border-radius: 4px;
-           color: var(--accent-hover-color);
-           font-weight: 500;
        }
 
        /* Dark theme overrides via CSS variables */
        body.dark-theme {
            --primary-bg: #0f141a;
            --secondary-bg: #121a23;
-           --primary-text: #e6edf3;
-           --secondary-text: #a9b4bf;
+           --primary-text: #d1d5db;
+           --secondary-text: #9aa4b2;
            --accent-color: #2f81f7;
            --accent-hover-color: #1f6feb;
            --results-header-bg: #0b4ea2;
@@ -444,16 +517,6 @@
        body.dark-theme .btn-ghost { color: var(--secondary-text); border-color: var(--border-color); }
       
        @media (max-width: 1024px) {
-           .main-content {
-               grid-template-columns: 1fr;
-           }
-           .sidebar {
-               position: static;
-               margin-bottom: 30px;
-           }
-       }
-      
-       @media (max-width: 768px) {
            body { padding-top: 10px; }
            .container { padding: 10px; }
            .header { margin-bottom: 30px; }
@@ -466,19 +529,21 @@
            .results-header { padding: 15px 20px; flex-direction: column; gap: 10px; text-align: center;}
            .results-title { font-size: 1.1rem; }
            .sort-controls { justify-content: center; flex-wrap: wrap; }
-          
-           .result-item {
-               flex-direction: column;
-               align-items: flex-start;
-               gap: 10px;
-               padding: 15px;
-           }
-           .population-info { text-align: left; width: 100%; }
-           .stats-grid { grid-template-columns: repeat(2, 1fr); }
-           .stat-number { font-size: 1.5rem; }
+           .results-tools { justify-content: center; flex-wrap: wrap; }
+           .theme-toggle-fab { top: 10px; right: 10px; }
+           .feedback-fab { bottom: 12px; right: 12px; }
        }
 
+       @keyframes spin {
+           0% { transform: rotate(0deg); }
+           100% { transform: rotate(360deg); }
+       }
 
+       @keyframes fadeIn {
+           from { opacity: 0; transform: translateY(10px); }
+           to { opacity: 1; transform: translateY(0); }
+       }
+   
    </style>
 </head>
 <body>
@@ -510,7 +575,21 @@
        <symbol id="icon-sun" viewBox="0 0 24 24">
            <path d="M3.55,18.54L4.96,17.13L3.55,15.72L2.14,17.13L3.55,18.54M11,22H13V19H11V22M18.36,18.54L19.77,17.13L18.36,15.72L16.95,17.13L18.36,18.54M22,11H19V13H22V11M4,11H2V13H4V11M3.55,8.28L2.14,6.87L3.55,5.46L4.96,6.87L3.55,8.28M11,5H13V2H11V5M16.95,6.87L18.36,5.46L19.77,6.87L18.36,8.28L16.95,6.87M12,8A4,4 0 1,0 16,12A4,4 0 0,0 12,8Z"/>
        </symbol>
+       <symbol id="icon-share" viewBox="0 0 24 24">
+           <path d="M18,16.08C17.24,16.08 16.56,16.38 16.05,16.85L8.91,12.7C8.96,12.47 9,12.24 9,12C9,11.76 8.96,11.53 8.91,11.3L15.96,7.19C16.5,7.69 17.2,8 18,8A3,3 0 0,0 21,5A3,3 0 0,0 18,2A3,3 0 0,0 15,5C15,5.24 15.04,5.47 15.09,5.7L8.04,9.81C7.5,9.31 6.8,9 6,9A3,3 0 0,0 3,12A3,3 0 0,0 6,15C6.8,15 7.5,14.69 8.04,14.19L15.14,18.36C15.09,18.57 15.06,18.78 15.06,19A3,3 0 1,0 18,16.08Z"/>
+       </symbol>
+       <symbol id="icon-chat" viewBox="0 0 24 24">
+           <path d="M12,3A9,7 0 0,0 3,10C3,13.87 7.03,17 12,17C12.74,17 13.46,16.93 14.15,16.81L19,20V15.8C20.79,14.5 21.99,12.57 22,10.5C22,6.64 17.97,3 12,3Z"/>
+       </symbol>
+       <symbol id="icon-x" viewBox="0 0 24 24">
+           <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+       </symbol>
    </svg>
+
+   <!-- Floating theme toggle to declutter header -->
+   <button id="themeToggle" class="theme-toggle-fab" title="Toggle theme" aria-label="Toggle theme">
+       <svg class="icon" aria-hidden="true"><use xlink:href="#icon-moon"></use></svg>
+   </button>
 
 
    <div class="container">
@@ -519,20 +598,7 @@
                <svg class="icon" aria-hidden="true"><use xlink:href="#icon-location-pin"></use></svg> Illinois Municipalities
            </h1>
            <p>Comprehensive database of cities, villages, and towns in Illinois (Populations updated with 2020 Census Data where available)</p>
-           <div class="header-actions">
-               <button id="themeToggle" class="btn btn-ghost small" title="Toggle dark mode">
-                   <svg class="icon" aria-hidden="true"><use xlink:href="#icon-moon"></use></svg>
-                   <span>Theme</span>
-               </button>
-               <button id="exportCsvBtn" class="btn btn-ghost small" title="Export current results to CSV">
-                   <svg class="icon" aria-hidden="true"><use xlink:href="#icon-download"></use></svg>
-                   <span>Export CSV</span>
-               </button>
-               <button id="shareLinkBtn" class="btn btn-ghost small" title="Copy shareable link">
-                   <svg class="icon" aria-hidden="true"><use xlink:href="#icon-search"></use></svg>
-                   <span>Share link</span>
-               </button>
-           </div>
+           <!-- Removed cluttered header actions -->
        </div>
       
        <div class="main-content">
@@ -544,6 +610,18 @@
                    </h3>
                   
                    <div class="search-controls">
+                       <!-- New: Audience-friendly quick presets -->
+                       <div class="input-group">
+                           <label for="presetSelect">Quick presets</label>
+                           <select id="presetSelect">
+                               <option value="">None</option>
+                               <option value="top50">Top 50 by population</option>
+                               <option value="small">Population < 1,000</option>
+                               <option value="multi">Multi-county only</option>
+                               <option value="favorites">Favorites</option>
+                           </select>
+                       </div>
+
                        <div class="input-group">
                            <label for="searchInput">Search municipalities or counties</label>
                            <input type="text" id="searchInput" placeholder="e.g., Chicago or Cook">
@@ -614,11 +692,21 @@
                        <span id="resultsTitle">Illinois Municipalities</span>
                        <span id="resultsCount" style="font-size: 0.9rem; opacity: 0.8;">(0 results)</span>
                    </div>
-                   <div class="sort-controls">
-                       <span style="font-size: 0.9rem; opacity: 0.8;">Sort by:</span>
-                       <button class="sort-btn active" onclick="sortResults('name')">Name</button>
-                       <button class="sort-btn" onclick="sortResults('population')">Population</button>
-                       <button class="sort-btn" onclick="sortResults('county')">County</button>
+                   <div class="results-tools">
+                       <div class="sort-controls">
+                           <span style="font-size: 0.9rem; opacity: 0.8;">Sort by:</span>
+                           <button class="sort-btn active" onclick="sortResults('name')">Name</button>
+                           <button class="sort-btn" onclick="sortResults('population')">Population</button>
+                           <button class="sort-btn" onclick="sortResults('county')">County</button>
+                       </div>
+                       <div class="results-actions">
+                           <button id="shareLinkBtn" class="icon-btn" title="Copy shareable link" aria-label="Copy shareable link">
+                               <svg class="icon" aria-hidden="true"><use xlink:href="#icon-share"></use></svg>
+                           </button>
+                           <button id="exportCsvBtn" class="icon-btn" title="Export current results to CSV" aria-label="Export current results to CSV">
+                               <svg class="icon" aria-hidden="true"><use xlink:href="#icon-download"></use></svg>
+                           </button>
+                       </div>
                    </div>
                </div>
               
@@ -630,6 +718,55 @@
                <div class="results-list" id="resultsList">
                    </div>
            </div>
+       </div>
+   </div>
+
+   <!-- Feedback floating button and modal -->
+   <button id="feedbackBtn" class="feedback-fab" title="Send feedback" aria-label="Send feedback">
+       <svg class="icon" aria-hidden="true"><use xlink:href="#icon-chat"></use></svg>
+       <span>Feedback</span>
+   </button>
+
+   <div id="feedbackModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
+       <div class="modal">
+           <div class="modal-header">
+               <div class="modal-title" id="feedbackTitle">We value your feedback</div>
+               <button id="feedbackClose" class="modal-close" aria-label="Close feedback form">
+                   <svg class="icon" aria-hidden="true"><use xlink:href="#icon-x"></use></svg>
+               </button>
+           </div>
+           <form id="feedbackForm" class="modal-body">
+               <div class="input-row">
+                   <div>
+                       <label for="fbName">Name (optional)</label>
+                       <input id="fbName" type="text" placeholder="Your name">
+                   </div>
+                   <div>
+                       <label for="fbEmail">Email (optional)</label>
+                       <input id="fbEmail" type="email" placeholder="you@example.com">
+                   </div>
+               </div>
+               <div>
+                   <label for="fbRole">I am a...</label>
+                   <select id="fbRole">
+                       <option value="Engaged Resident">Engaged Resident</option>
+                       <option value="Government Official">Government Official</option>
+                       <option value="Researcher">Researcher</option>
+                       <option value="Student">Student</option>
+                   </select>
+               </div>
+               <div>
+                   <label for="fbMessage">Message</label>
+                   <textarea id="fbMessage" placeholder="Share your thoughts, feature requests, or data questions..." required></textarea>
+               </div>
+               <div class="modal-footer">
+                   <button type="button" class="btn-secondary" id="feedbackCancel">Cancel</button>
+                   <button type="submit" class="btn" id="feedbackSubmit">
+                       <svg class="icon" aria-hidden="true"><use xlink:href="#icon-share"></use></svg>
+                       Send
+                   </button>
+               </div>
+           </form>
        </div>
    </div>
 
@@ -768,7 +905,6 @@
             {name: "Bonnie", type: "Village", county: "Jefferson", population: 397},
             {name: "Bourbonnais", type: "Village", county: "Kankakee", population: 18631},
             {name: "Bowen", type: "Village", county: "Hancock", population: 494},
-            {name: "Braceville", type: "Village", county: "Grundy", population: 793},
             {name: "Bradford", type: "Village", county: "Stark", population: 768},
             {name: "Bradley", type: "Village", county: "Kankakee", population: 15895},
             {name: "Braidwood", type: "City", county: "Will", population: 6191},
@@ -1950,6 +2086,9 @@
     let searchTimeout;
     let favoritesSet = new Set(JSON.parse(localStorage.getItem('im_favorites') || '[]'));
 
+    // Feedback configuration
+    const FEEDBACK_EMAIL = 'municipalities-feedback@example.com'; // TODO: replace with your inbox
+
     function initThemeFromStorage() {
         const saved = localStorage.getItem('im_theme');
         const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -2001,6 +2140,40 @@
         }).catch(() => {
             showUIMessage('Could not copy link. You can copy from the address bar.', 'warning');
         });
+    }
+
+    // --- Feedback modal helpers ---
+    function openFeedbackModal() {
+        document.getElementById('feedbackModal')?.classList.add('open');
+        document.getElementById('fbMessage')?.focus();
+    }
+    function closeFeedbackModal() {
+        document.getElementById('feedbackModal')?.classList.remove('open');
+    }
+    function submitFeedback(event) {
+        event.preventDefault();
+        const name = (document.getElementById('fbName')?.value || '').trim();
+        const email = (document.getElementById('fbEmail')?.value || '').trim();
+        const role = (document.getElementById('fbRole')?.value || '').trim();
+        const message = (document.getElementById('fbMessage')?.value || '').trim();
+        if (!message) {
+            showUIMessage('Please enter a message before sending feedback.', 'warning');
+            return;
+        }
+        const subject = encodeURIComponent(`Site Feedback${role ? ' - ' + role : ''}${name ? ' - ' + name : ''}`);
+        const bodyLines = [
+            message,
+            '',
+            `Role: ${role || 'N/A'}`,
+            `Name: ${name || 'N/A'}`,
+            `Email: ${email || 'N/A'}`,
+            `URL: ${window.location.href}`
+        ];
+        const body = encodeURIComponent(bodyLines.join('\n'));
+        const mailto = `mailto:${FEEDBACK_EMAIL}?subject=${subject}&body=${body}`;
+        window.location.href = mailto;
+        closeFeedbackModal();
+        showUIMessage('Thank you for your feedback!', 'info');
     }
 
     function getFilterInputs() {
@@ -2109,175 +2282,6 @@
         }
     }
 
-    /**
-     * Displays a non-blocking message on the page.
-     * @param {string} message - The message to display.
-     * @param {'info'|'warning'|'error'} type - The type of message.
-     */
-    function showUIMessage(message, type = 'info') {
-        let messageBox = document.getElementById('ui-message-box');
-        if (!messageBox) {
-            messageBox = document.createElement('div');
-            messageBox.id = 'ui-message-box';
-            // Basic styling for the message box
-            Object.assign(messageBox.style, {
-                position: 'fixed',
-                top: '20px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                padding: '12px 20px',
-                borderRadius: '8px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                zIndex: '1001', // Ensure it's above other content
-                display: 'none',
-                fontSize: '0.9rem',
-                border: '1px solid transparent'
-            });
-            document.body.appendChild(messageBox);
-        }
-
-        messageBox.textContent = message;
-        if (type === 'error') {
-            messageBox.style.backgroundColor = '#f8d7da';
-            messageBox.style.color = '#721c24';
-            messageBox.style.borderColor = '#f5c6cb';
-        } else if (type === 'warning') {
-            messageBox.style.backgroundColor = '#fff3cd';
-            messageBox.style.color = '#856404';
-            messageBox.style.borderColor = '#ffeeba';
-        } else { // info
-            messageBox.style.backgroundColor = '#d1ecf1';
-            messageBox.style.color = '#0c5460';
-            messageBox.style.borderColor = '#bee5eb';
-        }
-        messageBox.style.display = 'block';
-
-        // Clear any existing timeout
-        if (messageBox.hideTimeout) {
-            clearTimeout(messageBox.hideTimeout);
-        }
-        messageBox.hideTimeout = setTimeout(() => {
-            messageBox.style.display = 'none';
-        }, 5000); // Auto-hide after 5 seconds
-    }
-
-    /**
-     * Fetches 2020 Census population data and updates the illinoisMunicipalities array.
-     * @returns {Promise<boolean>} True if successful or fallback, false on critical error.
-     */
-    async function loadAndUpdatePopulationDataFromAPI() {
-        const censusApiUrl = 'https://api.census.gov/data/2020/dec/dp?get=NAME,DP1_0001C&for=place:*&in=state:17'; // Get only NAME and Total Population
-        const loadingElement = document.getElementById('loading');
-        if(loadingElement) loadingElement.style.display = 'block';
-
-        try {
-            console.log('Fetching 2020 Census data from API: ' + censusApiUrl);
-            const response = await fetch(censusApiUrl);
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('Failed to fetch data from Census API:', response.status, response.statusText, errorText);
-                showUIMessage(`Could not load 2020 population data (Status: ${response.status}). Using existing data.`, 'warning');
-                return true; // Proceed with existing data
-            }
-            const censusJson = await response.json();
-
-            if (!censusJson || censusJson.length < 2) {
-                console.error('Census API returned no data or invalid data format.');
-                showUIMessage('Census API returned no data. Using existing data.', 'warning');
-                return true; // Proceed with existing data
-            }
-
-            const header = censusJson[0];
-            const dataRows = censusJson.slice(1);
-
-            const populationVarApi = 'DP1_0001C';
-            const nameVarApi = 'NAME';
-
-            const populationIndex = header.indexOf(populationVarApi);
-            const nameIndex = header.indexOf(nameVarApi);
-
-            if (populationIndex === -1 || nameIndex === -1) {
-                console.error(`Required columns ('${populationVarApi}' or '${nameVarApi}') not found in API response. Header:`, header);
-                showUIMessage('Census API data format unexpected. Using existing data.', 'warning');
-                return true; // Proceed with existing data
-            }
-
-            let updatedCount = 0;
-            let notFoundInApiCount = 0;
-            const apiDataMap = new Map();
-
-            dataRows.forEach(apiRow => {
-                const apiNameFull = apiRow[nameIndex];
-                const apiPopulationStr = apiRow[populationIndex];
-                if (!apiNameFull || apiPopulationStr === undefined) return;
-
-                let censusNameNormalized = apiNameFull.toLowerCase();
-                // Normalize Census name: remove type suffixes and ", illinois"
-                censusNameNormalized = censusNameNormalized.replace(/ (city|town|village|cdp), illinois$/, '').trim();
-                censusNameNormalized = censusNameNormalized.replace(/, illinois$/, '').trim(); // General fallback
-
-                const population = parseInt(apiPopulationStr, 10);
-                if (!isNaN(population)) {
-                    apiDataMap.set(censusNameNormalized, population);
-                }
-            });
-
-            illinoisMunicipalities.forEach(localMunicipality => {
-                const normalizedLocalName = localMunicipality.name.toLowerCase().trim();
-                if (apiDataMap.has(normalizedLocalName)) {
-                    localMunicipality.population = apiDataMap.get(normalizedLocalName);
-                    updatedCount++;
-                } else {
-                    notFoundInApiCount++;
-                }
-            });
-
-            console.log(`Updated ${updatedCount} municipalities with 2020 population data from API.`);
-            if (notFoundInApiCount > 0) {
-                console.log(`${notFoundInApiCount} municipalities from your list were not found in the API response or had no population data; their existing population data is retained.`);
-            }
-            if (updatedCount === 0 && illinoisMunicipalities.length > 0 && apiDataMap.size > 0) {
-                console.warn("No municipalities were updated. This might indicate issues with name matching logic.");
-            }
-            return true;
-
-        } catch (error) {
-            console.error('Error loading or processing 2020 population data from API:', error);
-            showUIMessage('Error fetching population data. Using existing data.', 'error');
-            return true; // Proceed with existing data
-        } finally {
-            if(loadingElement) loadingElement.style.display = 'none';
-        }
-    }
-
-    /**
-     * Populates the county filter dropdown with unique counties from the municipalities list.
-     */
-    function populateCountyFilter() {
-        const countyFilter = document.getElementById('countyFilter');
-        if (!countyFilter) return;
-
-        const allCounties = illinoisMunicipalities.flatMap(m =>
-            Array.isArray(m.county) ? m.county : (m.county || "Unknown")
-        );
-        const uniqueCounties = [...new Set(allCounties.filter(c => c && c !== "Unknown"))].sort();
-
-        // Clear existing options except the first "All Counties" one
-        while (countyFilter.options.length > 1) {
-            countyFilter.remove(1);
-        }
-
-        uniqueCounties.forEach(county => {
-            const option = document.createElement('option');
-            option.value = county;
-            option.textContent = county;
-            countyFilter.appendChild(option);
-        });
-    }
-
-    /**
-     * Updates the statistics displayed on the page (total municipalities, cities, villages, towns, and results count).
-     */
     function updateStats() {
         const totalMunicipalitiesElement = document.getElementById('totalMunicipalities');
         const totalCitiesElement = document.getElementById('totalCities');
@@ -2302,10 +2306,6 @@
         }
     }
 
-    /**
-     * Displays the filtered and sorted list of municipalities in the results area.
-     * @param {object[]} results - The array of municipality objects to display.
-     */
     function displayResults(results) {
         const resultsList = document.getElementById('resultsList');
         const loading = document.getElementById('loading'); // Re-check if needed here, or manage globally
@@ -2363,10 +2363,6 @@
         }, 20); // Small delay for rendering
     }
 
-    /**
-     * Sorts the `filteredData` array based on the specified criteria and updates the display.
-     * @param {string} sortBy - The criteria to sort by ('name', 'population', 'county').
-     */
     function sortResults(sortBy) {
         currentSort = sortBy;
 
@@ -2399,10 +2395,6 @@
         displayResults(filteredData);
     }
 
-    /**
-     * Filters the `illinoisMunicipalities` list based on current search and filter inputs,
-     * then sorts and updates the display.
-     */
     function filterMunicipalities() {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
@@ -2410,9 +2402,6 @@
         }, 250); // Debounce search input
     }
 
-    /**
-     * Clears all filters and search inputs, then re-renders the full list.
-     */
     function clearAllFilters() { // Renamed to avoid conflict if HTML onclick is `clearFilters()`
         document.getElementById('searchInput').value = '';
         document.getElementById('countyFilter').value = '';
@@ -2420,15 +2409,50 @@
         const minPop = document.getElementById('minPop'); if (minPop) minPop.value = '';
         const maxPop = document.getElementById('maxPop'); if (maxPop) maxPop.value = '';
         const favOnly = document.getElementById('favoritesOnly'); if (favOnly) favOnly.checked = false;
+        const preset = document.getElementById('presetSelect'); if (preset) preset.value = '';
         filteredData = [...illinoisMunicipalities];
         sortResults(currentSort);
         updateStats();
         updateURLFromState();
     }
 
-    /**
-     * Sets up event listeners for search inputs and filter dropdowns.
-     */
+    // Audience-friendly quick presets
+    function applyPreset(presetValue) {
+        const minPopInput = document.getElementById('minPop');
+        const maxPopInput = document.getElementById('maxPop');
+        const favoritesOnlyInput = document.getElementById('favoritesOnly');
+        const countyFilter = document.getElementById('countyFilter');
+        const typeFilter = document.getElementById('typeFilter');
+
+        // Reset first
+        if (minPopInput) minPopInput.value = '';
+        if (maxPopInput) maxPopInput.value = '';
+        if (favoritesOnlyInput) favoritesOnlyInput.checked = false;
+        if (countyFilter) countyFilter.value = '';
+        if (typeFilter) typeFilter.value = '';
+
+        if (presetValue === 'top50') {
+            // No direct limit UI; we sort by population desc and slice in render via filteredData
+            currentSort = 'population';
+        } else if (presetValue === 'small') {
+            if (maxPopInput) maxPopInput.value = '1000';
+            currentSort = 'name';
+        } else if (presetValue === 'multi') {
+            // Filter to multi-county municipalities by a special flag using recompute filter
+            // We'll set a hidden sentinel by abusing countyFilter with a special value
+            countyFilter.value = ''; // ensure no county constraint
+            // Mark via data attribute on body, then handle in recompute
+            document.body.setAttribute('data-preset-multi', '1');
+        } else if (presetValue === 'favorites') {
+            if (favoritesOnlyInput) favoritesOnlyInput.checked = true;
+            currentSort = 'name';
+        } else {
+            document.body.removeAttribute('data-preset-multi');
+            currentSort = 'name';
+        }
+        recomputeAndRender();
+    }
+
     function setupEventListeners() {
         const searchInput = document.getElementById('searchInput');
         const countyFilter = document.getElementById('countyFilter');
@@ -2440,6 +2464,11 @@
         const exportBtn = document.getElementById('exportCsvBtn');
         const shareBtn = document.getElementById('shareLinkBtn');
         const themeToggle = document.getElementById('themeToggle');
+        const presetSelect = document.getElementById('presetSelect');
+        const feedbackBtn = document.getElementById('feedbackBtn');
+        const feedbackClose = document.getElementById('feedbackClose');
+        const feedbackCancel = document.getElementById('feedbackCancel');
+        const feedbackForm = document.getElementById('feedbackForm');
 
         if (searchInput) searchInput.addEventListener('input', filterMunicipalities);
         if (countyFilter) countyFilter.addEventListener('change', filterMunicipalities);
@@ -2447,32 +2476,13 @@
         if (minPop) minPop.addEventListener('input', filterMunicipalities);
         if (maxPop) maxPop.addEventListener('input', filterMunicipalities);
         if (favoritesOnly) favoritesOnly.addEventListener('change', filterMunicipalities);
+        if (presetSelect) presetSelect.addEventListener('change', (e) => applyPreset(e.target.value));
 
-        // If the HTML uses onclick="clearFilters()", we need to ensure window.clearFilters points to the correct function.
-        // The original HTML had onclick="clearFilters()".
-        // It's better to handle this in JS if possible, but for now, let's ensure it works.
+        // If the HTML uses onclick="clearFilters()", ensure it routes correctly
         if (clearButton) {
-             // Remove the inline onclick and add a proper event listener
             clearButton.removeAttribute('onclick');
             clearButton.addEventListener('click', clearAllFilters);
         }
-
-
-        // Focus/blur styling for inputs (optional, but was in original)
-        [searchInput, countyFilter, typeFilter].forEach(element => {
-            if (element) {
-                element.addEventListener('focus', () => {
-                    if (element.parentElement && element.parentElement.classList.contains('input-group')) {
-                         // You might want to add a specific class for focus styling
-                    }
-                });
-                element.addEventListener('blur', () => {
-                     if (element.parentElement && element.parentElement.classList.contains('input-group')) {
-                        // Remove focus styling class
-                    }
-                });
-            }
-        });
 
         // Results list favorite toggling via event delegation
         const resultsList = document.getElementById('resultsList');
@@ -2503,11 +2513,26 @@
         if (exportBtn) exportBtn.addEventListener('click', exportToCSV);
         if (shareBtn) shareBtn.addEventListener('click', copyShareLink);
         if (themeToggle) themeToggle.addEventListener('click', toggleTheme);
+
+        if (feedbackBtn) feedbackBtn.addEventListener('click', openFeedbackModal);
+        if (feedbackClose) feedbackClose.addEventListener('click', closeFeedbackModal);
+        if (feedbackCancel) feedbackCancel.addEventListener('click', closeFeedbackModal);
+        if (feedbackForm) feedbackForm.addEventListener('submit', submitFeedback);
+
+        // Close modal when clicking outside content
+        const feedbackModal = document.getElementById('feedbackModal');
+        if (feedbackModal) {
+            feedbackModal.addEventListener('click', (e) => {
+                if (e.target === feedbackModal) closeFeedbackModal();
+            });
+        }
+
+        // ESC to close modal
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeFeedbackModal();
+        });
     }
 
-    /**
-     * Initializes the application: loads data, populates filters, sets up listeners, and renders the initial list.
-     */
     async function initializeApp() {
         const loadingElement = document.getElementById('loading');
         if (loadingElement) loadingElement.style.display = 'block';
@@ -2524,7 +2549,6 @@
                 </div>`;
             return;
         }
-
 
         await loadAndUpdatePopulationDataFromAPI(); // Update populations
 
@@ -2550,9 +2574,121 @@
     // It's better to assign this via JS (see setupEventListeners), but this ensures compatibility if HTML is not changed.
     window.clearFilters = clearAllFilters;
 
+    // Displays a non-blocking toast-style message
+    function showUIMessage(message, type = 'info') {
+        let messageBox = document.getElementById('ui-message-box');
+        if (!messageBox) {
+            messageBox = document.createElement('div');
+            messageBox.id = 'ui-message-box';
+            Object.assign(messageBox.style, {
+                position: 'fixed',
+                top: '20px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                padding: '12px 20px',
+                borderRadius: '8px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                zIndex: '1200',
+                display: 'none',
+                fontSize: '0.9rem',
+                border: '1px solid transparent'
+            });
+            document.body.appendChild(messageBox);
+        }
+        messageBox.textContent = message;
+        if (type === 'error') {
+            messageBox.style.backgroundColor = '#f8d7da';
+            messageBox.style.color = '#721c24';
+            messageBox.style.borderColor = '#f5c6cb';
+        } else if (type === 'warning') {
+            messageBox.style.backgroundColor = '#fff3cd';
+            messageBox.style.color = '#856404';
+            messageBox.style.borderColor = '#ffeeba';
+        } else {
+            messageBox.style.backgroundColor = '#d1ecf1';
+            messageBox.style.color = '#0c5460';
+            messageBox.style.borderColor = '#bee5eb';
+        }
+        messageBox.style.display = 'block';
+        if (messageBox.hideTimeout) clearTimeout(messageBox.hideTimeout);
+        messageBox.hideTimeout = setTimeout(() => {
+            messageBox.style.display = 'none';
+        }, 4000);
+    }
+
+    // Fetches 2020 Census population data and updates the list
+    async function loadAndUpdatePopulationDataFromAPI() {
+        const censusApiUrl = 'https://api.census.gov/data/2020/dec/dp?get=NAME,DP1_0001C&for=place:*&in=state:17';
+        const loadingElement = document.getElementById('loading');
+        if(loadingElement) loadingElement.style.display = 'block';
+        try {
+            const response = await fetch(censusApiUrl);
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Failed to fetch data from Census API:', response.status, response.statusText, errorText);
+                showUIMessage(`Could not load 2020 population data (Status: ${response.status}). Using existing data.`, 'warning');
+                return true; // proceed
+            }
+            const censusJson = await response.json();
+            if (!censusJson || censusJson.length < 2) {
+                console.error('Census API returned no data or invalid data format.');
+                showUIMessage('Census API returned no data. Using existing data.', 'warning');
+                return true;
+            }
+            const header = censusJson[0];
+            const dataRows = censusJson.slice(1);
+            const populationIndex = header.indexOf('DP1_0001C');
+            const nameIndex = header.indexOf('NAME');
+            if (populationIndex === -1 || nameIndex === -1) {
+                console.error('Required columns not found in API response. Header:', header);
+                showUIMessage('Census API data format unexpected. Using existing data.', 'warning');
+                return true;
+            }
+            const apiDataMap = new Map();
+            for (const row of dataRows) {
+                const apiNameFull = row[nameIndex];
+                const popStr = row[populationIndex];
+                if (!apiNameFull) continue;
+                let normalized = apiNameFull.toLowerCase().trim();
+                normalized = normalized.replace(/ (city|town|village|cdp), illinois$/, '').replace(/, illinois$/, '').trim();
+                const pop = parseInt(popStr, 10);
+                if (!isNaN(pop)) apiDataMap.set(normalized, pop);
+            }
+            let updated = 0;
+            for (const m of illinoisMunicipalities) {
+                const key = (m.name || '').toLowerCase().trim();
+                if (apiDataMap.has(key)) {
+                    m.population = apiDataMap.get(key);
+                    updated++;
+                }
+            }
+            console.log(`Updated ${updated} municipalities with 2020 population data.`);
+            return true;
+        } catch (e) {
+            console.error('Error fetching population data:', e);
+            showUIMessage('Error fetching population data. Using existing data.', 'error');
+            return true;
+        } finally {
+            if(loadingElement) loadingElement.style.display = 'none';
+        }
+    }
+
+    function populateCountyFilter() {
+        const countyFilter = document.getElementById('countyFilter');
+        if (!countyFilter) return;
+        const allCounties = illinoisMunicipalities.flatMap(m => Array.isArray(m.county) ? m.county : (m.county || ''));
+        const unique = [...new Set(allCounties.filter(Boolean))].sort();
+        while (countyFilter.options.length > 1) countyFilter.remove(1);
+        unique.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c;
+            opt.textContent = c;
+            countyFilter.appendChild(opt);
+        });
+    }
+
  </script>
 </body>
 </html>
-```
 
 

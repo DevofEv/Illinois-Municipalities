@@ -1,0 +1,42 @@
+{
+  "name": "il-municipalities",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "prebuild": "node scripts/fetch-census-data.js",
+    "build": "next build",
+    "start": "next start",
+    "export": "next export",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@tanstack/react-table": "^8.21.3",
+    "@types/leaflet": "^1.9.20",
+    "critters": "^0.0.25",
+    "fuse.js": "^7.1.0",
+    "geojson": "^0.5.0",
+    "leaflet": "^1.9.4",
+    "lodash-es": "^4.17.21",
+    "lucide-react": "^0.537.0",
+    "next": "15.4.6",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-leaflet": "^5.0.0",
+    "react-leaflet-cluster": "^3.1.0",
+    "react-leaflet-heatmap-layer-v3": "^3.0.3-beta-1",
+    "zod": "^4.0.15",
+    "zustand": "^5.0.7"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.4.6",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}

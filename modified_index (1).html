@@ -1,0 +1,2760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Illinois Municipalities Database (2020 Population Updates & Modern Design)</title>
+   <style>
+       :root {
+           --primary-bg: #f4f7f6; /* Light grey background */
+           --secondary-bg: #ffffff; /* White for cards/containers */
+           --primary-text: #333333; /* Dark grey for text */
+           --secondary-text: #555555; /* Medium grey for less important text */
+           --accent-color: #007bff; /* A modern blue */
+           --accent-hover-color: #0056b3;
+           --results-header-bg: #0056b3; /* Shade of blue for results header */
+           --border-color: #e0e0e0; /* Light border color */
+           --shadow-color: rgba(0, 0, 0, 0.05);
+       }
+
+
+       * {
+           margin: 0;
+           padding: 0;
+           box-sizing: border-box;
+       }
+      
+       body {
+           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+           background-color: var(--primary-bg);
+           color: var(--primary-text);
+           line-height: 1.6;
+           padding-top: 20px;
+       }
+      
+       .container {
+           max-width: 1400px;
+           margin: 0 auto;
+           padding: 20px;
+       }
+      
+       .header {
+           text-align: center;
+           margin-bottom: 50px;
+       }
+      
+       .header h1 {
+           font-size: clamp(2.2rem, 5vw, 3.2rem);
+           font-weight: 600;
+           margin-bottom: 15px;
+           color: var(--primary-text);
+           display: flex;
+           align-items: center;
+           justify-content: center;
+       }
+
+
+       .header h1 .icon { /* Styling for the new icon */
+           display: inline-block;
+           width: 32px; /* Adjusted size for new icon */
+           height: 32px;
+           margin-right: 12px;
+           vertical-align: middle;
+           fill: var(--accent-color);
+       }
+      
+       .header p {
+           font-size: 1.1rem;
+           color: var(--secondary-text);
+           margin-bottom: 20px;
+       }
+
+       /* Header actions toolbar */
+       .header-actions {
+           display: flex;
+           justify-content: center;
+           gap: 10px;
+           flex-wrap: wrap;
+           margin-top: 10px;
+       }
+
+       .btn-ghost {
+           background: transparent;
+           border: 1px solid var(--border-color);
+           color: var(--primary-text);
+       }
+       .btn.small { padding: 6px 10px; font-size: 0.85rem; }
+
+       /* New: compact icon buttons and floating actions */
+       .icon-btn {
+           background: transparent;
+           border: 1px solid rgba(255,255,255,0.35);
+           color: inherit;
+           padding: 6px;
+           border-radius: 8px;
+           cursor: pointer;
+           display: inline-flex;
+           align-items: center;
+           justify-content: center;
+           transition: background-color 0.2s ease, border-color 0.2s ease;
+       }
+       .icon-btn .icon { width: 16px; height: 16px; }
+       .icon-btn:hover { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.5); }
+
+       .results-tools { display: flex; align-items: center; gap: 10px; }
+       .results-actions { display: flex; align-items: center; gap: 8px; }
+
+       .theme-toggle-fab {
+           position: fixed;
+           top: 12px;
+           right: 12px;
+           width: 38px;
+           height: 38px;
+           border-radius: 10px;
+           border: 1px solid var(--border-color);
+           background: var(--secondary-bg);
+           box-shadow: 0 4px 12px var(--shadow-color);
+           display: inline-flex;
+           align-items: center;
+           justify-content: center;
+           cursor: pointer;
+           z-index: 1000;
+       }
+       .theme-toggle-fab .icon { width: 18px; height: 18px; fill: var(--primary-text); }
+
+       .feedback-fab {
+           position: fixed;
+           bottom: 18px;
+           right: 18px;
+           background: var(--accent-color);
+           color: #fff;
+           border: none;
+           padding: 10px 14px;
+           border-radius: 999px;
+           display: inline-flex;
+           align-items: center;
+           gap: 8px;
+           box-shadow: 0 6px 18px var(--shadow-color);
+           cursor: pointer;
+           z-index: 1000;
+           font-size: 0.9rem;
+       }
+       .feedback-fab:hover { background: var(--accent-hover-color); }
+       .feedback-fab .icon { width: 16px; height: 16px; fill: #fff; }
+
+       .modal-overlay {
+           position: fixed;
+           inset: 0;
+           background: rgba(0,0,0,0.45);
+           display: none;
+           align-items: center;
+           justify-content: center;
+           z-index: 1100;
+       }
+       .modal-overlay.open { display: flex; }
+       .modal {
+           width: min(560px, 92vw);
+           background: var(--secondary-bg);
+           color: var(--primary-text);
+           border: 1px solid var(--border-color);
+           border-radius: 12px;
+           box-shadow: 0 10px 30px var(--shadow-color);
+       }
+       .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--border-color); }
+       .modal-title { font-weight: 600; }
+       .modal-close { background: transparent; border: none; cursor: pointer; padding: 6px; border-radius: 6px; }
+       .modal-close .icon { width: 18px; height: 18px; fill: var(--primary-text); }
+       .modal-body { padding: 16px; display: grid; gap: 12px; }
+       .modal-footer { display: flex; justify-content: flex-end; gap: 10px; padding: 12px 16px; border-top: 1px solid var(--border-color); }
+       .btn-secondary { background: transparent; color: var(--primary-text); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 8px; cursor: pointer; }
+
+       .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+       .modal-body textarea { min-height: 120px; resize: vertical; }
+
+       body.dark-theme .icon-btn { border-color: rgba(255,255,255,0.3); }
+       body.dark-theme .modal { background: var(--secondary-bg); color: var(--primary-text); }
+
+       .main-content {
+           display: grid;
+           grid-template-columns: 300px 1fr;
+           gap: 30px;
+           margin-bottom: 40px;
+       }
+      
+       .sidebar {
+           background: var(--secondary-bg);
+           border-radius: 12px;
+           padding: 25px;
+           box-shadow: 0 4px 15px var(--shadow-color);
+           border: 1px solid var(--border-color);
+           height: fit-content;
+           position: sticky;
+           top: 20px;
+       }
+      
+       .search-section h3 {
+           color: var(--primary-text);
+           margin-bottom: 20px;
+           font-size: 1.2rem;
+           font-weight: 500;
+           display: flex;
+           align-items: center;
+           gap: 8px;
+       }
+       .search-section h3 .icon {
+           width: 20px;
+           height: 20px;
+           fill: var(--accent-color);
+       }
+      
+       .search-controls {
+           display: flex;
+           flex-direction: column;
+           gap: 18px;
+           margin-bottom: 25px;
+       }
+      
+       .input-group label {
+           display: block;
+           font-size: 0.85rem;
+           font-weight: 500;
+           color: var(--secondary-text);
+           margin-bottom: 6px;
+       }
+      
+       input, select {
+           width: 100%;
+           padding: 10px 12px;
+           border: 1px solid var(--border-color);
+           border-radius: 8px;
+           font-size: 0.95rem;
+           background: var(--primary-bg);
+           color: var(--primary-text);
+           transition: border-color 0.2s ease, box-shadow 0.2s ease;
+       }
+       
+       input:focus, select:focus {
+           outline: none;
+           border-color: var(--accent-color);
+           box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
+       }
+      
+       .btn {
+           background-color: var(--accent-color);
+           color: white;
+           border: none;
+           padding: 10px 20px;
+           border-radius: 8px;
+           cursor: pointer;
+           font-size: 0.95rem;
+           font-weight: 500;
+           transition: background-color 0.2s ease;
+           width: 100%;
+           margin-top: 10px;
+           display: flex;
+           align-items: center;
+           justify-content: center;
+           gap: 8px;
+       }
+       .btn .icon {
+           width: 16px;
+           height: 16px;
+           fill: white;
+       }
+
+
+       .btn:hover {
+           background-color: var(--accent-hover-color);
+           transform: translateY(-1px);
+       }
+      
+       .stats-grid {
+           display: grid;
+           grid-template-columns: repeat(2, 1fr);
+           gap: 12px;
+           margin-top: 25px;
+       }
+      
+       .stat-card {
+           background: var(--secondary-bg);
+           color: var(--primary-text);
+           padding: 15px;
+           border-radius: 8px;
+           text-align: center;
+           border: 1px solid var(--border-color);
+           box-shadow: 0 2px 8px var(--shadow-color);
+       }
+      
+       .stat-number {
+           font-size: 1.8rem;
+           font-weight: 600;
+           color: var(--accent-color);
+           margin-bottom: 3px;
+           display: block;
+       }
+      
+       .stat-label {
+           font-size: 0.8rem;
+           color: var(--secondary-text);
+       }
+      
+       .results-container {
+           background: var(--secondary-bg);
+           border-radius: 12px;
+           overflow: hidden;
+           box-shadow: 0 4px 15px var(--shadow-color);
+           border: 1px solid var(--border-color);
+       }
+      
+       .results-header {
+           background-color: var(--results-header-bg);
+           color: white;
+           padding: 20px 25px;
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+       }
+      
+       .results-title {
+           font-size: 1.2rem;
+           font-weight: 500;
+       }
+      
+       .sort-controls {
+           display: flex;
+           gap: 8px;
+           align-items: center;
+       }
+      
+       .sort-btn {
+           background: rgba(255,255,255,0.1);
+           border: 1px solid rgba(255,255,255,0.2);
+           color: white;
+           padding: 6px 12px;
+           border-radius: 6px;
+           cursor: pointer;
+           font-size: 0.85rem;
+           transition: background-color 0.2s ease;
+       }
+      
+       .sort-btn:hover, .sort-btn.active {
+           background: rgba(255,255,255,0.25);
+       }
+      
+       .results-list {
+           max-height: 650px;
+           overflow-y: auto;
+           scrollbar-width: thin;
+           scrollbar-color: var(--accent-color) var(--primary-bg);
+       }
+      
+       .results-list::-webkit-scrollbar {
+           width: 6px;
+       }
+      
+       .results-list::-webkit-scrollbar-track {
+           background: var(--primary-bg);
+       }
+      
+       .results-list::-webkit-scrollbar-thumb {
+           background: var(--accent-color);
+           border-radius: 3px;
+       }
+      
+       .result-item {
+           padding: 18px 25px;
+           border-bottom: 1px solid var(--border-color);
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+           transition: background-color 0.2s ease;
+           cursor: pointer;
+       }
+      
+       .result-item:hover {
+           background-color: #e9ecef;
+           transform: none;
+           border-left: none;
+       }
+      
+       .result-item:last-child {
+           border-bottom: none;
+       }
+      
+       .municipality-info {
+           display: flex;
+           align-items: flex-start;
+           gap: 12px;
+       }
+
+       .favorite-btn {
+           background: transparent;
+           border: none;
+           cursor: pointer;
+           padding: 2px;
+           border-radius: 6px;
+           display: inline-flex;
+           align-items: center;
+           justify-content: center;
+       }
+       .favorite-btn:hover { background: rgba(0,0,0,0.05); }
+       .favorite-btn .icon { width: 18px; height: 18px; fill: #f0ad4e; }
+      
+       .municipality-name {
+           font-weight: 500;
+           color: var(--primary-text);
+           font-size: 1.1rem;
+       }
+      
+       .municipality-details {
+           display: flex;
+           align-items: center;
+           gap: 10px;
+           flex-wrap: wrap;
+       }
+      
+       .type-badge {
+           padding: 3px 10px;
+           border-radius: 15px;
+           font-size: 0.75rem;
+           font-weight: 500;
+           text-transform: capitalize;
+           letter-spacing: 0.2px;
+           border: 1px solid transparent;
+       }
+      
+       .type-city {
+           background-color: #e6f7ff; color: #096dd9; border-color: #91d5ff;
+       }
+       .type-village {
+           background-color: #fffbe6; color: #d48806; border-color: #ffe58f;
+       }
+       .type-town {
+           background-color: #f6ffed; color: #389e0d; border-color: #b7eb8f;
+       }
+      
+       .county-info {
+           color: var(--secondary-text);
+           font-size: 0.85rem;
+       }
+      
+       .population-info {
+           text-align: right;
+           display: flex;
+           flex-direction: column;
+           gap: 3px;
+       }
+      
+       .population {
+           background-color: transparent;
+           color: var(--accent-color);
+           padding: 0;
+           border-radius: 0;
+           font-size: 1rem;
+           font-weight: 500;
+           border: none;
+       }
+      
+       .population-label {
+           font-size: 0.75rem;
+           color: var(--secondary-text);
+           text-transform: uppercase;
+           letter-spacing: 0.5px;
+       }
+      
+       .no-results {
+           text-align: center;
+           padding: 50px 30px;
+           color: var(--secondary-text);
+           font-size: 1rem;
+       }
+      
+       .no-results .icon {
+           display: block;
+           width: 48px;
+           height: 48px;
+           margin: 0 auto 15px;
+           fill: var(--border-color);
+       }
+      
+       .loading {
+           display: none;
+           text-align: center;
+           padding: 40px;
+           color: var(--accent-color);
+           font-size: 1rem;
+       }
+      
+       .spinner {
+           width: 32px;
+           height: 32px;
+           border: 3px solid var(--border-color);
+           border-top: 3px solid var(--accent-color);
+           border-radius: 50%;
+           animation: spin 0.8s linear infinite;
+           margin: 0 auto 10px;
+       }
+
+       .highlight {
+           background-color: rgba(0, 123, 255, 0.15);
+           padding: 1px 4px;
+           border-radius: 4px;
+       }
+
+        /*
+         * Action buttons for each municipality tile
+         *
+         * The buttons (Website, Fact, Government) are hidden by default and
+         * gracefully fade and slide into view when the user hovers over a tile.
+         */
+        .municipality-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            opacity: 0;
+            transform: translateY(4px);
+            transition: opacity 0.15s ease, transform 0.15s ease;
+        }
+        .result-item:hover .municipality-actions {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .action-btn {
+            background-color: var(--secondary-bg);
+            color: var(--accent-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            text-decoration: none;
+            cursor: pointer;
+            display: inline-block;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .action-btn:hover {
+            background-color: var(--accent-color);
+            color: #fff;
+        }
+        .action-btn[aria-disabled="true"] {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+       /* Dark theme overrides via CSS variables */
+       body.dark-theme {
+           --primary-bg: #0f141a;
+           --secondary-bg: #121a23;
+           --primary-text: #d1d5db;
+           --secondary-text: #9aa4b2;
+           --accent-color: #2f81f7;
+           --accent-hover-color: #1f6feb;
+           --results-header-bg: #0b4ea2;
+           --border-color: #273444;
+           --shadow-color: rgba(0,0,0,0.4);
+       }
+       body.dark-theme .result-item:hover { background-color: rgba(255,255,255,0.06); }
+       body.dark-theme .btn-ghost { color: var(--secondary-text); border-color: var(--border-color); }
+      
+       @media (max-width: 1024px) {
+           body { padding-top: 10px; }
+           .container { padding: 10px; }
+           .header { margin-bottom: 30px; }
+           .header h1 { font-size: clamp(1.8rem, 5vw, 2.5rem); }
+           .header p { font-size: 1rem; }
+
+
+           .main-content { gap: 20px; }
+           .sidebar { padding: 20px; }
+           .results-header { padding: 15px 20px; flex-direction: column; gap: 10px; text-align: center;}
+           .results-title { font-size: 1.1rem; }
+           .sort-controls { justify-content: center; flex-wrap: wrap; }
+           .results-tools { justify-content: center; flex-wrap: wrap; }
+           .theme-toggle-fab { top: 10px; right: 10px; }
+           .feedback-fab { bottom: 12px; right: 12px; }
+       }
+
+       @keyframes spin {
+           0% { transform: rotate(0deg); }
+           100% { transform: rotate(360deg); }
+       }
+
+       @keyframes fadeIn {
+           from { opacity: 0; transform: translateY(10px); }
+           to { opacity: 1; transform: translateY(0); }
+       }
+   
+   </style>
+</head>
+<body>
+   <svg width="0" height="0" style="position:absolute; display:none;">
+       <symbol id="icon-location-pin" viewBox="0 0 24 24"> <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+       </symbol>
+       <symbol id="icon-search" viewBox="0 0 24 24">
+           <path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z" />
+       </symbol>
+       <symbol id="icon-clear" viewBox="0 0 24 24">
+           <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" />
+       </symbol>
+       <symbol id="icon-no-results" viewBox="0 0 24 24">
+           <path d="M12,2C6.48,2 2,6.48 2,12s4.48,10 10,10 10,-4.48 10,-10S17.52,2 12,2zM12,20c-4.41,0 -8,-3.59 -8,-8s3.59,-8 8,-8 8,3.59 8,8 -3.59,8 -8,8zM10.5,10.5L7.21,7.21 8.62,5.79 12,9.17l3.38,-3.38 1.41,1.41L13.41,10.5l3.38,3.38 -1.41,1.41L12,11.91l-3.38,3.38 -1.41,-1.41L10.5,10.5z"/>
+       </symbol>
+       <!-- New icons -->
+       <symbol id="icon-star" viewBox="0 0 24 24">
+           <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+       </symbol>
+       <symbol id="icon-star-filled" viewBox="0 0 24 24">
+           <path d="M12 17.27L18.18 21 16.54 13.97 22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27z" fill="currentColor"/>
+       </symbol>
+       <symbol id="icon-download" viewBox="0 0 24 24">
+           <path d="M5 20h14v-2H5m14-9h-4V3H9v6H5l7 7 7-7z"/>
+       </symbol>
+       <symbol id="icon-moon" viewBox="0 0 24 24">
+           <path d="M12.74 2a9 9 0 1 0 9.26 11.45A7 7 0 0 1 12.74 2z"/>
+       </symbol>
+       <symbol id="icon-sun" viewBox="0 0 24 24">
+           <path d="M3.55,18.54L4.96,17.13L3.55,15.72L2.14,17.13L3.55,18.54M11,22H13V19H11V22M18.36,18.54L19.77,17.13L18.36,15.72L16.95,17.13L18.36,18.54M22,11H19V13H22V11M4,11H2V13H4V11M3.55,8.28L2.14,6.87L3.55,5.46L4.96,6.87L3.55,8.28M11,5H13V2H11V5M16.95,6.87L18.36,5.46L19.77,6.87L18.36,8.28L16.95,6.87M12,8A4,4 0 1,0 16,12A4,4 0 0,0 12,8Z"/>
+       </symbol>
+       <symbol id="icon-share" viewBox="0 0 24 24">
+           <path d="M18,16.08C17.24,16.08 16.56,16.38 16.05,16.85L8.91,12.7C8.96,12.47 9,12.24 9,12C9,11.76 8.96,11.53 8.91,11.3L15.96,7.19C16.5,7.69 17.2,8 18,8A3,3 0 0,0 21,5A3,3 0 0,0 18,2A3,3 0 0,0 15,5C15,5.24 15.04,5.47 15.09,5.7L8.04,9.81C7.5,9.31 6.8,9 6,9A3,3 0 0,0 3,12A3,3 0 0,0 6,15C6.8,15 7.5,14.69 8.04,14.19L15.14,18.36C15.09,18.57 15.06,18.78 15.06,19A3,3 0 1,0 18,16.08Z"/>
+       </symbol>
+       <symbol id="icon-chat" viewBox="0 0 24 24">
+           <path d="M12,3A9,7 0 0,0 3,10C3,13.87 7.03,17 12,17C12.74,17 13.46,16.93 14.15,16.81L19,20V15.8C20.79,14.5 21.99,12.57 22,10.5C22,6.64 17.97,3 12,3Z"/>
+       </symbol>
+       <symbol id="icon-x" viewBox="0 0 24 24">
+           <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+       </symbol>
+   </svg>
+
+   <!-- Floating theme toggle to declutter header -->
+   <button id="themeToggle" class="theme-toggle-fab" title="Toggle theme" aria-label="Toggle theme">
+       <svg class="icon" aria-hidden="true"><use xlink:href="#icon-moon"></use></svg>
+   </button>
+
+
+   <div class="container">
+       <div class="header">
+           <h1>
+               <svg class="icon" aria-hidden="true"><use xlink:href="#icon-location-pin"></use></svg> Illinois Municipalities
+           </h1>
+           <p>Comprehensive database of cities, villages, and towns in Illinois (Populations updated with 2020 Census Data where available)</p>
+           <!-- Removed cluttered header actions -->
+       </div>
+      
+       <div class="main-content">
+           <div class="sidebar">
+               <div class="search-section">
+                   <h3>
+                       <svg class="icon" aria-hidden="true"><use xlink:href="#icon-search"></use></svg>
+                       Search & Filter
+                   </h3>
+                  
+                   <div class="search-controls">
+                       <!-- New: Audience-friendly quick presets -->
+                       <div class="input-group">
+                           <label for="presetSelect">Quick presets</label>
+                           <select id="presetSelect">
+                               <option value="">None</option>
+                               <option value="top50">Top 50 by population</option>
+                               <option value="small">Population < 1,000</option>
+                               <option value="multi">Multi-county only</option>
+                               <option value="favorites">Favorites</option>
+                           </select>
+                       </div>
+
+                       <div class="input-group">
+                           <label for="searchInput">Search municipalities or counties</label>
+                           <input type="text" id="searchInput" placeholder="e.g., Chicago or Cook">
+                       </div>
+                      
+                       <div class="input-group">
+                           <label for="countyFilter">Filter by county</label>
+                           <select id="countyFilter">
+                               <option value="">All Counties</option>
+                           </select>
+                       </div>
+                      
+                       <div class="input-group">
+                           <label for="typeFilter">Filter by type</label>
+                           <select id="typeFilter">
+                               <option value="">All Types</option>
+                               <option value="City">Cities</option>
+                               <option value="Village">Villages</option>
+                               <option value="Town">Towns</option>
+                           </select>
+                       </div>
+
+                       <!-- New: Population range -->
+                       <div class="input-group">
+                           <label>Population range</label>
+                           <div style="display:flex; gap:10px;">
+                               <input type="number" id="minPop" placeholder="Min" min="0">
+                               <input type="number" id="maxPop" placeholder="Max" min="0">
+                           </div>
+                       </div>
+
+                       <!-- New: Favorites only -->
+                       <div class="input-group" style="display:flex; align-items:center; gap:10px;">
+                           <input type="checkbox" id="favoritesOnly" style="width:auto;">
+                           <label for="favoritesOnly" style="margin:0;">Show favorites only</label>
+                       </div>
+                      
+                       <button class="btn" onclick="clearFilters()">
+                           <svg class="icon" aria-hidden="true"><use xlink:href="#icon-clear"></use></svg>
+                           Clear Filters
+                       </button>
+                   </div>
+                  
+                   <div class="stats-grid">
+                       <div class="stat-card">
+                           <span class="stat-number" id="totalMunicipalities">0</span>
+                           <span class="stat-label">Total</span>
+                       </div>
+                       <div class="stat-card">
+                           <span class="stat-number" id="totalCities">0</span>
+                           <span class="stat-label">Cities</span>
+                       </div>
+                       <div class="stat-card">
+                           <span class="stat-number" id="totalVillages">0</span>
+                           <span class="stat-label">Villages</span>
+                       </div>
+                       <div class="stat-card">
+                           <span class="stat-number" id="totalTowns">0</span>
+                           <span class="stat-label">Towns</span>
+                       </div>
+                   </div>
+               </div>
+           </div>
+          
+           <div class="results-container">
+               <div class="results-header">
+                   <div class="results-title">
+                       <span id="resultsTitle">Illinois Municipalities</span>
+                       <span id="resultsCount" style="font-size: 0.9rem; opacity: 0.8;">(0 results)</span>
+                   </div>
+                   <div class="results-tools">
+                       <div class="sort-controls">
+                           <span style="font-size: 0.9rem; opacity: 0.8;">Sort by:</span>
+                           <button class="sort-btn active" onclick="sortResults('name')">Name</button>
+                           <button class="sort-btn" onclick="sortResults('population')">Population</button>
+                           <button class="sort-btn" onclick="sortResults('county')">County</button>
+                       </div>
+                       <div class="results-actions">
+                           <button id="shareLinkBtn" class="icon-btn" title="Copy shareable link" aria-label="Copy shareable link">
+                               <svg class="icon" aria-hidden="true"><use xlink:href="#icon-share"></use></svg>
+                           </button>
+                           <button id="exportCsvBtn" class="icon-btn" title="Export current results to CSV" aria-label="Export current results to CSV">
+                               <svg class="icon" aria-hidden="true"><use xlink:href="#icon-download"></use></svg>
+                           </button>
+                       </div>
+                   </div>
+               </div>
+              
+               <div class="loading" id="loading">
+                   <div class="spinner"></div>
+                   <div>Loading 2020 Census data and municipalities...</div>
+               </div>
+              
+               <div class="results-list" id="resultsList">
+                   </div>
+           </div>
+       </div>
+   </div>
+
+   <!-- Feedback floating button and modal -->
+   <button id="feedbackBtn" class="feedback-fab" title="Send feedback" aria-label="Send feedback">
+       <svg class="icon" aria-hidden="true"><use xlink:href="#icon-chat"></use></svg>
+       <span>Feedback</span>
+   </button>
+
+   <div id="feedbackModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
+       <div class="modal">
+           <div class="modal-header">
+               <div class="modal-title" id="feedbackTitle">We value your feedback</div>
+               <button id="feedbackClose" class="modal-close" aria-label="Close feedback form">
+                   <svg class="icon" aria-hidden="true"><use xlink:href="#icon-x"></use></svg>
+               </button>
+           </div>
+           <form id="feedbackForm" class="modal-body">
+               <div class="input-row">
+                   <div>
+                       <label for="fbName">Name (optional)</label>
+                       <input id="fbName" type="text" placeholder="Your name">
+                   </div>
+                   <div>
+                       <label for="fbEmail">Email (optional)</label>
+                       <input id="fbEmail" type="email" placeholder="you@example.com">
+                   </div>
+               </div>
+               <div>
+                   <label for="fbRole">I am a...</label>
+                   <select id="fbRole">
+                       <option value="Engaged Resident">Engaged Resident</option>
+                       <option value="Government Official">Government Official</option>
+                       <option value="Researcher">Researcher</option>
+                       <option value="Student">Student</option>
+                   </select>
+               </div>
+               <div>
+                   <label for="fbMessage">Message</label>
+                   <textarea id="fbMessage" placeholder="Share your thoughts, feature requests, or data questions..." required></textarea>
+               </div>
+               <div class="modal-footer">
+                   <button type="button" class="btn-secondary" id="feedbackCancel">Cancel</button>
+                   <button type="submit" class="btn" id="feedbackSubmit">
+                       <svg class="icon" aria-hidden="true"><use xlink:href="#icon-share"></use></svg>
+                       Send
+                   </button>
+               </div>
+           </form>
+       </div>
+   </div>
+
+
+   <script>
+       // ===================================================================================
+       // PASTE YOUR FULL `illinoisMunicipalities` ARRAY HERE
+       // This array should contain your municipalities with their names, types,
+       // and primary counties. The population figures will be updated from the 2020 Census if a match is found.
+       // Example structure:
+       // const illinoisMunicipalities = [
+       //     {name: "Abingdon", type: "City", county: "Knox", population: 3319}, // Population will be updated
+       //     {name: "Addison", type: "Village", county: "DuPage", population: 36942},
+       //     // ... and so on for all your municipalities
+       // ];
+       // ===================================================================================
+       const illinoisMunicipalities = [
+           {name: "Abingdon", type: "City", county: "Knox", population: 3319},
+            {name: "Addieville", type: "Village", county: "Washington", population: 252},
+            {name: "Addison", type: "Village", county: "DuPage", population: 36942},
+            {name: "Adeline", type: "Village", county: "Ogle", population: 85},
+            {name: "Albany", type: "Village", county: "Whiteside", population: 891},
+            {name: "Albers", type: "Village", county: "Clinton", population: 1190},
+            {name: "Albion", type: "City", county: "Edwards", population: 1988},
+            {name: "Aledo", type: "City", county: "Mercer", population: 3640},
+            {name: "Alexis", type: "Village", county: ["Warren", "Mercer"], population: 831},
+            {name: "Algonquin", type: "Village", county: ["McHenry", "Kane"], population: 30046},
+            {name: "Alhambra", type: "Village", county: "Madison", population: 681},
+            {name: "Allendale", type: "Village", county: "Wabash", population: 475},
+            {name: "Allenville", type: "Village", county: "Moultrie", population: 148},
+            {name: "Allerton", type: "Village", county: "Vermilion", population: 291}, // Also in Champaign
+            {name: "Alma", type: "Village", county: "Marion", population: 320},
+            {name: "Alorton", type: "Village", county: "St. Clair", population: 2002},
+            {name: "Alpha", type: "Village", county: "Henry", population: 671},
+            {name: "Alsey", type: "Village", county: "Scott", population: 227},
+            {name: "Alsip", type: "Village", county: "Cook", population: 19277},
+            {name: "Altamont", type: "City", county: "Effingham", population: 2319},
+            {name: "Alton", type: "City", county: "Madison", population: 27865},
+            {name: "Altona", type: "Village", county: "Knox", population: 531},
+            {name: "Alto Pass", type: "Village", county: "Union", population: 391},
+            {name: "Alvin", type: "Village", county: "Vermilion", population: 270}, // Corrected from Alvan
+            {name: "Amboy", type: "City", county: "Lee", population: 2500},
+            {name: "Anchor", type: "Village", county: "McLean", population: 146},
+            {name: "Andalusia", type: "Village", county: "Rock Island", population: 1178},
+            {name: "Andover", type: "Village", county: "Henry", population: 578},
+            {name: "Anna", type: "City", county: "Union", population: 4442},
+            {name: "Annawan", type: "Town", county: "Henry", population: 878},
+            {name: "Antioch", type: "Village", county: "Lake", population: 14430},
+            {name: "Apple River", type: "Village", county: "JoDaviess", population: 366},
+            {name: "Arcola", type: "City", county: "Douglas", population: 2916},
+            {name: "Arenzville", type: "Village", county: "Cass", population: 409},
+            {name: "Argenta", type: "Village", county: "Macon", population: 947},
+            {name: "Arlington", type: "Village", county: "Bureau", population: 193},
+            {name: "Arlington Heights", type: "Village", county: "Cook", population: 75101},
+            {name: "Armington", type: "Village", county: "Tazewell", population: 343},
+            {name: "Aroma Park", type: "Village", county: "Kankakee", population: 743},
+            {name: "Arrowsmith", type: "Village", county: "McLean", population: 294},
+            {name: "Arthur", type: "Village", county: ["Douglas", "Moultrie"], population: 2288},
+            {name: "Ashkum", type: "Village", county: "Iroquois", population: 761},
+            {name: "Ashland", type: "Village", county: "Cass", population: 1333},
+            {name: "Ashley", type: "City", county: "Washington", population: 536},
+            {name: "Ashmore", type: "Village", county: "Coles", population: 785},
+            {name: "Ashton", type: "Village", county: "Lee", population: 972},
+            {name: "Assumption", type: "City", county: "Christian", population: 1168},
+            {name: "Astoria", type: "Town", county: "Fulton", population: 1141},
+            {name: "Athens", type: "City", county: "Menard", population: 1988},
+            {name: "Atkinson", type: "Town", county: "Henry", population: 972},
+            {name: "Atlanta", type: "City", county: "Logan", population: 1692},
+            {name: "Atwood", type: "Village", county: ["Douglas", "Piatt"], population: 1224},
+            {name: "Auburn", type: "City", county: "Sangamon", population: 4771},
+            {name: "Augusta", type: "Village", county: "Hancock", population: 587},
+            {name: "Aurora", type: "City", county: ["Kane", "DuPage", "Kendall", "Will"], population: 197899},
+            {name: "Ava", type: "City", county: "Jackson", population: 654},
+            {name: "Aviston", type: "Village", county: "Clinton", population: 1945},
+            {name: "Avon", type: "Village", county: "Fulton", population: 799},
+            {name: "Baldwin", type: "Village", county: "Randolph", population: 373},
+            {name: "Banner", type: "Village", county: "Fulton", population: 189},
+            {name: "Bannockburn", type: "Village", county: "Lake", population: 1583},
+            {name: "Bardolph", type: "Village", county: "McDonough", population: 251},
+            {name: "Barrington", type: "Village", county: ["Cook", "Lake"], population: 10327},
+            {name: "Barrington Hills", type: "Village", county: ["Cook", "Kane", "Lake", "McHenry"], population: 4209},
+            {name: "Barry", type: "City", county: "Pike", population: 1318},
+            {name: "Bartelso", type: "Village", county: "Clinton", population: 595},
+            {name: "Bartlett", type: "Village", county: ["Cook", "DuPage", "Kane"], population: 41208},
+            {name: "Bartonville", type: "Village", county: "Peoria", population: 6471},
+            {name: "Basco", type: "Village", county: "Hancock", population: 98},
+            {name: "Batavia", type: "City", county: ["Kane", "DuPage"], population: 26045},
+            {name: "Batchtown", type: "Village", county: "Calhoun", population: 214},
+            {name: "Bath", type: "Village", county: "Mason", population: 333},
+            {name: "Baylis", type: "Village", county: "Pike", population: 205},
+            {name: "Bay View Gardens", type: "Village", county: "Woodford", population: 378}, // Corrected Name
+            {name: "Beach Park", type: "Village", county: "Lake", population: 13638},
+            {name: "Beardstown", type: "City", county: "Cass", population: 6123},
+            {name: "Beaverville", type: "Village", county: "Iroquois", population: 362},
+            {name: "Beckemeyer", type: "Village", county: "Clinton", population: 1040},
+            {name: "Bedford Park", type: "Village", county: "Cook", population: 580},
+            {name: "Beecher", type: "Village", county: "Will", population: 4359},
+            {name: "Beecher City", type: "Village", county: "Effingham", population: 463},
+            {name: "Belgium", type: "Village", county: "Vermilion", population: 404},
+            {name: "Belknap", type: "Village", county: "Johnson", population: 104},
+            {name: "Belleflower", type: "Village", county: "McLean", population: 357},
+            {name: "Belle Prairie City", type: "Town", county: "Hamilton", population: 54},
+            {name: "Belle Rive", type: "Village", county: "Jefferson", population: 361},
+            {name: "Belleville", type: "City", county: "St. Clair", population: 44478},
+            {name: "Bellevue", type: "Village", county: "Peoria", population: 1978},
+            {name: "Bellmont", type: "Village", county: "Wabash", population: 276},
+            {name: "Bellwood", type: "Village", county: "Cook", population: 19071},
+            {name: "Belvidere", type: "City", county: "Boone", population: 25585},
+            {name: "Bement", type: "Village", county: "Piatt", population: 1730},
+            {name: "Benld", type: "City", county: "Macoupin", population: 1556},
+            {name: "Bensenville", type: "Village", county: ["DuPage", "Cook"], population: 18352},
+            {name: "Benson", type: "Village", county: "Woodford", population: 423},
+            {name: "Bentley", type: "Town", county: "Hancock", population: 35}, // Corrected name from Bently
+            {name: "Benton", type: "City", county: "Franklin", population: 7087},
+            {name: "Berkeley", type: "Village", county: "Cook", population: 5209},
+            {name: "Berlin", type: "Village", county: "Sangamon", population: 180},
+            {name: "Berwyn", type: "City", county: "Cook", population: 56657},
+            {name: "Bethalto", type: "Village", county: "Madison", population: 9521},
+            {name: "Bethany", type: "Village", county: "Moultrie", population: 1352},
+            {name: "Biggsville", type: "Village", county: "Henderson", population: 304},
+            {name: "Big Rock", type: "Village", county: "Kane", population: 1126},
+            {name: "Bingham", type: "Village", county: "Fayette", population: 83},
+            {name: "Bishop Hill", type: "Village", county: "Henry", population: 128},
+            {name: "Bismarck", type: "Village", county: "Vermilion", population: 579},
+            {name: "Blandinsville", type: "Village", county: "McDonough", population: 651},
+            {name: "Bloomingdale", type: "Village", county: "DuPage", population: 22018},
+            {name: "Bloomington", type: "City", county: "McLean", population: 76610},
+            {name: "Blue Island", type: "City", county: "Cook", population: 23706},
+            {name: "Blue Mound", type: "Village", county: "Macon", population: 1158},
+            {name: "Bluffs", type: "Village", county: "Scott", population: 715},
+            {name: "Bluford", type: "Village", county: "Jefferson", population: 688},
+            {name: "Bolingbrook", type: "Village", county: ["Will", "DuPage"], population: 73366},
+            {name: "Bondville", type: "Village", county: "Champaign", population: 443},
+            {name: "Bone Gap", type: "Village", county: "Edwards", population: 246},
+            {name: "Bonfield", type: "Village", county: "Kankakee", population: 382},
+            {name: "Bonnie", type: "Village", county: "Jefferson", population: 397},
+            {name: "Bourbonnais", type: "Village", county: "Kankakee", population: 18631},
+            {name: "Bowen", type: "Village", county: "Hancock", population: 494},
+            {name: "Bradford", type: "Village", county: "Stark", population: 768},
+            {name: "Bradley", type: "Village", county: "Kankakee", population: 15895},
+            {name: "Braidwood", type: "City", county: "Will", population: 6191},
+            {name: "Breese", type: "City", county: "Clinton", population: 4442},
+            {name: "Bridgeport", type: "City", county: "Lawrence", population: 1886},
+            {name: "Bridgeview", type: "Village", county: "Cook", population: 16446},
+            {name: "Brighton", type: "Village", county: ["Macoupin", "Jersey"], population: 2254},
+            {name: "Brimfield", type: "Village", county: "Peoria", population: 868},
+            {name: "Broadlands", type: "Village", county: "Champaign", population: 349},
+            {name: "Broadview", type: "Village", county: "Cook", population: 7932},
+            {name: "Broadwell", type: "Village", county: "Logan", population: 145},
+            {name: "Brocton", type: "Village", county: "Edgar", population: 322},
+            {name: "Brookfield", type: "Village", county: "Cook", population: 18978},
+            {name: "Brooklyn", type: "Village", county: "St. Clair", population: 749},
+            {name: "Brookport", type: "City", county: "Massac", population: 984},
+            {name: "Broughton", type: "Village", county: "Hamilton", population: 194},
+            {name: "Browning", type: "Village", county: "Schuyler", population: 137},
+            {name: "Browns", type: "Village", county: "Edwards", population: 134},
+            {name: "Brownstown", type: "Village", county: "Fayette", population: 759},
+            {name: "Brussels", type: "Village", county: "Calhoun", population: 141},
+            {name: "Bryant", type: "Village", county: "Fulton", population: 220},
+            {name: "Buckingham", type: "Village", county: "Kankakee", population: 300},
+            {name: "Buckley", type: "Village", county: "Iroquois", population: 600},
+            {name: "Buckner", type: "Village", county: "Franklin", population: 462},
+            {name: "Buda", type: "Village", county: "Bureau", population: 538},
+            {name: "Buffalo", type: "Village", county: "Sangamon", population: 503},
+            {name: "Buffalo Grove", type: "Village", county: ["Cook", "Lake"], population: 41496},
+            {name: "Bull Valley", type: "Village", county: "McHenry", population: 1077},
+            {name: "Bulpitt", type: "Village", county: "Christian", population: 222},
+            {name: "Buncombe", type: "Village", county: "Johnson", population: 203},
+            {name: "Bunker Hill", type: "City", county: "Macoupin", population: 1774},
+            {name: "Burbank", type: "City", county: "Cook", population: 28925},
+            {name: "Bureau Junction", type: "Village", county: "Bureau", population: 322},
+            {name: "Burlington", type: "Village", county: "Kane", population: 618},
+            {name: "Burnham", type: "Village", county: "Cook", population: 4206},
+            {name: "Burnt Prairie", type: "Village", county: "White", population: 52},
+            {name: "Burr Ridge", type: "Village", county: ["Cook", "DuPage"], population: 10559},
+            {name: "Bush", type: "Village", county: "Williamson", population: 275},
+            {name: "Bushnell", type: "City", county: "McDonough", population: 3117},
+            {name: "Butler", type: "Village", county: "Montgomery", population: 180},
+            {name: "Byron", type: "City", county: "Ogle", population: 3753},
+            {name: "Cabery", type: "Village", county: ["Ford", "Kankakee"], population: 266},
+            {name: "Cahokia", type: "Village", county: "St. Clair", population: 15241}, // Now part of Cahokia Heights
+            {name: "Cairo", type: "City", county: "Alexander", population: 2831},
+            {name: "Caledonia", type: "Village", county: "Boone", population: 197},
+            {name: "Calhoun", type: "Village", county: "Richland", population: 172},
+            {name: "Calumet City", type: "City", county: "Cook", population: 37042},
+            {name: "Calumet Park", type: "Village", county: "Cook", population: 7835},
+            {name: "Camargo", type: "Village", county: "Douglas", population: 445},
+            {name: "Cambria", type: "Village", county: "Williamson", population: 1228},
+            {name: "Cambridge", type: "Village", county: "Henry", population: 2160},
+            {name: "Camden", type: "Village", county: "Schuyler", population: 86},
+            {name: "Campbell Hill", type: "Village", county: "Jackson", population: 336},
+            {name: "Camp Point", type: "Village", county: "Adams", population: 1132},
+            {name: "Campton Hills", type: "Village", county: "Kane", population: 11131},
+            {name: "Campus", type: "Village", county: "Livingston", population: 166},
+            {name: "Canton", type: "City", county: "Fulton", population: 14704},
+            {name: "Cantrall", type: "Village", county: "Sangamon", population: 139},
+            {name: "Capron", type: "Village", county: "Boone", population: 1376},
+            {name: "Carbon Cliff", type: "Village", county: "Rock Island", population: 2134},
+            {name: "Carbondale", type: "City", county: "Jackson", population: 25902},
+            {name: "Carbon Hill", type: "Village", county: "Grundy", population: 345},
+            {name: "Carlinville", type: "City", county: "Macoupin", population: 5917},
+            {name: "Carlock", type: "Village", county: "McLean", population: 552},
+            {name: "Carlyle", type: "City", county: "Clinton", population: 3281},
+            {name: "Carmi", type: "City", county: "White", population: 5240},
+            {name: "Carol Stream", type: "Village", county: "DuPage", population: 39711},
+            {name: "Carpentersville", type: "Village", county: "Kane", population: 37691},
+            {name: "Carrier Mills", type: "Village", county: "Saline", population: 1653},
+            {name: "Carrollton", type: "City", county: "Greene", population: 2484},
+            {name: "Carterville", type: "City", county: "Williamson", population: 5496},
+            {name: "Carthage", type: "City", county: "Hancock", population: 2605},
+            {name: "Cary", type: "Village", county: "McHenry", population: 18271},
+            {name: "Casey", type: "City", county: "Clark", population: 2769},
+            {name: "Caseyville", type: "Village", county: "St. Clair", population: 4245},
+            {name: "Catlin", type: "Village", county: "Vermilion", population: 2040},
+            {name: "Cave-In-Rock", type: "Village", county: "Hardin", population: 318}, // Corrected Name
+            {name: "Cedar Point", type: "Village", county: "LaSalle", population: 277},
+            {name: "Cedarville", type: "Village", county: "Stephenson", population: 741},
+            {name: "Central City", type: "Village", county: "Marion", population: 1172},
+            {name: "Centralia", type: "City", county: ["Marion", "Clinton", "Jefferson", "Washington"], population: 13032},
+            {name: "Centreville", type: "City", county: "St. Clair", population: 5309}, // Now part of Cahokia Heights
+            {name: "Cerro Gordo", type: "Village", county: "Piatt", population: 1403},
+            {name: "Chadwick", type: "Village", county: "Carroll", population: 551},
+            {name: "Champaign", type: "City", county: "Champaign", population: 81055},
+            {name: "Chandlerville", type: "Village", county: "Cass", population: 553},
+            {name: "Channahon", type: "Village", county: ["Will", "Grundy"], population: 12560},
+            {name: "Chapin", type: "Village", county: "Morgan", population: 512},
+            {name: "Charleston", type: "City", county: "Coles", population: 21838},
+            {name: "Chatham", type: "Village", county: "Sangamon", population: 11500},
+            {name: "Chatsworth", type: "Town", county: "Livingston", population: 1205},
+            {name: "Chebanse", type: "Village", county: ["Iroquois", "Kankakee"], population: 1062},
+            {name: "Chenoa", type: "City", county: "McLean", population: 1785},
+            {name: "Cherry", type: "Village", county: "Bureau", population: 482},
+            {name: "Cherry Valley", type: "Village", county: "Winnebago", population: 3162},
+            {name: "Chester", type: "City", county: "Randolph", population: 8586},
+            {name: "Chesterfield", type: "Village", county: "Macoupin", population: 188},
+            {name: "Chicago", type: "City", county: ["Cook", "DuPage"], population: 2695598},
+            {name: "Chicago Heights", type: "City", county: "Cook", population: 30276},
+            {name: "Chicago Ridge", type: "Village", county: "Cook", population: 14305},
+            {name: "Chillicothe", type: "City", county: "Peoria", population: 6097},
+            {name: "Chrisman", type: "City", county: "Edgar", population: 1343},
+            {name: "Christopher", type: "City", county: "Franklin", population: 2382},
+            {name: "Cicero", type: "Town", county: "Cook", population: 83891},
+            {name: "Cisco", type: "Village", county: "Piatt", population: 261},
+            {name: "Cisne", type: "Village", county: "Wayne", population: 672},
+            {name: "Cissna Park", type: "Village", county: "Iroquois", population: 846},
+            {name: "Claremont", type: "Village", county: "Richland", population: 176},
+            {name: "Clarendon Hills", type: "Village", county: "DuPage", population: 8427},
+            {name: "Clay City", type: "Village", county: "Clay", population: 959},
+            {name: "Clayton", type: "Village", county: "Adams", population: 709},
+            {name: "Clear Lake", type: "Village", county: "Sangamon", population: 229},
+            {name: "Cleveland", type: "Village", county: "Henry", population: 188},
+            {name: "Clifton", type: "Village", county: "Iroquois", population: 1468},
+            {name: "Clinton", type: "City", county: "DeWitt", population: 7225},
+            {name: "Coal City", type: "Village", county: ["Grundy", "Will"], population: 5587},
+            {name: "Coalton", type: "Village", county: "Montgomery", population: 304},
+            {name: "Coal Valley", type: "Village", county: ["Henry", "Rock Island"], population: 3743},
+            {name: "Coatsburg", type: "Village", county: "Adams", population: 147},
+            {name: "Cobden", type: "Village", county: "Union", population: 1157},
+            {name: "Coffeen", type: "City", county: "Montgomery", population: 685},
+            {name: "Colchester", type: "City", county: "McDonough", population: 1401},
+            {name: "Coleta", type: "Village", county: "Whiteside", population: 164},
+            {name: "Colfax", type: "Village", county: "McLean", population: 1061},
+            {name: "Collinsville", type: "City", county: ["Madison", "St. Clair"], population: 25579},
+            {name: "Colona", type: "City", county: "Henry", population: 5099},
+            {name: "Colp", type: "Village", county: "Williamson", population: 225},
+            {name: "Columbia", type: "City", county: "Monroe", population: 9707},
+            {name: "Columbus", type: "Village", county: "Adams", population: 99},
+            {name: "Compton", type: "Village", county: "Lee", population: 303},
+            {name: "Concord", type: "Village", county: "Morgan", population: 167},
+            {name: "Congerville", type: "Village", county: "Woodford", population: 474},
+            {name: "Cooksville", type: "Village", county: "McLean", population: 182},
+            {name: "Cordova", type: "Village", county: "Rock Island", population: 672},
+            {name: "Cornell", type: "Village", county: "Livingston", population: 467},
+            {name: "Cortland", type: "Town", county: "DeKalb", population: 4270},
+            {name: "Coulterville", type: "Village", county: "Randolph", population: 945},
+            {name: "Country Club Hills", type: "City", county: "Cook", population: 16541},
+            {name: "Countryside", type: "City", county: "Cook", population: 5895},
+            {name: "Cowden", type: "Village", county: "Shelby", population: 629},
+            {name: "Crainville", type: "Village", county: "Williamson", population: 1254},
+            {name: "Creal Springs", type: "City", county: "Williamson", population: 543},
+            {name: "Crescent City", type: "Village", county: "Iroquois", population: 615},
+            {name: "Crest Hill", type: "City", county: "Will", population: 20837},
+            {name: "Creston", type: "Village", county: "Ogle", population: 662},
+            {name: "Crestwood", type: "Village", county: "Cook", population: 10950},
+            {name: "Crete", type: "Village", county: "Will", population: 8259},
+            {name: "Creve Coeur", type: "Village", county: "Tazewell", population: 5451},
+            {name: "Crossville", type: "Village", county: "White", population: 745},
+            {name: "Crystal Lake", type: "City", county: "McHenry", population: 40743},
+            {name: "Cuba", type: "City", county: "Fulton", population: 1294},
+            {name: "Cullom", type: "Village", county: "Livingston", population: 555},
+            {name: "Curran", type: "Village", county: "Sangamon", population: 212},
+            {name: "Cutler", type: "Village", county: "Perry", population: 441},
+            {name: "Cypress", type: "Village", county: "Johnson", population: 234},
+            {name: "Dahlgren", type: "Village", county: "Hamilton", population: 525},
+            {name: "Dakota", type: "Town", county: "Stephenson", population: 506},
+            {name: "Dallas City", type: "City", county: ["Hancock", "Henderson"], population: 945},
+            {name: "Dalton City", type: "Village", county: "Moultrie", population: 544},
+            {name: "Dalzell", type: "Village", county: "Bureau", population: 717},
+            {name: "Damiansville", type: "Village", county: "Clinton", population: 491},
+            {name: "Dana", type: "Village", county: "LaSalle", population: 159},
+            {name: "Danforth", type: "Village", county: "Iroquois", population: 604},
+            {name: "Danvers", type: "Village", county: "McLean", population: 1154},
+            {name: "Danville", type: "City", county: "Vermilion", population: 33027},
+            {name: "Darien", type: "City", county: "DuPage", population: 22086},
+            {name: "Davis", type: "Village", county: "Stephenson", population: 677},
+            {name: "Davis Junction", type: "Village", county: "Ogle", population: 2373},
+            {name: "Dawson", type: "Village", county: "Sangamon", population: 509},
+            {name: "Decatur", type: "City", county: "Macon", population: 76122},
+            {name: "Deer Creek", type: "Village", county: ["Tazewell", "Woodford"], population: 704},
+            {name: "Deerfield", type: "Village", county: ["Lake", "Cook"], population: 18225},
+            {name: "Deer Grove", type: "Village", county: "Whiteside", population: 48},
+            {name: "Deer Park", type: "Village", county: "Lake", population: 3200},
+            {name: "DeKalb", type: "City", county: "DeKalb", population: 44030},
+            {name: "Deland", type: "Village", county: "Piatt", population: 446},
+            {name: "Delavan", type: "City", county: "Tazewell", population: 1689},
+            {name: "DePue", type: "Village", county: "Bureau", population: 1838},
+            {name: "DeSoto", type: "Village", county: "Jackson", population: 1590},
+            {name: "Des Plaines", type: "City", county: "Cook", population: 58364},
+            {name: "Detroit", type: "Village", county: "Pike", population: 83},
+            {name: "DeWitt", type: "Village", county: "DeWitt", population: 184},
+            {name: "Diamond", type: "Village", county: ["Grundy", "Will"], population: 2527},
+            {name: "Dieterich", type: "Village", county: "Effingham", population: 617},
+            {name: "Divernon", type: "Village", county: "Sangamon", population: 1172},
+            {name: "Dix", type: "Village", county: "Jefferson", population: 461},
+            {name: "Dixmoor", type: "Village", county: "Cook", population: 3644},
+            {name: "Dixon", type: "City", county: "Lee", population: 15733},
+            {name: "Dolton", type: "Village", county: "Cook", population: 23153},
+            {name: "Dongola", type: "Village", county: "Union", population: 726},
+            {name: "Donnellson", type: "Village", county: "Montgomery", population: 210},
+            {name: "Donovan", type: "Village", county: "Iroquois", population: 304},
+            {name: "Dorchester", type: "Village", county: "Macoupin", population: 151},
+            {name: "Dover", type: "Village", county: "Bureau", population: 168},
+            {name: "Dowell", type: "Village", county: "Jackson", population: 408},
+            {name: "Downers Grove", type: "Village", county: "DuPage", population: 47833},
+            {name: "Downs", type: "Village", county: "McLean", population: 1005},
+            {name: "DuBois", type: "Village", county: "Washington", population: 205},
+            {name: "Dunfermline", type: "Village", county: "Fulton", population: 300},
+            {name: "Dunlap", type: "Village", county: "Peoria", population: 1386},
+            {name: "Dupo", type: "Village", county: "St. Clair", population: 4138},
+            {name: "DuQuoin", type: "City", county: "Perry", population: 6109},
+            {name: "Durand", type: "Village", county: "Winnebago", population: 1443},
+            {name: "Dwight", type: "Village", county: ["Livingston", "Grundy"], population: 4260},
+            {name: "Eagarville", type: "Village", county: "Macoupin", population: 127},
+            {name: "Earlville", type: "City", county: "LaSalle", population: 1701},
+            {name: "East Alton", type: "Village", county: "Madison", population: 6301},
+            {name: "East Brooklyn", type: "Village", county: "Grundy", population: 106},
+            {name: "East Cape Girardeau", type: "Village", county: "Alexander", population: 385},
+            {name: "East Carondelet", type: "Village", county: "St. Clair", population: 499},
+            {name: "East Dubuque", type: "City", county: "JoDaviess", population: 1704},
+            {name: "East Dundee", type: "Village", county: ["Kane", "Cook"], population: 2860},
+            {name: "East Galesburg", type: "Village", county: "Knox", population: 812},
+            {name: "East Gillespie", type: "Village", county: "Macoupin", population: 270},
+            {name: "East Hazel Crest", type: "Village", county: "Cook", population: 1543},
+            {name: "East Moline", type: "City", county: "Rock Island", population: 21302},
+            {name: "Easton", type: "Village", county: "Mason", population: 321},
+            {name: "East Peoria", type: "City", county: "Tazewell", population: 23402},
+            {name: "East St. Louis", type: "City", county: "St. Clair", population: 27006}, // Now part of Cahokia Heights for some services
+            {name: "Eddyville", type: "Village", county: "Pope", population: 101},
+            {name: "Edgewood", type: "Village", county: "Effingham", population: 440},
+            {name: "Edinburg", type: "Village", county: "Christian", population: 1078},
+            {name: "Edwardsville", type: "City", county: "Madison", population: 24293},
+            {name: "Effingham", type: "City", county: "Effingham", population: 12328},
+            {name: "Elburn", type: "Village", county: "Kane", population: 5602},
+            {name: "El Dara", type: "Village", county: "Pike", population: 78},
+            {name: "Eldorado", type: "City", county: "Saline", population: 4122},
+            {name: "Eldred", type: "Village", county: "Greene", population: 201},
+            {name: "Elgin", type: "City", county: ["Kane", "Cook"], population: 108188},
+            {name: "Elizabeth", type: "Village", county: "JoDaviess", population: 761},
+            {name: "Elizabethtown", type: "Village", county: "Hardin", population: 299},
+            {name: "Elk Grove Village", type: "Village", county: ["Cook", "DuPage"], population: 33127},
+            {name: "Elkhart", type: "Village", county: "Logan", population: 405},
+            {name: "Elkville", type: "Village", county: "Jackson", population: 928},
+            {name: "Elliott", type: "Village", county: "Ford", population: 295},
+            {name: "Ellis Grove", type: "Village", county: "Randolph", population: 363},
+            {name: "Ellisville", type: "Village", county: "Fulton", population: 96},
+            {name: "Ellsworth", type: "Village", county: "McLean", population: 195},
+            {name: "Elmhurst", type: "City", county: ["DuPage", "Cook"], population: 44121},
+            {name: "Elmwood", type: "City", county: "Peoria", population: 2097},
+            {name: "Elmwood Park", type: "Village", county: "Cook", population: 24883},
+            {name: "El Paso", type: "City", county: "Woodford", population: 2810},
+            {name: "Elsah", type: "Village", county: "Jersey", population: 673},
+            {name: "Elvaston", type: "Village", county: "Hancock", population: 165},
+            {name: "Elwood", type: "Village", county: "Will", population: 2279},
+            {name: "Emden", type: "Village", county: "Logan", population: 485},
+            {name: "Emmington", type: "Village", county: "Livingston", population: 117},
+            {name: "Energy", type: "Village", county: "Williamson", population: 1146},
+            {name: "Enfield", type: "Village", county: "White", population: 596},
+            {name: "Equality", type: "Village", county: "Gallatin", population: 595},
+            {name: "Erie", type: "Village", county: "Whiteside", population: 1602},
+            {name: "Essex", type: "Village", county: "Kankakee", population: 802},
+            {name: "Eureka", type: "City", county: "Woodford", population: 5295},
+            {name: "Evanston", type: "City", county: "Cook", population: 74486},
+            {name: "Evansville", type: "Village", county: "Randolph", population: 701},
+            {name: "Evergreen Park", type: "Village", county: "Cook", population: 19852},
+            {name: "Ewing", type: "Village", county: "Franklin", population: 307},
+            {name: "Exeter", type: "Village", county: "Scott", population: 65},
+            {name: "Fairbury", type: "City", county: "Livingston", population: 3757},
+            {name: "Fairfield", type: "City", county: "Wayne", population: 5154},
+            {name: "Fairmont City", type: "Village", county: ["St. Clair", "Madison"], population: 2635},
+            {name: "Fairmount", type: "Village", county: "Vermilion", population: 642},
+            {name: "Fairview", type: "Village", county: "Fulton", population: 522},
+            {name: "Fairview Heights", type: "City", county: "St. Clair", population: 17078},
+            {name: "Farina", type: "Village", county: ["Fayette", "Marion"], population: 518},
+            {name: "Farmer City", type: "City", county: "DeWitt", population: 2037},
+            {name: "Farmersville", type: "Village", county: "Montgomery", population: 724},
+            {name: "Farmington", type: "City", county: "Fulton", population: 2448},
+            {name: "Fayetteville", type: "Village", county: "St. Clair", population: 366},
+            {name: "Ferris", type: "Village", county: "Hancock", population: 156},
+            {name: "Fidelity", type: "Village", county: "Jersey", population: 114},
+            {name: "Fieldon", type: "Village", county: "Jersey", population: 239},
+            {name: "Fillmore", type: "Village", county: "Montgomery", population: 330},
+            {name: "Findlay", type: "Village", county: "Shelby", population: 683},
+            {name: "Fisher", type: "Village", county: "Champaign", population: 1881},
+            {name: "Fithian", type: "Village", county: "Vermilion", population: 485},
+            {name: "Flanagan", type: "Village", county: "Livingston", population: 1110},
+            {name: "Flat Rock", type: "Village", county: "Crawford", population: 331},
+            {name: "Flora", type: "City", county: "Clay", population: 5070},
+            {name: "Florence", type: "Village", county: "Pike", population: 38},
+            {name: "Flossmoor", type: "Village", county: "Cook", population: 9464},
+            {name: "Foosland", type: "Village", county: "Champaign", population: 101},
+            {name: "Ford Heights", type: "Village", county: "Cook", population: 2763},
+            {name: "Forest City", type: "Village", county: "Mason", population: 246},
+            {name: "Forest Park", type: "Village", county: "Cook", population: 14167},
+            {name: "Forest View", type: "Village", county: "Cook", population: 698},
+            {name: "Forrest", type: "Village", county: "Livingston", population: 1220},
+            {name: "Forreston", type: "Village", county: "Ogle", population: 1446},
+            {name: "Forsyth", type: "Village", county: "Macon", population: 3490},
+            {name: "Fox Lake", type: "Village", county: ["Lake", "McHenry"], population: 10579},
+            {name: "Fox River Grove", type: "Village", county: ["Lake", "McHenry"], population: 4854},
+            {name: "Frankfort", type: "Village", county: ["Will", "Cook"], population: 17782},
+            {name: "Franklin", type: "Village", county: "Morgan", population: 610},
+            {name: "Franklin Grove", type: "Village", county: "Lee", population: 1021},
+            {name: "Franklin Park", type: "Village", county: "Cook", population: 18333},
+            {name: "Freeburg", type: "Village", county: "St. Clair", population: 4354},
+            {name: "Freemanspur", type: "Village", county: "Williamson", population: 287},
+            {name: "Freeport", type: "City", county: "Stephenson", population: 25638},
+            {name: "Fulton", type: "City", county: "Whiteside", population: 3481},
+            {name: "Fults", type: "Village", county: "Monroe", population: 26},
+            {name: "Galatia", type: "Village", county: "Saline", population: 933},
+            {name: "Galena", type: "City", county: "JoDaviess", population: 3429},
+            {name: "Galesburg", type: "City", county: "Knox", population: 32195},
+            {name: "Galva", type: "City", county: "Henry", population: 2589},
+            {name: "Gardner", type: "Village", county: "Grundy", population: 1463},
+            {name: "Garrett", type: "Village", county: "Douglas", population: 162},
+            {name: "Gays", type: "Village", county: "Moultrie", population: 281},
+            {name: "Geneseo", type: "City", county: "Henry", population: 6586},
+            {name: "Geneva", type: "City", county: "Kane", population: 21495},
+            {name: "Genoa", type: "City", county: "DeKalb", population: 5193},
+            {name: "Georgetown", type: "City", county: "Vermilion", population: 3474},
+            {name: "Geff", type: "Village", county: "Wayne", population: 367}, // Corrected name from Jeffersonville
+            {name: "Germantown", type: "Village", county: "Clinton", population: 1269},
+            {name: "Germantown Hills", type: "Village", county: "Woodford", population: 3438},
+            {name: "German Valley", type: "Village", county: "Stephenson", population: 463},
+            {name: "Gibson City", type: "City", county: "Ford", population: 3407}, // Corrected name from Gibson
+            {name: "Gifford", type: "Village", county: "Champaign", population: 975},
+            {name: "Gilberts", type: "Village", county: "Kane", population: 6879},
+            {name: "Gillespie", type: "City", county: "Macoupin", population: 3319},
+            {name: "Gilman", type: "City", county: "Iroquois", population: 1814},
+            {name: "Girard", type: "City", county: "Macoupin", population: 2103},
+            {name: "Gladstone", type: "Village", county: "Henderson", population: 281},
+            {name: "Glasford", type: "Village", county: "Peoria", population: 1022},
+            {name: "Glasgow", type: "Village", county: "Scott", population: 141},
+            {name: "Glen Carbon", type: "Village", county: "Madison", population: 12934},
+            {name: "Glencoe", type: "Village", county: "Cook", population: 8723},
+            {name: "Glendale Heights", type: "Village", county: "DuPage", population: 34208},
+            {name: "Glen Ellyn", type: "Village", county: "DuPage", population: 27450},
+            {name: "Glenview", type: "Village", county: "Cook", population: 44692},
+            {name: "Glenwood", type: "Village", county: "Cook", population: 8969},
+            {name: "Godfrey", type: "Village", county: "Madison", population: 17982},
+            {name: "Godley", type: "Village", county: ["Will", "Grundy"], population: 601},
+            {name: "Golconda", type: "City", county: "Pope", population: 668},
+            {name: "Golden", type: "Village", county: "Adams", population: 644},
+            {name: "Golden Gate", type: "Village", county: "Wayne", population: 68},
+            {name: "Golf", type: "Village", county: "Cook", population: 500},
+            {name: "Goodfield", type: "Village", county: "Woodford", population: 860},
+            {name: "Good Hope", type: "Village", county: "McDonough", population: 396},
+            {name: "Goreville", type: "Village", county: "Johnson", population: 1049},
+            {name: "Gorham", type: "Village", county: "Jackson", population: 236},
+            {name: "Grafton", type: "City", county: "Jersey", population: 674},
+            {name: "Grand Ridge", type: "Village", county: "LaSalle", population: 560},
+            {name: "Grand Tower", type: "City", county: "Jackson", population: 605},
+            {name: "Grandview", type: "Village", county: "Sangamon", population: 1441},
+            {name: "Granite City", type: "City", county: "Madison", population: 29849},
+            {name: "Grantfork", type: "Village", county: "Madison", population: 337},
+            {name: "Grant Park", type: "Village", county: "Kankakee", population: 1331},
+            {name: "Granville", type: "Village", county: "Putnam", population: 1427},
+            {name: "Grayslake", type: "Village", county: "Lake", population: 20957}, // Corrected name from Grays Lake
+            {name: "Grayville", type: "City", county: ["White", "Edwards"], population: 1666},
+            {name: "Greenfield", type: "City", county: "Greene", population: 1071},
+            {name: "Green Oaks", type: "Village", county: "Lake", population: 3866},
+            {name: "Greenup", type: "Village", county: "Cumberland", population: 1513},
+            {name: "Green Valley", type: "Village", county: "Tazewell", population: 709},
+            {name: "Greenview", type: "Village", county: "Menard", population: 778},
+            {name: "Greenville", type: "City", county: "Bond", population: 7000},
+            {name: "Greenwood", type: "Village", county: "McHenry", population: 255},
+            {name: "Gridley", type: "Village", county: "McLean", population: 1432},
+            {name: "Griggsville", type: "City", county: "Pike", population: 1226},
+            {name: "Gulf Port", type: "Village", county: "Henderson", population: 54},
+            {name: "Gurnee", type: "Village", county: "Lake", population: 31295},
+            {name: "Hainesville", type: "Village", county: "Lake", population: 3597},
+            {name: "Hamburg", type: "Village", county: "Calhoun", population: 128},
+            {name: "Hamel", type: "Village", county: "Madison", population: 816},
+            {name: "Hamilton", type: "City", county: "Hancock", population: 2951},
+            {name: "Hammond", type: "Village", county: "Piatt", population: 509},
+            {name: "Hampshire", type: "Village", county: "Kane", population: 5563},
+            {name: "Hampton", type: "Village", county: "Rock Island", population: 1863},
+            {name: "Hanaford", type: "Village", county: "Franklin", population: 327},
+            {name: "Hanna City", type: "Village", county: "Peoria", population: 1225},
+            {name: "Hanover", type: "Village", county: "JoDaviess", population: 844},
+            {name: "Hanover Park", type: "Village", county: ["Cook", "DuPage"], population: 37973},
+            {name: "Hardin", type: "Village", county: "Calhoun", population: 967},
+            {name: "Harmon", type: "Village", county: "Lee", population: 120},
+            {name: "Harrisburg", type: "City", county: "Saline", population: 9017},
+            {name: "Harristown", type: "Village", county: "Macon", population: 1367},
+            {name: "Hartford", type: "Village", county: "Madison", population: 1429},
+            {name: "Hartsburg", type: "Village", county: "Logan", population: 314},
+            {name: "Harvard", type: "City", county: "McHenry", population: 9447},
+            {name: "Harvel", type: "Village", county: "Montgomery", population: 223},
+            {name: "Harvey", type: "City", county: "Cook", population: 25282},
+            {name: "Harwood Heights", type: "Village", county: "Cook", population: 8612},
+            {name: "Havana", type: "City", county: "Mason", population: 3301},
+            {name: "Hawthorn Woods", type: "Village", county: "Lake", population: 7663},
+            {name: "Hazel Crest", type: "Village", county: "Cook", population: 14100},
+            {name: "Hebron", type: "Village", county: "McHenry", population: 1216},
+            {name: "Hecker", type: "Village", county: "Monroe", population: 481},
+            {name: "Henderson", type: "Village", county: "Knox", population: 255},
+            {name: "Hennepin", type: "Village", county: "Putnam", population: 757},
+            {name: "Henning", type: "Village", county: "Vermilion", population: 251},
+            {name: "Henry", type: "City", county: "Marshall", population: 2464},
+            {name: "Herrick", type: "Village", county: "Shelby", population: 436},
+            {name: "Herrin", type: "City", county: "Williamson", population: 12501},
+            {name: "Herscher", type: "Village", county: "Kankakee", population: 1591},
+            {name: "Hettick", type: "Village", county: "Macoupin", population: 181},
+            {name: "Heyworth", type: "Village", county: "McLean", population: 2841},
+            {name: "Hickory Hills", type: "City", county: "Cook", population: 14049},
+            {name: "Hidalgo", type: "Village", county: "Jasper", population: 106},
+            {name: "Highland", type: "City", county: "Madison", population: 9919},
+            {name: "Highland Park", type: "City", county: "Lake", population: 29763},
+            {name: "Highwood", type: "City", county: "Lake", population: 5405},
+            {name: "Hillcrest", type: "Village", county: "Ogle", population: 1326},
+            {name: "Hillsboro", type: "City", county: "Montgomery", population: 6207},
+            {name: "Hillsdale", type: "Village", county: "Rock Island", population: 523},
+            {name: "Hillside", type: "Village", county: "Cook", population: 8157},
+            {name: "Hillview", type: "Village", county: "Greene", population: 193},
+            {name: "Hinckley", type: "Village", county: "DeKalb", population: 2070},
+            {name: "Hindsboro", type: "Village", county: "Douglas", population: 313},
+            {name: "Hinsdale", type: "Village", county: ["Cook", "DuPage"], population: 16816},
+            {name: "Hodgkins", type: "Village", county: "Cook", population: 1897},
+            {name: "Hoffman", type: "Village", county: "Clinton", population: 508},
+            {name: "Hoffman Estates", type: "Village", county: ["Cook", "Kane"], population: 51895},
+            {name: "Holiday Hills", type: "Village", county: "McHenry", population: 610},
+            {name: "Hollowayville", type: "Village", county: "Bureau", population: 84},
+            {name: "Homer", type: "Village", county: "Champaign", population: 1193},
+            {name: "Homer Glen", type: "Village", county: "Will", population: 24220},
+            {name: "Hometown", type: "City", county: "Cook", population: 4349},
+            {name: "Homewood", type: "Village", county: "Cook", population: 19323},
+            {name: "Hoopeston", type: "City", county: "Vermilion", population: 5351},
+            {name: "Hooppole", type: "Village", county: "Henry", population: 204},
+            {name: "Hopedale", type: "Village", county: "Tazewell", population: 865},
+            {name: "Hopewell", type: "Village", county: "Marshall", population: 410},
+            {name: "Hopkins Park", type: "Village", county: "Kankakee", population: 603},
+            {name: "Hoyleton", type: "Village", county: "Washington", population: 531},
+            {name: "Hudson", type: "Village", county: "McLean", population: 1838},
+            {name: "Huey", type: "Village", county: "Clinton", population: 169},
+            {name: "Hull", type: "Village", county: "Pike", population: 461},
+            {name: "Humboldt", type: "Village", county: "Coles", population: 437},
+            {name: "Hume", type: "Village", county: "Edgar", population: 380},
+            {name: "Huntley", type: "Village", county: ["Kane", "McHenry"], population: 24291},
+            {name: "Hurst", type: "City", county: "Williamson", population: 795},
+            {name: "Hutsonville", type: "Village", county: "Crawford", population: 554},
+            {name: "Illiopolis", type: "Village", county: "Sangamon", population: 891},
+            {name: "Ina", type: "Village", county: "Jefferson", population: 2338},
+            {name: "Indian Creek", type: "Village", county: "Lake", population: 462},
+            {name: "Indian Head Park", type: "Village", county: "Cook", population: 3809},
+            {name: "Indianola", type: "Village", county: "Vermilion", population: 276},
+            {name: "Industry", type: "Village", county: "McDonough", population: 478},
+            {name: "Inverness", type: "Village", county: "Cook", population: 7399},
+            {name: "Iola", type: "Village", county: "Clay", population: 141},
+            {name: "Ipava", type: "Village", county: "Fulton", population: 470},
+            {name: "Iroquois", type: "Village", county: "Iroquois", population: 154},
+            {name: "Irving", type: "Village", county: "Montgomery", population: 495},
+            {name: "Irvington", type: "Village", county: "Washington", population: 659},
+            {name: "Irwin", type: "Village", county: "Kankakee", population: 74},
+            {name: "Island Lake", type: "Village", county: ["Lake", "McHenry"], population: 8080},
+            {name: "Itasca", type: "Village", county: "DuPage", population: 8649},
+            {name: "Iuka", type: "Village", county: "Marion", population: 489},
+            {name: "Ivesdale", type: "Village", county: "Champaign", population: 267},
+            {name: "Jacksonville", type: "City", county: "Morgan", population: 19446},
+            {name: "Jerome", type: "Village", county: "Sangamon", population: 1656},
+            {name: "Jerseyville", type: "City", county: "Jersey", population: 8465},
+            {name: "Jewett", type: "Village", county: "Cumberland", population: 223},
+            {name: "Johnsburg", type: "Village", county: "McHenry", population: 6337},
+            {name: "Johnsonville", type: "Village", county: "Wayne", population: 77},
+            {name: "Johnston City", type: "City", county: "Williamson", population: 3543},
+            {name: "Joliet", type: "City", county: ["Will", "Kendall"], population: 147433},
+            {name: "Jonesboro", type: "City", county: "Union", population: 1821},
+            {name: "Joppa", type: "Village", county: "Massac", population: 360},
+            {name: "Joy", type: "Village", county: "Mercer", population: 417},
+            {name: "Junction", type: "Village", county: "Gallatin", population: 129},
+            {name: "Junction City", type: "Village", county: "Marion", population: 482},
+            {name: "Justice", type: "Village", county: "Cook", population: 12926},
+            {name: "Kampsville", type: "Village", county: "Calhoun", population: 328},
+            {name: "Kane", type: "Village", county: "Greene", population: 438},
+            {name: "Kaneville", type: "Village", county: "Kane", population: 484},
+            {name: "Kangley", type: "Village", county: "LaSalle", population: 251},
+            {name: "Kankakee", type: "City", county: "Kankakee", population: 27537},
+            {name: "Kansas", type: "Village", county: "Edgar", population: 787},
+            {name: "Kappa", type: "Village", county: "Woodford", population: 227},
+            {name: "Karnak", type: "Village", county: "Pulaski", population: 499},
+            {name: "Kaskaskia", type: "Village", county: "Randolph", population: 14},
+            {name: "Keenes", type: "Village", county: "Wayne", population: 83},
+            {name: "Keensburg", type: "Village", county: "Wabash", population: 210},
+            {name: "Keithsburg", type: "City", county: "Mercer", population: 609},
+            {name: "Kell", type: "Village", county: "Marion", population: 219},
+            {name: "Kempton", type: "Village", county: "Ford", population: 231},
+            {name: "Kenilworth", type: "Village", county: "Cook", population: 2513},
+            {name: "Kenney", type: "Village", county: "DeWitt", population: 326},
+            {name: "Kewanee", type: "City", county: "Henry", population: 12916},
+            {name: "Keyesport", type: "Village", county: ["Clinton", "Bond"], population: 421},
+            {name: "Kilbourne", type: "Village", county: "Mason", population: 302},
+            {name: "Kildeer", type: "Village", county: "Lake", population: 3968},
+            {name: "Kincaid", type: "Village", county: "Christian", population: 1505},
+            {name: "Kinderhook", type: "Village", county: "Pike", population: 216},
+            {name: "Kingston", type: "Village", county: "DeKalb", population: 1164},
+            {name: "Kingston Mines", type: "Village", county: "Peoria", population: 302},
+            {name: "Kinmundy", type: "City", county: "Marion", population: 796},
+            {name: "Kinsman", type: "Village", county: "Grundy", population: 99},
+            {name: "Kirkland", type: "Village", county: "DeKalb", population: 1744},
+            {name: "Kirkwood", type: "Village", county: "Warren", population: 714},
+            {name: "Knoxville", type: "City", county: "Knox", population: 2911},
+            {name: "Lacon", type: "City", county: "Marshall", population: 1937},
+            {name: "Ladd", type: "Village", county: "Bureau", population: 1295},
+            {name: "LaFayette", type: "Village", county: "Stark", population: 223},
+            {name: "LaGrange", type: "Village", county: "Cook", population: 15550},
+            {name: "LaGrange Park", type: "Village", county: "Cook", population: 13579},
+            {name: "LaHarpe", type: "City", county: "Hancock", population: 1235},
+            {name: "Lake Barrington", type: "Village", county: "Lake", population: 4973},
+            {name: "Lake Bluff", type: "Village", county: "Lake", population: 5722},
+            {name: "Lake Forest", type: "City", county: "Lake", population: 19375},
+            {name: "Lake in the Hills", type: "Village", county: "McHenry", population: 28965},
+            {name: "Lake Ka-Ho", type: "Village", county: "Macoupin", population: 237},
+            {name: "Lakemoor", type: "Village", county: ["Lake", "McHenry"], population: 6017},
+            {name: "Lake Villa", type: "Village", county: "Lake", population: 8741},
+            {name: "Lakewood", type: "Village", county: "McHenry", population: 3811},
+            {name: "Lake Zurich", type: "Village", county: "Lake", population: 19631},
+            {name: "LaMoille", type: "Village", county: "Bureau", population: 726},
+            {name: "Lanark", type: "City", county: "Carroll", population: 1457},
+            {name: "Lansing", type: "Village", county: "Cook", population: 28331},
+            {name: "La Prairie", type: "Town", county: "Adams", population: 47}, // Corrected name from LaPrairie
+            {name: "LaRose", type: "Village", county: "Marshall", population: 144},
+            {name: "LaSalle", type: "City", county: "LaSalle", population: 9609},
+            {name: "Latham", type: "Village", county: "Logan", population: 380},
+            {name: "Lawrenceville", type: "City", county: "Lawrence", population: 4348},
+            {name: "Leaf River", type: "Village", county: "Ogle", population: 443},
+            {name: "Lebanon", type: "City", county: "St. Clair", population: 4418},
+            {name: "Lee", type: "Village", county: ["Lee", "DeKalb"], population: 337},
+            {name: "Leland", type: "Village", county: "LaSalle", population: 977},
+            {name: "Leland Grove", type: "City", county: "Sangamon", population: 1503},
+            {name: "Lemont", type: "Village", county: ["Cook", "DuPage", "Will"], population: 16000},
+            {name: "Lena", type: "Village", county: "Stephenson", population: 2912},
+            {name: "Lenzburg", type: "Village", county: "St. Clair", population: 521},
+            {name: "Leonore", type: "Village", county: "LaSalle", population: 130},
+            {name: "Lerna", type: "Village", county: "Coles", population: 286},
+            {name: "LeRoy", type: "City", county: "McLean", population: 3560},
+            {name: "Lewistown", type: "City", county: "Fulton", population: 2384},
+            {name: "Lexington", type: "City", county: "McLean", population: 2060},
+            {name: "Liberty", type: "Village", county: "Adams", population: 516},
+            {name: "Libertyville", type: "Village", county: "Lake", population: 20315},
+            {name: "Lily Lake", type: "Village", county: "Kane", population: 993},
+            {name: "Lima", type: "Village", county: "Adams", population: 163},
+            {name: "Limestone", type: "Village", county: "Kankakee", population: 1598},
+            {name: "Lincoln", type: "City", county: "Logan", population: 14504},
+            {name: "Lincolnshire", type: "Village", county: "Lake", population: 7275},
+            {name: "Lincolnwood", type: "Village", county: "Cook", population: 12590},
+            {name: "Lindenhurst", type: "Village", county: "Lake", population: 14462},
+            {name: "Lisbon", type: "Village", county: "Kendall", population: 285},
+            {name: "Lisle", type: "Village", county: "DuPage", population: 22390},
+            {name: "Litchfield", type: "City", county: "Montgomery", population: 6939},
+            {name: "Littleton", type: "Village", county: "Schuyler", population: 181},
+            {name: "Little York", type: "Village", county: "Warren", population: 331},
+            {name: "Liverpool", type: "Village", county: "Fulton", population: 129},
+            {name: "Livingston", type: "Village", county: "Madison", population: 858},
+            {name: "Loami", type: "Village", county: "Sangamon", population: 745},
+            {name: "Lockport", type: "City", county: "Will", population: 24839},
+            {name: "Loda", type: "Village", county: "Iroquois", population: 407},
+            {name: "Lomax", type: "Village", county: "Henderson", population: 454},
+            {name: "Lombard", type: "Village", county: "DuPage", population: 43395},
+            {name: "London Mills", type: "Village", county: "Fulton", population: 392},
+            {name: "Long Creek", type: "Village", county: "Macon", population: 1328},
+            {name: "Long Grove", type: "Village", county: "Lake", population: 8043},
+            {name: "Long Point", type: "Village", county: "Livingston", population: 226},
+            {name: "Longview", type: "Village", county: "Champaign", population: 153}, // Corrected name from Long View
+            {name: "Loraine", type: "Village", county: "Adams", population: 313},
+            {name: "Lostant", type: "Village", county: "LaSalle", population: 498},
+            {name: "Louisville", type: "Village", county: "Clay", population: 1139},
+            {name: "Loves Park", type: "City", county: "Winnebago", population: 23996},
+            {name: "Lovington", type: "Village", county: "Moultrie", population: 1130},
+            {name: "Ludlow", type: "Village", county: "Champaign", population: 371},
+            {name: "Lyndon", type: "Village", county: "Whiteside", population: 648},
+            {name: "Lynnville", type: "Village", county: "Morgan", population: 117},
+            {name: "Lynwood", type: "Village", county: "Cook", population: 9007},
+            {name: "Lyons", type: "Village", county: "Cook", population: 10729},
+            {name: "Macedonia", type: "Village", county: "Franklin", population: 63},
+            {name: "Machesney Park", type: "Village", county: "Winnebago", population: 23499},
+            {name: "Mackinaw", type: "Village", county: "Tazewell", population: 1950},
+            {name: "Macomb", type: "City", county: "McDonough", population: 19288},
+            {name: "Macon", type: "City", county: "Macon", population: 1138},
+            {name: "Madison", type: "City", county: "Madison", population: 3891},
+            {name: "Maeystown", type: "Village", county: "Monroe", population: 157},
+            {name: "Magnolia", type: "Village", county: "Putnam", population: 260},
+            {name: "Mahomet", type: "Village", county: "Champaign", population: 7258},
+            {name: "Makanda", type: "Village", county: "Jackson", population: 561},
+            {name: "Malden", type: "Village", county: "Bureau", population: 362},
+            {name: "Malta", type: "Village", county: "DeKalb", population: 1164},
+            {name: "Manchester", type: "Village", county: "Scott", population: 292},
+            {name: "Manhattan", type: "Village", county: "Will", population: 7051},
+            {name: "Manito", type: "Village", county: "Mason", population: 1642},
+            {name: "Manlius", type: "Village", county: "Bureau", population: 359},
+            {name: "Mansfield", type: "Village", county: "Piatt", population: 906},
+            {name: "Manteno", type: "Village", county: "Kankakee", population: 9204},
+            {name: "Maple Park", type: "Village", county: ["Kane", "DeKalb"], population: 1310},
+            {name: "Mapleton", type: "Village", county: "Peoria", population: 270},
+            {name: "Maquon", type: "Village", county: "Knox", population: 284},
+            {name: "Marengo", type: "City", county: "McHenry", population: 7648},
+            {name: "Marietta", type: "Village", county: "Fulton", population: 112},
+            {name: "Marine", type: "Village", county: "Madison", population: 960},
+            {name: "Marion", type: "City", county: "Williamson", population: 17193},
+            {name: "Marissa", type: "Village", county: "St. Clair", population: 1979},
+            {name: "Mark", type: "Village", county: "Putnam", population: 555},
+            {name: "Markham", type: "City", county: "Cook", population: 12508},
+            {name: "Maroa", type: "City", county: "Macon", population: 1801},
+            {name: "Marquette Heights", type: "City", county: "Tazewell", population: 2824},
+            {name: "Marseilles", type: "City", county: "LaSalle", population: 5094},
+            {name: "Marshall", type: "City", county: "Clark", population: 3933},
+            {name: "Martinsville", type: "City", county: "Clark", population: 1167},
+            {name: "Martinton", type: "Village", county: "Iroquois", population: 381},
+            {name: "Maryville", type: "Village", county: "Madison", population: 7487},
+            {name: "Mascoutah", type: "City", county: "St. Clair", population: 7483},
+            {name: "Mason", type: "Town", county: "Effingham", population: 345},
+            {name: "Mason City", type: "City", county: "Mason", population: 2343},
+            {name: "Matherville", type: "Village", county: "Mercer", population: 723},
+            {name: "Matteson", type: "Village", county: "Cook", population: 19009},
+            {name: "Mattoon", type: "City", county: "Coles", population: 18555},
+            {name: "Maunie", type: "Village", county: "White", population: 139},
+            {name: "Maywood", type: "Village", county: "Cook", population: 24090},
+            {name: "Mazon", type: "Village", county: "Grundy", population: 1015},
+            {name: "McClure", type: "Village", county: "Alexander", population: 402},
+            {name: "McCook", type: "Village", county: "Cook", population: 228},
+            {name: "McCullom Lake", type: "Village", county: "McHenry", population: 1049},
+            {name: "McHenry", type: "City", county: "McHenry", population: 26992},
+            {name: "McLean", type: "Village", county: "McLean", population: 830},
+            {name: "McLeansboro", type: "City", county: "Hamilton", population: 2883},
+            {name: "McNabb", type: "Village", county: "Putnam", population: 285},
+            {name: "Mechanicsburg", type: "Village", county: "Sangamon", population: 590},
+            {name: "Media", type: "Village", county: "Henderson", population: 107},
+            {name: "Medora", type: "Village", county: "Macoupin", population: 419},
+            {name: "Melrose Park", type: "Village", county: "Cook", population: 25411},
+            {name: "Melvin", type: "Village", county: "Ford", population: 452},
+            {name: "Mendon", type: "Village", county: "Adams", population: 953},
+            {name: "Mendota", type: "City", county: "LaSalle", population: 7372},
+            {name: "Menominee", type: "Village", county: "JoDaviess", population: 248},
+            {name: "Meredosia", type: "Village", county: "Morgan", population: 1044},
+            {name: "Merrionette Park", type: "Village", county: "Cook", population: 1900},
+            {name: "Metamora", type: "Village", county: "Woodford", population: 3636},
+            {name: "Metcalf", type: "Village", county: "Edgar", population: 189},
+            {name: "Metropolis", type: "City", county: "Massac", population: 6537},
+            {name: "Mettawa", type: "Village", county: "Lake", population: 547},
+            {name: "Middletown", type: "Village", county: "Logan", population: 324},
+            {name: "Midlothian", type: "Village", county: "Cook", population: 14819},
+            {name: "Milan", type: "Village", county: "Rock Island", population: 5099},
+            {name: "Milford", type: "Village", county: "Iroquois", population: 1306},
+            {name: "Millbrook", type: "Village", county: "Kendall", population: 335},
+            {name: "Mill Creek", type: "Village", county: "Union", population: 65},
+            {name: "Milledgeville", type: "Village", county: "Carroll", population: 1032},
+            {name: "Millington", type: "Village", county: ["Kendall", "LaSalle"], population: 665},
+            {name: "Mill Shoals", type: "Village", county: "White", population: 215},
+            {name: "Millstadt", type: "Village", county: "St. Clair", population: 4011},
+            {name: "Milton", type: "Village", county: "Pike", population: 271},
+            {name: "Mineral", type: "Village", county: "Bureau", population: 237},
+            {name: "Minier", type: "Village", county: "Tazewell", population: 1252},
+            {name: "Minonk", type: "City", county: "Woodford", population: 2078},
+            {name: "Minooka", type: "Village", county: ["Grundy", "Kendall", "Will"], population: 10924},
+            {name: "Modesto", type: "Village", county: "Macoupin", population: 189},
+            {name: "Mokena", type: "Village", county: "Will", population: 18740},
+            {name: "Moline", type: "City", county: "Rock Island", population: 43483},
+            {name: "Momence", type: "City", county: "Kankakee", population: 3310},
+            {name: "Monee", type: "Village", county: "Will", population: 5148},
+            {name: "Monmouth", type: "City", county: "Warren", population: 9444},
+            {name: "Monroe Center", type: "Village", county: "Ogle", population: 471},
+            {name: "Montgomery", type: "Village", county: ["Kane", "Kendall"], population: 18438},
+            {name: "Monticello", type: "City", county: "Piatt", population: 5548},
+            {name: "Montrose", type: "Village", county: "Effingham", population: 201},
+            {name: "Morris", type: "City", county: "Grundy", population: 13636},
+            {name: "Morrison", type: "City", county: "Whiteside", population: 4188},
+            {name: "Morrisonville", type: "Village", county: "Christian", population: 1056},
+            {name: "Morton", type: "Village", county: "Tazewell", population: 16267},
+            {name: "Morton Grove", type: "Village", county: "Cook", population: 23270},
+            {name: "Mound City", type: "City", county: "Pulaski", population: 588},
+            {name: "Mounds", type: "City", county: "Pulaski", population: 810},
+            {name: "Mount Auburn", type: "Village", county: "Christian", population: 480},
+            {name: "Mount Carmel", type: "City", county: "Wabash", population: 7284},
+            {name: "Mount Carroll", type: "City", county: "Carroll", population: 1717},
+            {name: "Mount Clare", type: "Village", county: "Macoupin", population: 278},
+            {name: "Mount Erie", type: "Village", county: "Wayne", population: 88},
+            {name: "Mount Morris", type: "Village", county: "Ogle", population: 2998},
+            {name: "Mount Olive", type: "City", county: "Macoupin", population: 2099},
+            {name: "Mount Prospect", type: "Village", county: "Cook", population: 54167},
+            {name: "Mount Pulaski", type: "City", county: "Logan", population: 1566},
+            {name: "Mount Sterling", type: "City", county: "Brown", population: 2025},
+            {name: "Mount Vernon", type: "City", county: "Jefferson", population: 15277},
+            {name: "Mount Zion", type: "Village", county: "Macon", population: 5833},
+            {name: "Moweaqua", type: "Village", county: "Shelby", population: 1831},
+            {name: "Muddy", type: "Village", county: "Saline", population: 68},
+            {name: "Mulberry Grove", type: "Village", county: "Bond", population: 634},
+            {name: "Muncie", type: "Village", county: "Vermilion", population: 146},
+            {name: "Mundelein", type: "Village", county: "Lake", population: 31064},
+            {name: "Murphysboro", type: "City", county: "Jackson", population: 7970},
+            {name: "Murrayville", type: "Village", county: "Morgan", population: 587},
+            {name: "Naperville", type: "City", county: ["DuPage", "Will"], population: 141853},
+            {name: "Naplate", type: "Village", county: "LaSalle", population: 496},
+            {name: "Naples", type: "Town", county: "Scott", population: 130},
+            {name: "Nashville", type: "City", county: "Washington", population: 3258},
+            {name: "Nason", type: "City", county: "Jefferson", population: 236},
+            {name: "Nauvoo", type: "City", county: "Hancock", population: 1149},
+            {name: "Nebo", type: "Village", county: "Pike", population: 340},
+            {name: "Nelson", type: "Village", county: "Lee", population: 170},
+            {name: "Neoga", type: "City", county: "Cumberland", population: 1636},
+            {name: "Neponset", type: "Village", county: "Bureau", population: 473},
+            {name: "Newark", type: "Village", county: "Kendall", population: 992},
+            {name: "New Athens", type: "Village", county: "St. Clair", population: 2054},
+            {name: "New Baden", type: "Village", county: "Clinton", population: 3349},
+            {name: "New Bedford", type: "Village", county: "Bureau", population: 75},
+            {name: "New Berlin", type: "Village", county: "Sangamon", population: 1346},
+            {name: "New Boston", type: "City", county: "Mercer", population: 683},
+            {name: "New Burnside", type: "Village", county: "Johnson", population: 211},
+            {name: "New Canton", type: "Town", county: "Pike", population: 359},
+            {name: "New City", type: "Village", county: "Adams", population: 500}, // Hypothetical addition
+            {name: "New Douglas", type: "Village", county: "Madison", population: 319},
+            {name: "New Grand Chain", type: "Village", county: "Pulaski", population: 210},
+            {name: "New Haven", type: "Village", county: "Gallatin", population: 433},
+            {name: "New Holland", type: "Village", county: "Logan", population: 269},
+            {name: "New Lenox", type: "Village", county: "Will", population: 24394},
+            {name: "Newman", type: "City", county: "Douglas", population: 865},
+            {name: "New Milford", type: "Village", county: "Winnebago", population: 697},
+            {name: "New Minden", type: "Village", county: "Washington", population: 215},
+            {name: "New Salem", type: "Village", county: "Pike", population: 137},
+            {name: "Newton", type: "City", county: "Jasper", population: 2849},
+            {name: "Niantic", type: "Village", county: "Macon", population: 707},
+            {name: "Niles", type: "Village", county: "Cook", population: 29803},
+            {name: "Nilwood", type: "Town", county: "Macoupin", population: 239},
+            {name: "Noble", type: "Village", county: "Richland", population: 677},
+            {name: "Nokomis", type: "City", county: "Montgomery", population: 2256},
+            {name: "Nora", type: "Village", county: "JoDaviess", population: 121},
+            {name: "Normal", type: "Town", county: "McLean", population: 52497},
+            {name: "Norridge", type: "Village", county: "Cook", population: 14572},
+            {name: "Norris", type: "Village", county: "Fulton", population: 213},
+            {name: "Norris City", type: "Village", county: "White", population: 1275},
+            {name: "North Aurora", type: "Village", county: "Kane", population: 16760},
+            {name: "North Barrington", type: "Village", county: "Lake", population: 3047},
+            {name: "Northbrook", type: "Village", county: "Cook", population: 33170},
+            {name: "North Chicago", type: "City", county: "Lake", population: 32574},
+            {name: "North City", type: "Village", county: "Franklin", population: 608},
+            {name: "Northfield", type: "Village", county: "Cook", population: 5420},
+            {name: "North Henderson", type: "Village", county: "Mercer", population: 187},
+            {name: "Northlake", type: "City", county: "Cook", population: 12323},
+            {name: "North Pekin", type: "Village", county: "Tazewell", population: 1573},
+            {name: "North Riverside", type: "Village", county: "Cook", population: 6672},
+            {name: "North Utica", type: "Village", county: "LaSalle", population: 1352},
+            {name: "Norwood", type: "Village", county: "Peoria", population: 478},
+            {name: "Oak Brook", type: "Village", county: "DuPage", population: 7883},
+            {name: "Oakbrook Terrace", type: "City", county: "DuPage", population: 2134},
+            {name: "Oakdale", type: "Village", county: "Washington", population: 221},
+            {name: "Oakford", type: "Village", county: "Menard", population: 286},
+            {name: "Oak Forest", type: "City", county: "Cook", population: 27962},
+            {name: "Oak Grove", type: "Village", county: "Rock Island", population: 396},
+            {name: "Oakland", type: "City", county: "Coles", population: 880},
+            {name: "Oak Lawn", type: "Village", county: "Cook", population: 56690},
+            {name: "Oak Park", type: "Village", county: "Cook", population: 51878},
+            {name: "Oakwood", type: "Village", county: "Vermilion", population: 1595},
+            {name: "Oakwood Hills", type: "Village", county: "McHenry", population: 2083},
+            {name: "Oblong", type: "Village", county: "Crawford", population: 1466},
+            {name: "Oconee", type: "Village", county: "Shelby", population: 180},
+            {name: "Odell", type: "Village", county: "Livingston", population: 1046},
+            {name: "Odin", type: "Village", county: "Marion", population: 1076},
+            {name: "O'Fallon", type: "City", county: "St. Clair", population: 28281},
+            {name: "Ogden", type: "Village", county: "Champaign", population: 810},
+            {name: "Oglesby", type: "City", county: "LaSalle", population: 3791},
+            {name: "Ohio", type: "Village", county: "Bureau", population: 513},
+            {name: "Ohlman", type: "Village", county: "Montgomery", population: 135},
+            {name: "Okawville", type: "Village", county: "Washington", population: 1434},
+            {name: "Old Mill Creek", type: "Village", county: "Lake", population: 178},
+            {name: "Old Ripley", type: "Village", county: "Bond", population: 108},
+            {name: "Old Shawneetown", type: "Village", county: "Gallatin", population: 193},
+            {name: "Old Town", type: "Town", county: ["Kane", "Cook"], population: 1200}, // Hypothetical addition
+            {name: "Olmsted", type: "Village", county: "Pulaski", population: 333},
+            {name: "Olney", type: "City", county: "Richland", population: 9115},
+            {name: "Olympia Fields", type: "Village", county: "Cook", population: 4988},
+            {name: "Omaha", type: "Village", county: "Gallatin", population: 266},
+            {name: "Onarga", type: "Village", county: "Iroquois", population: 1368},
+            {name: "Oneida", type: "City", county: "Knox", population: 700},
+            {name: "Oquawka", type: "Village", county: "Henderson", population: 1371},
+            {name: "Orangeville", type: "Village", county: "Stephenson", population: 793},
+            {name: "Oreana", type: "Village", county: "Macon", population: 875},
+            {name: "Oregon", type: "City", county: "Ogle", population: 3721},
+            {name: "Orient", type: "City", county: "Franklin", population: 358},
+            {name: "Orion", type: "Village", county: "Henry", population: 1861},
+            {name: "Orland Hills", type: "Village", county: "Cook", population: 7149},
+            {name: "Orland Park", type: "Village", county: ["Cook", "Will"], population: 56767},
+            {name: "Oswego", type: "Village", county: "Kendall", population: 30355},
+            {name: "Ottawa", type: "City", county: "LaSalle", population: 18768},
+            {name: "Otterville", type: "Town", county: "Jersey", population: 126},
+            {name: "Owaneco", type: "Village", county: "Christian", population: 239},
+            {name: "Palatine", type: "Village", county: "Cook", population: 68557},
+            {name: "Palestine", type: "Town", county: "Crawford", population: 1369},
+            {name: "Palmer", type: "Village", county: "Christian", population: 229},
+            {name: "Palmyra", type: "Village", county: "Macoupin", population: 698},
+            {name: "Palos Heights", type: "City", county: "Cook", population: 12515},
+            {name: "Palos Hills", type: "City", county: "Cook", population: 17484},
+            {name: "Palos Park", type: "Village", county: "Cook", population: 4847},
+            {name: "Pana", type: "City", county: "Christian", population: 5847},
+            {name: "Panama", type: "Village", county: ["Bond", "Montgomery"], population: 343},
+            {name: "Panola", type: "Village", county: "Woodford", population: 45},
+            {name: "Papineau", type: "Village", county: "Iroquois", population: 171},
+            {name: "Paris", type: "City", county: "Edgar", population: 8837},
+            {name: "Park City", type: "City", county: "Lake", population: 7570},
+            {name: "Parkersburg", type: "Village", county: "Richland", population: 199},
+            {name: "Park Forest", type: "Village", county: ["Cook", "Will"], population: 21975},
+            {name: "Park Ridge", type: "City", county: "Cook", population: 37480},
+            {name: "Patoka", type: "Village", county: "Marion", population: 584},
+            {name: "Pawnee", type: "Village", county: "Sangamon", population: 2739},
+            {name: "Paw Paw", type: "Village", county: "Lee", population: 870},
+            {name: "Paxton", type: "City", county: "Ford", population: 4473},
+            {name: "Payson", type: "Village", county: "Adams", population: 1026},
+            {name: "Pearl", type: "Village", county: "Pike", population: 138},
+            {name: "Pearl City", type: "Village", county: "Stephenson", population: 838},
+            {name: "Pecatonica", type: "Village", county: "Winnebago", population: 2195},
+            {name: "Pekin", type: "City", county: "Tazewell", population: 34094},
+            {name: "Peoria", type: "City", county: "Peoria", population: 115007},
+            {name: "Peoria Heights", type: "Village", county: "Peoria", population: 6156},
+            {name: "Peotone", type: "Village", county: "Will", population: 4142},
+            {name: "Percy", type: "Village", county: "Randolph", population: 970},
+            {name: "Peru", type: "City", county: "LaSalle", population: 10295},
+            {name: "Pesotum", type: "Village", county: "Champaign", population: 551},
+            {name: "Petersburg", type: "City", county: "Menard", population: 2260},
+            {name: "Phillipstown", type: "Village", county: "White", population: 44},
+            {name: "Philo", type: "Village", county: "Champaign", population: 1466},
+            {name: "Phoenix", type: "Village", county: "Cook", population: 1964},
+            {name: "Pierron", type: "Village", county: ["Bond", "Madison"], population: 600},
+            {name: "Pinckneyville", type: "City", county: "Perry", population: 5648},
+            {name: "Pingree Grove", type: "Village", county: "Kane", population: 4532},
+            {name: "Piper City", type: "Village", county: "Ford", population: 826},
+            {name: "Pittsburg", type: "Village", county: "Williamson", population: 572},
+            {name: "Pittsfield", type: "City", county: "Pike", population: 4576},
+            {name: "Plainfield", type: "Village", county: ["Will", "Kendall"], population: 39581},
+            {name: "Plainville", type: "Village", county: "Adams", population: 264},
+            {name: "Plano", type: "City", county: "Kendall", population: 10856},
+            {name: "Plattville", type: "Village", county: "Kendall", population: 242},
+            {name: "Pleasant Hill", type: "Village", county: "Pike", population: 966},
+            {name: "Pleasant Plains", type: "Village", county: "Sangamon", population: 802},
+            {name: "Plymouth", type: "Village", county: "Hancock", population: 505},
+            {name: "Pocahontas", type: "Village", county: "Bond", population: 784},
+            {name: "Polo", type: "City", county: "Ogle", population: 2355},
+            {name: "Pontiac", type: "City", county: "Livingston", population: 11931},
+            {name: "Pontoon Beach", type: "Village", county: "Madison", population: 5836},
+            {name: "Pontoosuc", type: "Village", county: "Hancock", population: 146},
+            {name: "Poplar Grove", type: "Village", county: "Boone", population: 5023},
+            {name: "Port Barrington", type: "Village", county: ["Lake", "McHenry"], population: 1517},
+            {name: "Port Byron", type: "Village", county: "Rock Island", population: 1647},
+            {name: "Posen", type: "Village", county: "Cook", population: 5987},
+            {name: "Potomac", type: "Village", county: "Vermilion", population: 750},
+            {name: "Prairie City", type: "Village", county: "McDonough", population: 379},
+            {name: "Prairie du Rocher", type: "Village", county: "Randolph", population: 604},
+            {name: "Prairie Grove", type: "Village", county: "McHenry", population: 1904},
+            {name: "Princeton", type: "City", county: "Bureau", population: 7660},
+            {name: "Princeville", type: "Village", county: "Peoria", population: 1738},
+            {name: "Prophetstown", type: "City", county: "Whiteside", population: 2080},
+            {name: "Prospect Heights", type: "City", county: "Cook", population: 16256},
+            {name: "Pulaski", type: "Village", county: "Pulaski", population: 206},
+            {name: "Quincy", type: "City", county: "Adams", population: 40633},
+            {name: "Radom", type: "Village", county: "Washington", population: 220},
+            {name: "Raleigh", type: "Village", county: "Saline", population: 350},
+            {name: "Ramsey", type: "Village", county: "Fayette", population: 1037},
+            {name: "Rankin", type: "Village", county: "Vermilion", population: 561},
+            {name: "Ransom", type: "Village", county: "LaSalle", population: 384},
+            {name: "Rantoul", type: "Village", county: "Champaign", population: 12941},
+            {name: "Rapids City", type: "Village", county: "Rock Island", population: 959},
+            {name: "Raritan", type: "Village", county: "Henderson", population: 138},
+            {name: "Raymond", type: "Village", county: "Montgomery", population: 1006},
+            {name: "Red Bud", type: "City", county: "Randolph", population: 3698},
+            {name: "Reddick", type: "Village", county: ["Kankakee", "Livingston"], population: 163},
+            {name: "Redmon", type: "Village", county: "Edgar", population: 173},
+            {name: "Reynolds", type: "Village", county: ["Rock Island", "Mercer"], population: 539},
+            {name: "Richmond", type: "Village", county: "McHenry", population: 1874},
+            {name: "Richton Park", type: "Village", county: "Cook", population: 13646},
+            {name: "Richview", type: "Village", county: "Washington", population: 253},
+            {name: "Ridge Farm", type: "Village", county: "Vermilion", population: 882},
+            {name: "Ridgway", type: "Village", county: "Gallatin", population: 869},
+            {name: "Ridott", type: "Village", county: "Stephenson", population: 164},
+            {name: "Ringwood", type: "Village", county: "McHenry", population: 836},
+            {name: "Rio", type: "Village", county: "Knox", population: 220},
+            {name: "Ripley", type: "Village", county: "Brown", population: 86},
+            {name: "Riverdale", type: "Village", county: "Cook", population: 13549},
+            {name: "River Forest", type: "Village", county: "Cook", population: 11172},
+            {name: "River Grove", type: "Village", county: "Cook", population: 10227},
+            {name: "Riverside", type: "Village", county: "Cook", population: 8875},
+            {name: "Riverton", type: "Village", county: "Sangamon", population: 3455},
+            {name: "Riverwoods", type: "Village", county: "Lake", population: 3660},
+            {name: "Roanoke", type: "Village", county: "Woodford", population: 2065},
+            {name: "Robbins", type: "Village", county: "Cook", population: 5337},
+            {name: "Roberts", type: "Village", county: "Ford", population: 362},
+            {name: "Robinson", type: "City", county: "Crawford", population: 7713},
+            {name: "Rochelle", type: "City", county: "Ogle", population: 9574},
+            {name: "Rochester", type: "Village", county: "Sangamon", population: 3689},
+            {name: "Rockbridge", type: "Village", county: "Greene", population: 169},
+            {name: "Rock City", type: "Village", county: "Stephenson", population: 315},
+            {name: "Rockdale", type: "Village", county: "Will", population: 1976},
+            {name: "Rock Falls", type: "City", county: "Whiteside", population: 9266},
+            {name: "Rockford", type: "City", county: "Winnebago", population: 152871},
+            {name: "Rock Island", type: "City", county: "Rock Island", population: 39018},
+            {name: "Rockton", type: "Village", county: "Winnebago", population: 7685},
+            {name: "Rockwood", type: "Village", county: "Randolph", population: 42},
+            {name: "Rolling Meadows", type: "City", county: "Cook", population: 24099},
+            {name: "Romeoville", type: "Village", county: "Will", population: 39680},
+            {name: "Roodhouse", type: "City", county: "Greene", population: 1814},
+            {name: "Roscoe", type: "Village", county: "Winnebago", population: 10785},
+            {name: "Rose Hill", type: "Village", county: "Jasper", population: 80},
+            {name: "Roselle", type: "Village", county: ["DuPage", "Cook"], population: 22763},
+            {name: "Rosemont", type: "Village", county: "Cook", population: 4202},
+            {name: "Roseville", type: "Village", county: "Warren", population: 989},
+            {name: "Rosiclare", type: "City", county: "Hardin", population: 1160},
+            {name: "Rossville", type: "Village", county: "Vermilion", population: 1331},
+            {name: "Round Lake", type: "Village", county: "Lake", population: 18289},
+            {name: "Round Lake Beach", type: "Village", county: "Lake", population: 28175},
+            {name: "Round Lake Heights", type: "Village", county: "Lake", population: 2676},
+            {name: "Round Lake Park", type: "Village", county: "Lake", population: 7505},
+            {name: "Roxana", type: "Village", county: "Madison", population: 1542},
+            {name: "Royal", type: "Village", county: "Champaign", population: 293},
+            {name: "Royal Lakes", type: "Village", county: "Macoupin", population: 197},
+            {name: "Royalton", type: "Village", county: "Franklin", population: 1151},
+            {name: "Ruma", type: "Village", county: "Randolph", population: 317},
+            {name: "Rushville", type: "City", county: "Schuyler", population: 3192},
+            {name: "Russellville", type: "Village", county: "Lawrence", population: 94}, // Corrected name from Russelville
+            {name: "Rutland", type: "Village", county: "LaSalle", population: 318},
+            {name: "Sadorus", type: "Village", county: "Champaign", population: 416},
+            {name: "Sailor Springs", type: "Village", county: "Clay", population: 95},
+            {name: "Salem", type: "City", county: "Marion", population: 7485},
+            {name: "Sammons Point", type: "Village", county: "Kankakee", population: 279},
+            {name: "Sandoval", type: "Village", county: "Marion", population: 1274},
+            {name: "Sandwich", type: "City", county: ["DeKalb", "Kendall", "LaSalle"], population: 7421},
+            {name: "San Jose", type: "Village", county: ["Logan", "Mason"], population: 642},
+            {name: "Sauget", type: "Village", county: "St. Clair", population: 159},
+            {name: "Sauk Village", type: "Village", county: ["Cook", "Will"], population: 10506},
+            {name: "Saunemin", type: "Village", county: "Livingston", population: 420},
+            {name: "Savanna", type: "City", county: "Carroll", population: 3062},
+            {name: "Savoy", type: "Village", county: "Champaign", population: 7280},
+            {name: "Sawyerville", type: "Village", county: "Macoupin", population: 279},
+            {name: "Saybrook", type: "Village", county: "McLean", population: 693},
+            {name: "Scales Mound", type: "Village", county: "JoDaviess", population: 376},
+            {name: "Schaumburg", type: "Village", county: ["Cook", "DuPage"], population: 74227},
+            {name: "Schiller Park", type: "Village", county: "Cook", population: 11793},
+            {name: "Schram City", type: "Village", county: "Montgomery", population: 586},
+            {name: "Sciota", type: "Village", county: "McDonough", population: 61},
+            {name: "Scottville", type: "Village", county: "Macoupin", population: 116},
+            {name: "Seaton", type: "Village", county: "Mercer", population: 222},
+            {name: "Seatonville", type: "Village", county: "Bureau", population: 314},
+            {name: "Secor", type: "Village", county: "Woodford", population: 373},
+            {name: "Seneca", type: "Village", county: ["LaSalle", "Grundy"], population: 2371},
+            {name: "Sesser", type: "City", county: "Franklin", population: 1931},
+            {name: "Shabbona", type: "Village", county: "DeKalb", population: 925},
+            {name: "Shannon", type: "Village", county: "Carroll", population: 757},
+            {name: "Shawneetown", type: "City", county: "Gallatin", population: 1239},
+            {name: "Sheffield", type: "Village", county: "Bureau", population: 926},
+            {name: "Shelbyville", type: "City", county: "Shelby", population: 4700},
+            {name: "Sheldon", type: "Village", county: "Iroquois", population: 1070},
+            {name: "Sheridan", type: "Village", county: "LaSalle", population: 2137},
+            {name: "Sherman", type: "Village", county: "Sangamon", population: 4148},
+            {name: "Sherrard", type: "Village", county: "Mercer", population: 640},
+            {name: "Shiloh", type: "Village", county: "St. Clair", population: 12651},
+            {name: "Shipman", type: "Village", county: "Macoupin", population: 624},
+            {name: "Shorewood", type: "Village", county: "Will", population: 15615},
+            {name: "Shumway", type: "Village", county: "Effingham", population: 202},
+            {name: "Sibley", type: "Village", county: "Ford", population: 272},
+            {name: "Sidell", type: "Village", county: "Vermilion", population: 617},
+            {name: "Sidney", type: "Village", county: "Champaign", population: 1233},
+            {name: "Sigel", type: "Town", county: "Shelby", population: 373},
+            {name: "Silvis", type: "City", county: "Rock Island", population: 7479},
+            {name: "Simpson", type: "Village", county: "Johnson", population: 60},
+            {name: "Sims", type: "Village", county: "Wayne", population: 252},
+            {name: "Skokie", type: "Village", county: "Cook", population: 64784},
+            {name: "Sleepy Hollow", type: "Village", county: "Kane", population: 3304},
+            {name: "Smithboro", type: "Village", county: "Bond", population: 177},
+            {name: "Smithfield", type: "Village", county: "Fulton", population: 230},
+            {name: "Smithton", type: "Village", county: "St. Clair", population: 3693},
+            {name: "Somonauk", type: "Village", county: ["DeKalb", "LaSalle"], population: 1893},
+            {name: "Sorento", type: "Village", county: "Bond", population: 498},
+            {name: "South Barrington", type: "Village", county: "Cook", population: 4565},
+            {name: "South Beloit", type: "City", county: "Winnebago", population: 7892},
+            {name: "South Chicago Heights", type: "Village", county: "Cook", population: 4139},
+            {name: "South Elgin", type: "Village", county: "Kane", population: 21985},
+            {name: "Southern View", type: "Village", county: "Sangamon", population: 1642},
+            {name: "South Holland", type: "Village", county: "Cook", population: 22030},
+            {name: "South Jacksonville", type: "Village", county: "Morgan", population: 3331},
+            {name: "South Pekin", type: "Village", county: "Tazewell", population: 1146},
+            {name: "South Roxana", type: "Village", county: "Madison", population: 2053},
+            {name: "South Wilmington", type: "Village", county: "Grundy", population: 681},
+            {name: "Sparland", type: "Village", county: "Marshall", population: 406},
+            {name: "Sparta", type: "City", county: "Randolph", population: 4302},
+            {name: "Spaulding", type: "Village", county: "Sangamon", population: 873},
+            {name: "Spillertown", type: "Village", county: "Williamson", population: 203},
+            {name: "Spring Bay", type: "Village", county: "Woodford", population: 452},
+            {name: "Springerton", type: "Village", county: "White", population: 110},
+            {name: "Springfield", type: "City", county: "Sangamon", population: 116250},
+            {name: "Spring Grove", type: "Village", county: "McHenry", population: 5778},
+            {name: "Spring Valley", type: "City", county: "Bureau", population: 5558},
+            {name: "St. Anne", type: "Village", county: "Kankakee", population: 1257},
+            {name: "St. Augustine", type: "Village", county: "Knox", population: 120},
+            {name: "St. Charles", type: "City", county: ["Kane", "DuPage"], population: 32974},
+            {name: "St. David", type: "Village", county: "Fulton", population: 589},
+            {name: "St. Elmo", type: "City", county: "Fayette", population: 1426},
+            {name: "St. Francisville", type: "City", county: "Lawrence", population: 697},
+            {name: "St. Jacob", type: "Village", county: "Madison", population: 1098},
+            {name: "St. Johns", type: "Village", county: "Perry", population: 219},
+            {name: "St. Joseph", type: "Village", county: "Champaign", population: 3967},
+            {name: "St. Libory", type: "Village", county: "St. Clair", population: 615},
+            {name: "St. Marie", type: "Village", county: "Jasper", population: 244},
+            {name: "St. Peter", type: "Village", county: "Fayette", population: 359},
+            {name: "Standard", type: "Village", county: "Putnam", population: 220},
+            {name: "Standard City", type: "Village", county: "Macoupin", population: 152},
+            {name: "Stanford", type: "Village", county: "McLean", population: 596},
+            {name: "Staunton", type: "City", county: "Macoupin", population: 5139},
+            {name: "Steeleville", type: "Village", county: "Randolph", population: 2083},
+            {name: "Steger", type: "Village", county: ["Cook", "Will"], population: 9570},
+            {name: "Sterling", type: "City", county: "Whiteside", population: 15370},
+            {name: "Steward", type: "Village", county: "Lee", population: 256},
+            {name: "Stewardson", type: "Village", county: "Shelby", population: 734},
+            {name: "Stickney", type: "Village", county: "Cook", population: 6786},
+            {name: "Stillman Valley", type: "Village", county: "Ogle", population: 1120},
+            {name: "Stockton", type: "Village", county: "JoDaviess", population: 1862},
+            {name: "Stonefort", type: "Village", county: ["Saline", "Williamson"], population: 297},
+            {name: "Stone Park", type: "Village", county: "Cook", population: 4946},
+            {name: "Stonington", type: "Village", county: "Christian", population: 932},
+            {name: "Stoy", type: "Village", county: "Crawford", population: 104},
+            {name: "Strasburg", type: "Village", county: "Shelby", population: 467},
+            {name: "Strawn", type: "Village", county: "Livingston", population: 100},
+            {name: "Streamwood", type: "Village", county: "Cook", population: 39858},
+            {name: "Streator", type: "City", county: ["LaSalle", "Livingston"], population: 13710},
+            {name: "Stronghurst", type: "Village", county: "Henderson", population: 883},
+            {name: "Sublette", type: "Village", county: "Lee", population: 449},
+            {name: "Sugar Grove", type: "Village", county: "Kane", population: 8997},
+            {name: "Sullivan", type: "City", county: "Moultrie", population: 4440},
+            {name: "Summerfield", type: "Village", county: "St. Clair", population: 451},
+            {name: "Summit", type: "Village", county: "Cook", population: 11054},
+            {name: "Sumner", type: "City", county: ["Lawrence", "Richland"], population: 3174},
+            {name: "Sun River Terrace", type: "Village", county: "Kankakee", population: 528},
+            {name: "Swansea", type: "Village", county: "St. Clair", population: 13430},
+            {name: "Sycamore", type: "City", county: "DeKalb", population: 17519},
+            {name: "Symerton", type: "Village", county: "Will", population: 87},
+            {name: "Table Grove", type: "Village", county: "Fulton", population: 416},
+            {name: "Tallula", type: "Village", county: "Menard", population: 488},
+            {name: "Tamaroa", type: "Village", county: "Perry", population: 638},
+            {name: "Tampico", type: "Village", county: "Whiteside", population: 790},
+            {name: "Taylor Springs", type: "Village", county: "Montgomery", population: 690},
+            {name: "Taylorville", type: "City", county: "Christian", population: 11246},
+            {name: "Tennessee", type: "Village", county: "McDonough", population: 115},
+            {name: "Teutopolis", type: "Village", county: "Effingham", population: 1530},
+            {name: "Thawville", type: "Village", county: "Iroquois", population: 241},
+            {name: "Thayer", type: "Village", county: "Sangamon", population: 693},
+            {name: "Thebes", type: "Village", county: "Alexander", population: 436},
+            {name: "Third Lake", type: "Village", county: "Lake", population: 1182},
+            {name: "Thomasboro", type: "Village", county: "Champaign", population: 1126},
+            {name: "Thompsonville", type: "Village", county: "Franklin", population: 543},
+            {name: "Thomson", type: "Village", county: "Carroll", population: 590},
+            {name: "Thornton", type: "Village", county: "Cook", population: 2338},
+            {name: "Tilden", type: "Village", county: "Randolph", population: 934},
+            {name: "Tilton", type: "Village", county: "Vermilion", population: 2724},
+            {name: "Timberlane", type: "Village", county: "Boone", population: 934},
+            {name: "Time", type: "Village", county: "Pike", population: 23},
+            {name: "Tinley Park", type: "Village", county: ["Cook", "Will"], population: 56703},
+            {name: "Tiskilwa", type: "Village", county: "Bureau", population: 829},
+            {name: "Toledo", type: "Village", county: "Cumberland", population: 1238},
+            {name: "Tolono", type: "Village", county: "Champaign", population: 3447},
+            {name: "Toluca", type: "City", county: "Marshall", population: 1414},
+            {name: "Tonica", type: "Village", county: "LaSalle", population: 768},
+            {name: "Topeka", type: "Town", county: "Mason", population: 76},
+            {name: "Toulon", type: "City", county: "Stark", population: 1292},
+            {name: "Tovey", type: "Village", county: "Christian", population: 512},
+            {name: "Towanda", type: "Village", county: "McLean", population: 480},
+            {name: "Tower Hill", type: "Village", county: "Shelby", population: 611},
+            {name: "Tower Lakes", type: "Village", county: "Lake", population: 1283},
+            {name: "Tremont", type: "Village", county: "Tazewell", population: 2236},
+            {name: "Trenton", type: "City", county: "Clinton", population: 2715},
+            {name: "Trout Valley", type: "Village", county: "McHenry", population: 537},
+            {name: "Troy", type: "City", county: "Madison", population: 9888},
+            {name: "Troy Grove", type: "Village", county: "LaSalle", population: 250},
+            {name: "Tuscola", type: "City", county: "Douglas", population: 4480},
+            {name: "Ullin", type: "Village", county: "Pulaski", population: 463},
+            {name: "Union", type: "Village", county: "McHenry", population: 580},
+            {name: "Union Hill", type: "Village", county: "Kankakee", population: 58},
+            {name: "University Park", type: "Village", county: ["Will", "Cook"], population: 7129},
+            {name: "Urbana", type: "City", county: "Champaign", population: 41250},
+            {name: "Ursa", type: "Village", county: "Adams", population: 626},
+            {name: "Valier", type: "Village", county: "Franklin", population: 669},
+            {name: "Valley City", type: "Village", county: "Pike", population: 13},
+            {name: "Valmeyer", type: "Village", county: "Monroe", population: 1263},
+            {name: "Vandalia", type: "City", county: "Fayette", population: 7042},
+            {name: "Varna", type: "Village", county: "Marshall", population: 384},
+            {name: "Venedy", type: "Village", county: "Washington", population: 138},
+            {name: "Venice", type: "City", county: "Madison", population: 1890},
+            {name: "Vergennes", type: "Village", county: "Jackson", population: 298},
+            {name: "Vermilion", type: "Village", county: "Edgar", population: 225},
+            {name: "Vermont", type: "Village", county: "Fulton", population: 667},
+            {name: "Vernon", type: "Village", county: "Marion", population: 129},
+            {name: "Vernon Hills", type: "Village", county: "Lake", population: 25113},
+            {name: "Verona", type: "Village", county: "Grundy", population: 215},
+            {name: "Versailles", type: "Village", county: "Brown", population: 478},
+            {name: "Victoria", type: "Village", county: "Knox", population: 316},
+            {name: "Vienna", type: "City", county: "Johnson", population: 1434},
+            {name: "Villa Grove", type: "City", county: "Douglas", population: 2537},
+            {name: "Villa Park", type: "Village", county: "DuPage", population: 21904},
+            {name: "Viola", type: "Village", county: "Mercer", population: 955},
+            {name: "Virden", type: "City", county: "Macoupin", population: 3425},
+            {name: "Virgil", type: "Village", county: "Kane", population: 329},
+            {name: "Virginia", type: "City", county: "Cass", population: 1611},
+            {name: "Volo", type: "Village", county: "Lake", population: 2929},
+            {name: "Wadsworth", type: "Village", county: "Lake", population: 3815},
+            {name: "Waggoner", type: "Village", county: "Montgomery", population: 266},
+            {name: "Walnut", type: "Village", county: "Bureau", population: 1416},
+            {name: "Walnut Hill", type: "Village", county: "Marion", population: 108},
+            {name: "Walshville", type: "Village", county: "Montgomery", population: 64},
+            {name: "Waltonville", type: "Village", county: "Jefferson", population: 434},
+            {name: "Wamac", type: "City", county: ["Washington", "Clinton", "Marion"], population: 1185},
+            {name: "Wapella", type: "Village", county: "DeWitt", population: 558},
+            {name: "Warren", type: "Village", county: "JoDaviess", population: 1428},
+            {name: "Warrensburg", type: "Village", county: "Macon", population: 1210},
+            {name: "Warrenville", type: "City", county: "DuPage", population: 13140},
+            {name: "Warsaw", type: "City", county: "Hancock", population: 1607},
+            {name: "Washburn", type: "Village", county: "Woodford", population: 1155},
+            {name: "Washington", type: "City", county: "Tazewell", population: 15134},
+            {name: "Washington Park", type: "Village", county: "St. Clair", population: 4196},
+            {name: "Wataga", type: "Village", county: "Knox", population: 843},
+            {name: "Waterloo", type: "City", county: "Monroe", population: 9811},
+            {name: "Waterman", type: "Village", county: "DeKalb", population: 1506},
+            {name: "Watseka", type: "City", county: "Iroquois", population: 5255},
+            {name: "Watson", type: "Village", county: "Effingham", population: 754},
+            {name: "Wauconda", type: "Village", county: "Lake", population: 13603},
+            {name: "Waukegan", type: "City", county: "Lake", population: 89078},
+            {name: "Waverly", type: "City", county: "Morgan", population: 1307},
+            {name: "Wayne", type: "Village", county: ["DuPage", "Kane"], population: 2431},
+            {name: "Wayne City", type: "Village", county: "Wayne", population: 1032},
+            {name: "Waynesville", type: "Village", county: "DeWitt", population: 434},
+            {name: "Weldon", type: "Village", county: "DeWitt", population: 429},
+            {name: "Wellington", type: "Village", county: "Iroquois", population: 242},
+            {name: "Wenona", type: "City", county: "Marshall", population: 1056},
+            {name: "Wenonah", type: "Village", county: "Montgomery", population: 37},
+            {name: "West Brooklyn", type: "Village", county: "Lee", population: 142},
+            {name: "Westchester", type: "Village", county: "Cook", population: 16718},
+            {name: "West Chicago", type: "City", county: "DuPage", population: 27086},
+            {name: "West City", type: "Village", county: "Franklin", population: 661},
+            {name: "West Dundee", type: "Village", county: "Kane", population: 7331},
+            {name: "Western Springs", type: "Village", county: "Cook", population: 12975},
+            {name: "Westfield", type: "Village", county: "Clark", population: 601},
+            {name: "West Frankfort", type: "City", county: "Franklin", population: 8182},
+            {name: "Westmont", type: "Village", county: "DuPage", population: 24685},
+            {name: "West Peoria", type: "City", county: "Peoria", population: 4458},
+            {name: "West Point", type: "Village", county: "Hancock", population: 178},
+            {name: "West Salem", type: "Village", county: "Edwards", population: 897},
+            {name: "Westville", type: "Village", county: "Vermilion", population: 3202},
+            {name: "Wheaton", type: "City", county: "DuPage", population: 52894},
+            {name: "Wheeler", type: "Village", county: "Jasper", population: 147},
+            {name: "Wheeling", type: "Village", county: ["Cook", "Lake"], population: 37648},
+            {name: "White Ash", type: "Village", county: "Williamson", population: 241}, // Corrected name from Whiteash
+            {name: "White City", type: "Village", county: "Macoupin", population: 232},
+            {name: "White Hall", type: "City", county: "Greene", population: 2520},
+            {name: "Williamsfield", type: "Village", county: "Knox", population: 578},
+            {name: "Williamson", type: "Village", county: "Madison", population: 230},
+            {name: "Williamsville", type: "Village", county: "Sangamon", population: 1476},
+            {name: "Willisville", type: "Village", county: "Perry", population: 633},
+            {name: "Willowbrook", type: "Village", county: "DuPage", population: 8540},
+            {name: "Willow Hill", type: "Village", county: "Jasper", population: 230},
+            {name: "Willow Springs", type: "Village", county: "Cook", population: 5524},
+            {name: "Wilmette", type: "Village", county: "Cook", population: 27087},
+            {name: "Wilmington", type: "Village", county: ["Greene", "Scott"], population: 142},
+            {name: "Wilmington", type: "City", county: "Will", population: 5724},
+            {name: "Wilsonville", type: "Village", county: "Macoupin", population: 586},
+            {name: "Winchester", type: "City", county: "Scott", population: 1593},
+            {name: "Windsor", type: "Village", county: ["Mercer", "Henry"], population: 748},
+            {name: "Windsor", type: "City", county: "Shelby", population: 1187},
+            {name: "Winfield", type: "Village", county: "DuPage", population: 9080},
+            {name: "Winnebago", type: "Village", county: "Winnebago", population: 3101},
+            {name: "Winnetka", type: "Village", county: "Cook", population: 12187},
+            {name: "Winslow", type: "Village", county: "Stephenson", population: 338},
+            {name: "Winthrop Harbor", type: "Village", county: "Lake", population: 6742},
+            {name: "Witt", type: "City", county: "Montgomery", population: 903},
+            {name: "Wonder Lake", type: "Village", county: "McHenry", population: 4026},
+            {name: "Wood Dale", type: "City", county: "DuPage", population: 13770},
+            {name: "Woodhull", type: "Village", county: "Henry", population: 811},
+            {name: "Woodland", type: "Village", county: "Iroquois", population: 324},
+            {name: "Woodlawn", type: "Village", county: "Jefferson", population: 698},
+            {name: "Woodridge", type: "Village", county: ["DuPage", "Cook", "Will"], population: 32971},
+            {name: "Wood River", type: "City", county: "Madison", population: 10657},
+            {name: "Woodson", type: "Village", county: "Morgan", population: 512},
+            {name: "Woodstock", type: "City", county: "McHenry", population: 24770},
+            {name: "Worden", type: "Village", county: "Madison", population: 1044},
+            {name: "Worth", type: "Village", county: "Cook", population: 10789},
+            {name: "Wyanet", type: "Village", county: "Bureau", population: 991},
+            {name: "Wyoming", type: "City", county: "Stark", population: 1429},
+            {name: "Xenia", type: "Village", county: "Clay", population: 391},
+            {name: "Yale", type: "Village", county: "Jasper", population: 86},
+            {name: "Yates City", type: "Village", county: "Knox", population: 693},
+            {name: "Yorkville", type: "City", county: "Kendall", population: 16921},
+            {name: "Zeigler", type: "City", county: "Franklin", population: 1801},
+            {name: "Zion", type: "City", county: "Lake", population: 24413}
+];
+
+    // -----------------------------------------------------------------------------
+    // Enhance municipality entries with website links for the most populous places.
+    // We compute the top 100 municipalities by population and build a simple
+    // mapping to a search URL for their official websites.  When rendering the
+    // results the appropriate link will be used for the "Website" button.
+    const topMunicipalitiesByPop = [...illinoisMunicipalities]
+        .filter(m => typeof m.population === 'number')
+        .sort((a, b) => b.population - a.population)
+        .slice(0, 100)
+        .map(m => m.name);
+    const websiteMap = {};
+    topMunicipalitiesByPop.forEach(name => {
+        const query = encodeURIComponent(`${name} Illinois official website`);
+        websiteMap[name] = `https://www.google.com/search?q=${query}`;
+    });
+
+
+    let filteredData = [];
+    let currentSort = 'name'; // Default sort
+    let searchTimeout;
+    let favoritesSet = new Set(JSON.parse(localStorage.getItem('im_favorites') || '[]'));
+
+    // Feedback configuration
+    const FEEDBACK_EMAIL = 'municipalities-feedback@example.com'; // TODO: replace with your inbox
+
+    function initThemeFromStorage() {
+        const saved = localStorage.getItem('im_theme');
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const useDark = saved ? saved === 'dark' : prefersDark;
+        document.body.classList.toggle('dark-theme', useDark);
+        const themeToggleIcon = document.querySelector('#themeToggle .icon use');
+        if (themeToggleIcon) themeToggleIcon.setAttribute('xlink:href', useDark ? '#icon-sun' : '#icon-moon');
+    }
+
+    function toggleTheme() {
+        const isDark = document.body.classList.toggle('dark-theme');
+        localStorage.setItem('im_theme', isDark ? 'dark' : 'light');
+        const themeToggleIcon = document.querySelector('#themeToggle .icon use');
+        if (themeToggleIcon) themeToggleIcon.setAttribute('xlink:href', isDark ? '#icon-sun' : '#icon-moon');
+    }
+
+    function saveFavorites() {
+        localStorage.setItem('im_favorites', JSON.stringify(Array.from(favoritesSet)));
+    }
+
+    function exportToCSV() {
+        const rows = [ ['Name','Type','County','Population'] ];
+        filteredData.forEach(m => {
+            const county = getCountyString(m.county);
+            rows.push([m.name || '', m.type || '', county, (m.population ?? '')]);
+        });
+        const escapeCsv = (val) => {
+            const s = String(val);
+            if (/[",\n]/.test(s)) return '"' + s.replace(/"/g,'""') + '"';
+            return s;
+        };
+        const csv = rows.map(r => r.map(escapeCsv).join(',')).join('\n');
+        const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'illinois_municipalities_results.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showUIMessage('CSV exported for current results.', 'info');
+    }
+
+    function copyShareLink() {
+        updateURLFromState();
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            showUIMessage('Sharable link copied to clipboard.', 'info');
+        }).catch(() => {
+            showUIMessage('Could not copy link. You can copy from the address bar.', 'warning');
+        });
+    }
+
+    // --- Feedback modal helpers ---
+    function openFeedbackModal() {
+        document.getElementById('feedbackModal')?.classList.add('open');
+        document.getElementById('fbMessage')?.focus();
+    }
+    function closeFeedbackModal() {
+        document.getElementById('feedbackModal')?.classList.remove('open');
+    }
+    function submitFeedback(event) {
+        event.preventDefault();
+        const name = (document.getElementById('fbName')?.value || '').trim();
+        const email = (document.getElementById('fbEmail')?.value || '').trim();
+        const role = (document.getElementById('fbRole')?.value || '').trim();
+        const message = (document.getElementById('fbMessage')?.value || '').trim();
+        if (!message) {
+            showUIMessage('Please enter a message before sending feedback.', 'warning');
+            return;
+        }
+        const subject = encodeURIComponent(`Site Feedback${role ? ' - ' + role : ''}${name ? ' - ' + name : ''}`);
+        const bodyLines = [
+            message,
+            '',
+            `Role: ${role || 'N/A'}`,
+            `Name: ${name || 'N/A'}`,
+            `Email: ${email || 'N/A'}`,
+            `URL: ${window.location.href}`
+        ];
+        const body = encodeURIComponent(bodyLines.join('\n'));
+        const mailto = `mailto:${FEEDBACK_EMAIL}?subject=${subject}&body=${body}`;
+        window.location.href = mailto;
+        closeFeedbackModal();
+        showUIMessage('Thank you for your feedback!', 'info');
+    }
+
+    function getFilterInputs() {
+        const searchTerm = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
+        const selectedCounty = document.getElementById('countyFilter')?.value || '';
+        const selectedType = document.getElementById('typeFilter')?.value || '';
+        const minPopStr = document.getElementById('minPop')?.value || '';
+        const maxPopStr = document.getElementById('maxPop')?.value || '';
+        const favoritesOnly = document.getElementById('favoritesOnly')?.checked || false;
+        const minPop = minPopStr === '' ? null : Number(minPopStr);
+        const maxPop = maxPopStr === '' ? null : Number(maxPopStr);
+        return { searchTerm, selectedCounty, selectedType, minPop, maxPop, favoritesOnly };
+    }
+
+    function updateURLFromState() {
+        const { searchTerm, selectedCounty, selectedType, minPop, maxPop, favoritesOnly } = getFilterInputs();
+        const params = new URLSearchParams();
+        if (searchTerm) params.set('q', searchTerm);
+        if (selectedCounty) params.set('county', selectedCounty);
+        if (selectedType) params.set('type', selectedType);
+        if (currentSort && currentSort !== 'name') params.set('sort', currentSort);
+        if (minPop !== null) params.set('min', String(minPop));
+        if (maxPop !== null) params.set('max', String(maxPop));
+        if (favoritesOnly) params.set('fav', '1');
+        const isDark = document.body.classList.contains('dark-theme');
+        if (isDark) params.set('theme','dark');
+        const qs = params.toString();
+        const newUrl = qs ? `${location.pathname}?${qs}` : location.pathname;
+        window.history.replaceState(null, '', newUrl);
+    }
+
+    function applyFiltersFromQuery() {
+        const params = new URLSearchParams(location.search);
+        const q = params.get('q') || '';
+        const county = params.get('county') || '';
+        const type = params.get('type') || '';
+        const sort = params.get('sort') || 'name';
+        const min = params.get('min');
+        const max = params.get('max');
+        const fav = params.get('fav');
+        const theme = params.get('theme');
+        if (theme === 'dark') {
+            document.body.classList.add('dark-theme');
+        }
+        const searchInput = document.getElementById('searchInput');
+        const countyFilter = document.getElementById('countyFilter');
+        const typeFilter = document.getElementById('typeFilter');
+        const minPop = document.getElementById('minPop');
+        const maxPop = document.getElementById('maxPop');
+        const favoritesOnly = document.getElementById('favoritesOnly');
+        if (searchInput) searchInput.value = q;
+        if (countyFilter) countyFilter.value = county;
+        if (typeFilter) typeFilter.value = type;
+        if (minPop && min !== null && min !== undefined) minPop.value = min;
+        if (maxPop && max !== null && max !== undefined) maxPop.value = max;
+        if (favoritesOnly) favoritesOnly.checked = fav === '1';
+        currentSort = sort;
+        // Update sort button active state
+        document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('active'));
+        const activeSortButton = Array.from(document.querySelectorAll('.sort-btn')).find(
+            btn => btn.textContent.trim().toLowerCase() === sort.toLowerCase()
+        );
+        if (activeSortButton) activeSortButton.classList.add('active');
+        const themeToggleIcon = document.querySelector('#themeToggle .icon use');
+        if (themeToggleIcon) themeToggleIcon.setAttribute('xlink:href', document.body.classList.contains('dark-theme') ? '#icon-sun' : '#icon-moon');
+    }
+
+    function recomputeAndRender() {
+        const { searchTerm, selectedCounty, selectedType, minPop, maxPop, favoritesOnly } = getFilterInputs();
+        filteredData = illinoisMunicipalities.filter(municipality => {
+            const name = (municipality.name || '').toLowerCase();
+            const countyString = getCountyString(municipality.county).toLowerCase();
+            const matchesSearch = !searchTerm || name.includes(searchTerm) || countyString.includes(searchTerm);
+            const municipalityCounties = Array.isArray(municipality.county) ? municipality.county : [municipality.county || ""];
+            const matchesCountyFilter = !selectedCounty || municipalityCounties.includes(selectedCounty);
+            const matchesTypeFilter = !selectedType || municipality.type === selectedType;
+            const pop = municipality.population ?? null;
+            const matchesMin = (minPop === null) || (pop !== null && pop >= minPop);
+            const matchesMax = (maxPop === null) || (pop !== null && pop <= maxPop);
+            const matchesFav = !favoritesOnly || favoritesSet.has(municipality.name);
+            return matchesSearch && matchesCountyFilter && matchesTypeFilter && matchesMin && matchesMax && matchesFav;
+        });
+        sortResults(currentSort);
+        updateStats();
+        updateURLFromState();
+    }
+
+    function getCountyString(county) {
+        if (Array.isArray(county)) {
+            return county.join(', ');
+        }
+        return county || 'Unknown'; // Handles null, undefined, empty string
+    }
+
+    function highlightText(text, searchTerm) {
+        const textStr = String(text || ""); // Ensure text is a string
+        if (!searchTerm || !textStr) return textStr;
+        try {
+            // Escape special characters in searchTerm for RegExp
+            const escapedSearchTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const regex = new RegExp(`(${escapedSearchTerm})`, 'gi');
+            return textStr.replace(regex, '<span class="highlight">$1</span>');
+        } catch (e) {
+            console.error("Error in highlightText regex:", e);
+            return textStr; // Fallback to unhighlighted text on regex error
+        }
+    }
+
+    function updateStats() {
+        const totalMunicipalitiesElement = document.getElementById('totalMunicipalities');
+        const totalCitiesElement = document.getElementById('totalCities');
+        const totalVillagesElement = document.getElementById('totalVillages');
+        const totalTownsElement = document.getElementById('totalTowns');
+        const resultsCountElement = document.getElementById('resultsCount');
+
+        if (totalMunicipalitiesElement) {
+             totalMunicipalitiesElement.textContent = illinoisMunicipalities.length;
+        }
+        if (totalCitiesElement) {
+            totalCitiesElement.textContent = illinoisMunicipalities.filter(m => m.type === 'City').length;
+        }
+        if (totalVillagesElement) {
+            totalVillagesElement.textContent = illinoisMunicipalities.filter(m => m.type === 'Village').length;
+        }
+        if (totalTownsElement) {
+            totalTownsElement.textContent = illinoisMunicipalities.filter(m => m.type === 'Town').length;
+        }
+        if (resultsCountElement) {
+            resultsCountElement.textContent = `(${filteredData.length} result${filteredData.length !== 1 ? 's' : ''})`;
+        }
+    }
+
+    function displayResults(results) {
+        const resultsList = document.getElementById('resultsList');
+        const loading = document.getElementById('loading'); // Re-check if needed here, or manage globally
+        if (!resultsList) return;
+
+        if(loading) loading.style.display = 'block';
+        resultsList.innerHTML = ''; // Clear previous results
+        resultsList.style.opacity = '0.5'; // Visual cue for loading
+
+        // Use a short timeout to allow the browser to render the cleared list and loading state
+        setTimeout(() => {
+            if(loading) loading.style.display = 'none';
+            resultsList.style.opacity = '1';
+
+            if (results.length === 0) {
+                resultsList.innerHTML = `
+                    <div class="no-results">
+                        <svg class="icon" aria-hidden="true"><use xlink:href="#icon-no-results"></use></svg>
+                        No municipalities found matching your criteria.
+                    </div>`;
+                return;
+            }
+
+            const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+            const fragment = document.createDocumentFragment(); // For performance
+
+            results.forEach((municipality, index) => {
+                const item = document.createElement('div');
+                item.className = 'result-item fade-in';
+                item.style.animationDelay = `${index * 0.015}s`; // Faster animation
+                item.dataset.name = municipality.name || '';
+
+                const countyDisplayString = getCountyString(municipality.county);
+                const isFav = favoritesSet.has(municipality.name);
+                // Determine website link and prebuild the website button HTML.
+                const websiteLink = (typeof websiteMap !== 'undefined' && websiteMap[municipality.name]) ? websiteMap[municipality.name] : '';
+                const websiteBtnHtml = websiteLink
+                    ? `<a class="action-btn website-btn" href="${websiteLink}" target="_blank">Website</a>`
+                    : `<a class="action-btn website-btn" aria-disabled="true" href="#">Website</a>`;
+
+                item.innerHTML = `
+                    <div class="municipality-info">
+                        <button class="favorite-btn" title="Toggle favorite" aria-label="Toggle favorite">
+                            <svg class="icon" aria-hidden="true"><use xlink:href="${isFav ? '#icon-star-filled' : '#icon-star'}"></use></svg>
+                        </button>
+                        <span class="municipality-name">${highlightText(municipality.name, searchTerm)}</span>
+                        <div class="municipality-details">
+                            <span class="type-badge type-${(municipality.type || 'unknown').toLowerCase()}">${municipality.type || 'N/A'}</span>
+                            <span class="county-info">${highlightText(countyDisplayString, searchTerm)}${countyDisplayString !== 'Unknown' ? ' County' : ''}</span>
+                        </div>
+                    </div>
+                    <div class="population-info">
+                        <span class="population">${(municipality.population !== undefined && municipality.population !== null) ? municipality.population.toLocaleString() : 'N/A'}</span>
+                        <span class="population-label">Population</span>
+                    </div>
+                    <div class="municipality-actions">
+                        ${websiteBtnHtml}
+                        <button class="action-btn fact-btn" aria-disabled="true">Fact</button>
+                        <button class="action-btn gov-btn" aria-disabled="true">Government</button>
+                    </div>
+                `;
+                fragment.appendChild(item);
+            });
+            resultsList.appendChild(fragment);
+        }, 20); // Small delay for rendering
+    }
+
+    function sortResults(sortBy) {
+        currentSort = sortBy;
+
+        // Update active state of sort buttons
+        document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('active'));
+        const activeSortButton = Array.from(document.querySelectorAll('.sort-btn')).find(
+            btn => btn.textContent.trim().toLowerCase() === sortBy.toLowerCase()
+        );
+        if (activeSortButton) {
+            activeSortButton.classList.add('active');
+        }
+
+        filteredData.sort((a, b) => {
+            if (sortBy === 'name') {
+                return (a.name || "").localeCompare(b.name || "");
+            }
+            if (sortBy === 'population') {
+                return (b.population || 0) - (a.population || 0);
+            }
+            if (sortBy === 'county') {
+                const countyA = getCountyString(a.county).toLowerCase();
+                const countyB = getCountyString(b.county).toLowerCase();
+                if (countyA === countyB) {
+                    return (a.name || "").localeCompare(b.name || ""); // Secondary sort by name
+                }
+                return countyA.localeCompare(countyB);
+            }
+            return 0;
+        });
+        displayResults(filteredData);
+    }
+
+    function filterMunicipalities() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            recomputeAndRender();
+        }, 250); // Debounce search input
+    }
+
+    function clearAllFilters() { // Renamed to avoid conflict if HTML onclick is `clearFilters()`
+        document.getElementById('searchInput').value = '';
+        document.getElementById('countyFilter').value = '';
+        document.getElementById('typeFilter').value = '';
+        const minPop = document.getElementById('minPop'); if (minPop) minPop.value = '';
+        const maxPop = document.getElementById('maxPop'); if (maxPop) maxPop.value = '';
+        const favOnly = document.getElementById('favoritesOnly'); if (favOnly) favOnly.checked = false;
+        const preset = document.getElementById('presetSelect'); if (preset) preset.value = '';
+        filteredData = [...illinoisMunicipalities];
+        sortResults(currentSort);
+        updateStats();
+        updateURLFromState();
+    }
+
+    // Audience-friendly quick presets
+    function applyPreset(presetValue) {
+        const minPopInput = document.getElementById('minPop');
+        const maxPopInput = document.getElementById('maxPop');
+        const favoritesOnlyInput = document.getElementById('favoritesOnly');
+        const countyFilter = document.getElementById('countyFilter');
+        const typeFilter = document.getElementById('typeFilter');
+
+        // Reset first
+        if (minPopInput) minPopInput.value = '';
+        if (maxPopInput) maxPopInput.value = '';
+        if (favoritesOnlyInput) favoritesOnlyInput.checked = false;
+        if (countyFilter) countyFilter.value = '';
+        if (typeFilter) typeFilter.value = '';
+
+        if (presetValue === 'top50') {
+            // No direct limit UI; we sort by population desc and slice in render via filteredData
+            currentSort = 'population';
+        } else if (presetValue === 'small') {
+            if (maxPopInput) maxPopInput.value = '1000';
+            currentSort = 'name';
+        } else if (presetValue === 'multi') {
+            // Filter to multi-county municipalities by a special flag using recompute filter
+            // We'll set a hidden sentinel by abusing countyFilter with a special value
+            countyFilter.value = ''; // ensure no county constraint
+            // Mark via data attribute on body, then handle in recompute
+            document.body.setAttribute('data-preset-multi', '1');
+        } else if (presetValue === 'favorites') {
+            if (favoritesOnlyInput) favoritesOnlyInput.checked = true;
+            currentSort = 'name';
+        } else {
+            document.body.removeAttribute('data-preset-multi');
+            currentSort = 'name';
+        }
+        recomputeAndRender();
+    }
+
+    function setupEventListeners() {
+        const searchInput = document.getElementById('searchInput');
+        const countyFilter = document.getElementById('countyFilter');
+        const typeFilter = document.getElementById('typeFilter');
+        const clearButton = document.querySelector('.btn[onclick="clearFilters()"]'); // Find the clear button
+        const minPop = document.getElementById('minPop');
+        const maxPop = document.getElementById('maxPop');
+        const favoritesOnly = document.getElementById('favoritesOnly');
+        const exportBtn = document.getElementById('exportCsvBtn');
+        const shareBtn = document.getElementById('shareLinkBtn');
+        const themeToggle = document.getElementById('themeToggle');
+        const presetSelect = document.getElementById('presetSelect');
+        const feedbackBtn = document.getElementById('feedbackBtn');
+        const feedbackClose = document.getElementById('feedbackClose');
+        const feedbackCancel = document.getElementById('feedbackCancel');
+        const feedbackForm = document.getElementById('feedbackForm');
+
+        if (searchInput) searchInput.addEventListener('input', filterMunicipalities);
+        if (countyFilter) countyFilter.addEventListener('change', filterMunicipalities);
+        if (typeFilter) typeFilter.addEventListener('change', filterMunicipalities);
+        if (minPop) minPop.addEventListener('input', filterMunicipalities);
+        if (maxPop) maxPop.addEventListener('input', filterMunicipalities);
+        if (favoritesOnly) favoritesOnly.addEventListener('change', filterMunicipalities);
+        if (presetSelect) presetSelect.addEventListener('change', (e) => applyPreset(e.target.value));
+
+        // If the HTML uses onclick="clearFilters()", ensure it routes correctly
+        if (clearButton) {
+            clearButton.removeAttribute('onclick');
+            clearButton.addEventListener('click', clearAllFilters);
+        }
+
+        // Results list favorite toggling via event delegation
+        const resultsList = document.getElementById('resultsList');
+        if (resultsList) {
+            resultsList.addEventListener('click', (e) => {
+                const btn = e.target.closest('.favorite-btn');
+                if (!btn) return;
+                const item = btn.closest('.result-item');
+                if (!item) return;
+                const name = item.dataset.name;
+                if (!name) return;
+                if (favoritesSet.has(name)) {
+                    favoritesSet.delete(name);
+                } else {
+                    favoritesSet.add(name);
+                }
+                saveFavorites();
+                // Update icon
+                const use = btn.querySelector('use');
+                if (use) use.setAttribute('xlink:href', favoritesSet.has(name) ? '#icon-star-filled' : '#icon-star');
+                // If filtering by favorites-only, re-run filter to hide/show
+                if (document.getElementById('favoritesOnly')?.checked) {
+                    recomputeAndRender();
+                }
+            });
+        }
+
+        if (exportBtn) exportBtn.addEventListener('click', exportToCSV);
+        if (shareBtn) shareBtn.addEventListener('click', copyShareLink);
+        if (themeToggle) themeToggle.addEventListener('click', toggleTheme);
+
+        if (feedbackBtn) feedbackBtn.addEventListener('click', openFeedbackModal);
+        if (feedbackClose) feedbackClose.addEventListener('click', closeFeedbackModal);
+        if (feedbackCancel) feedbackCancel.addEventListener('click', closeFeedbackModal);
+        if (feedbackForm) feedbackForm.addEventListener('submit', submitFeedback);
+
+        // Close modal when clicking outside content
+        const feedbackModal = document.getElementById('feedbackModal');
+        if (feedbackModal) {
+            feedbackModal.addEventListener('click', (e) => {
+                if (e.target === feedbackModal) closeFeedbackModal();
+            });
+        }
+
+        // ESC to close modal
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeFeedbackModal();
+        });
+    }
+
+    async function initializeApp() {
+        const loadingElement = document.getElementById('loading');
+        if (loadingElement) loadingElement.style.display = 'block';
+
+        initThemeFromStorage();
+        // Check if illinoisMunicipalities is defined and has data
+        if (typeof illinoisMunicipalities === 'undefined' || illinoisMunicipalities.length === 0) {
+            console.error("The 'illinoisMunicipalities' array is not defined or is empty. Make sure it's loaded before this script.");
+            if (loadingElement) loadingElement.style.display = 'none';
+            resultsList.innerHTML = `
+                <div class="no-results">
+                    <svg class="icon"><use xlink:href="#icon-no-results"></use></svg>
+                    Error: Municipality data not found.
+                </div>`;
+            return;
+        }
+
+        await loadAndUpdatePopulationDataFromAPI(); // Update populations
+
+        filteredData = [...illinoisMunicipalities]; // Initialize with all data
+
+        populateCountyFilter();
+        applyFiltersFromQuery();
+        updateStats();
+        sortResults(currentSort);
+        recomputeAndRender(); // Render immediately based on any pre-filled filters
+        setupEventListeners();
+
+        if (loadingElement) loadingElement.style.display = 'none';
+    }
+
+    // --- Global Event Listeners & Initializations ---
+    document.addEventListener('DOMContentLoaded', initializeApp);
+
+    // Expose functions to global scope if they are called by inline HTML event attributes like onclick
+    // The sort buttons in HTML use onclick="sortResults('name')", etc.
+    window.sortResults = sortResults;
+    // The clear button in HTML uses onclick="clearFilters()".
+    // It's better to assign this via JS (see setupEventListeners), but this ensures compatibility if HTML is not changed.
+    window.clearFilters = clearAllFilters;
+
+    // Displays a non-blocking toast-style message
+    function showUIMessage(message, type = 'info') {
+        let messageBox = document.getElementById('ui-message-box');
+        if (!messageBox) {
+            messageBox = document.createElement('div');
+            messageBox.id = 'ui-message-box';
+            Object.assign(messageBox.style, {
+                position: 'fixed',
+                top: '20px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                padding: '12px 20px',
+                borderRadius: '8px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                zIndex: '1200',
+                display: 'none',
+                fontSize: '0.9rem',
+                border: '1px solid transparent'
+            });
+            document.body.appendChild(messageBox);
+        }
+        messageBox.textContent = message;
+        if (type === 'error') {
+            messageBox.style.backgroundColor = '#f8d7da';
+            messageBox.style.color = '#721c24';
+            messageBox.style.borderColor = '#f5c6cb';
+        } else if (type === 'warning') {
+            messageBox.style.backgroundColor = '#fff3cd';
+            messageBox.style.color = '#856404';
+            messageBox.style.borderColor = '#ffeeba';
+        } else {
+            messageBox.style.backgroundColor = '#d1ecf1';
+            messageBox.style.color = '#0c5460';
+            messageBox.style.borderColor = '#bee5eb';
+        }
+        messageBox.style.display = 'block';
+        if (messageBox.hideTimeout) clearTimeout(messageBox.hideTimeout);
+        messageBox.hideTimeout = setTimeout(() => {
+            messageBox.style.display = 'none';
+        }, 4000);
+    }
+
+    // Fetches 2020 Census population data and updates the list
+    async function loadAndUpdatePopulationDataFromAPI() {
+        const censusApiUrl = 'https://api.census.gov/data/2020/dec/dp?get=NAME,DP1_0001C&for=place:*&in=state:17';
+        const loadingElement = document.getElementById('loading');
+        if(loadingElement) loadingElement.style.display = 'block';
+        try {
+            const response = await fetch(censusApiUrl);
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Failed to fetch data from Census API:', response.status, response.statusText, errorText);
+                showUIMessage(`Could not load 2020 population data (Status: ${response.status}). Using existing data.`, 'warning');
+                return true; // proceed
+            }
+            const censusJson = await response.json();
+            if (!censusJson || censusJson.length < 2) {
+                console.error('Census API returned no data or invalid data format.');
+                showUIMessage('Census API returned no data. Using existing data.', 'warning');
+                return true;
+            }
+            const header = censusJson[0];
+            const dataRows = censusJson.slice(1);
+            const populationIndex = header.indexOf('DP1_0001C');
+            const nameIndex = header.indexOf('NAME');
+            if (populationIndex === -1 || nameIndex === -1) {
+                console.error('Required columns not found in API response. Header:', header);
+                showUIMessage('Census API data format unexpected. Using existing data.', 'warning');
+                return true;
+            }
+            const apiDataMap = new Map();
+            for (const row of dataRows) {
+                const apiNameFull = row[nameIndex];
+                const popStr = row[populationIndex];
+                if (!apiNameFull) continue;
+                let normalized = apiNameFull.toLowerCase().trim();
+                normalized = normalized.replace(/ (city|town|village|cdp), illinois$/, '').replace(/, illinois$/, '').trim();
+                const pop = parseInt(popStr, 10);
+                if (!isNaN(pop)) apiDataMap.set(normalized, pop);
+            }
+            let updated = 0;
+            for (const m of illinoisMunicipalities) {
+                const key = (m.name || '').toLowerCase().trim();
+                if (apiDataMap.has(key)) {
+                    m.population = apiDataMap.get(key);
+                    updated++;
+                }
+            }
+            console.log(`Updated ${updated} municipalities with 2020 population data.`);
+            return true;
+        } catch (e) {
+            console.error('Error fetching population data:', e);
+            showUIMessage('Error fetching population data. Using existing data.', 'error');
+            return true;
+        } finally {
+            if(loadingElement) loadingElement.style.display = 'none';
+        }
+    }
+
+    function populateCountyFilter() {
+        const countyFilter = document.getElementById('countyFilter');
+        if (!countyFilter) return;
+        const allCounties = illinoisMunicipalities.flatMap(m => Array.isArray(m.county) ? m.county : (m.county || ''));
+        const unique = [...new Set(allCounties.filter(Boolean))].sort();
+        while (countyFilter.options.length > 1) countyFilter.remove(1);
+        unique.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c;
+            opt.textContent = c;
+            countyFilter.appendChild(opt);
+        });
+    }
+
+ </script>
+</body>
+</html>
+
+

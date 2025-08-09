@@ -1,4 +1,4 @@
-type Geometry = { type: string; coordinates: any };
+import type { Geometry } from "geojson";
 
 export interface Municipality {
   id: string;

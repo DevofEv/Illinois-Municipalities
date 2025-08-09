@@ -1,13 +1,19 @@
 import { resolve } from "path";
 import { readFile } from "fs/promises";
 import type { Municipality } from "@/types/municipality";
+import { MunicipalitySchema } from "@/types/municipality.schema";
 
 const DATA_PATH = resolve(process.cwd(), "public/data/municipalities.json");
 
 export async function getAllMunicipalities(): Promise<Municipality[]> {
   const raw = await readFile(DATA_PATH, "utf8");
-  const parsed = JSON.parse(raw) as Municipality[];
-  return parsed ?? [];
+  const json = JSON.parse(raw);
+  const result = MunicipalitySchema.array().safeParse(json);
+  if (!result.success) {
+    console.warn("Invalid municipalities data:", result.error.message);
+    return [];
+  }
+  return result.data as unknown as Municipality[];
 }
 
 export async function getMunicipalityByIdOrSlug(idOrSlug: string): Promise<Municipality | undefined> {

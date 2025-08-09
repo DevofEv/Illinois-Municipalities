@@ -2477,7 +2477,7 @@
 
         filteredData.sort((a, b) => {
             if (sortBy === 'name') {
-                return (a.name || "").localeCompare(b.name || "");
+                return (a.name || "").localeCompare(b.name || "", undefined, { sensitivity: 'base' });
             }
             if (sortBy === 'population') {
                 return (b.population || 0) - (a.population || 0);

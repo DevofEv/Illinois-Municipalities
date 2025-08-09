@@ -1,11 +1,12 @@
 "use client";
 
 import data from "@/public/data/municipalities.json" assert { type: "json" };
-import { useMemo, useState } from "react";
+import { useMemo, useState, Suspense } from "react";
 import type { Municipality } from "@/types/municipality";
 import { SearchBar } from "@/components/features/SearchBar/SearchBar";
 import { FilterPanel, type FilterState } from "@/components/features/FilterPanel/FilterPanel";
 import { MunicipalityList } from "@/components/features/MunicipalityList/MunicipalityList";
+import { useUrlState } from "@/lib/hooks/useUrlState";
 
 export default function Home() {
   const allData = (data as unknown as Municipality[]) ?? [];
@@ -19,7 +20,7 @@ export default function Home() {
     populationMax: 3_000_000,
     sortOrder: "asc",
   }), []);
-  const [filters, setFilters] = useState<FilterState>(defaultFilters);
+  const [filters, updateFilters] = useUrlState<FilterState>(defaultFilters);
 
   const effectiveData = useMemo(() => {
     const filteredData = filtered.filter((m) => {
@@ -35,28 +36,30 @@ export default function Home() {
   }, [filtered, filters]);
 
   return (
-    <main className="p-6 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
-      <section className="md:col-span-2 space-y-4">
+    <Suspense fallback={<div className="p-6">Loading...</div>}>
+      <main className="p-6 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+        <section className="md:col-span-2 space-y-4">
 
-        <SearchBar
-          data={allData}
-          onSearch={setFiltered}
-          onCountySelect={(county) => setFilters((prev) => ({ ...prev, county }))}
-        />
+          <SearchBar
+            data={allData}
+            onSearch={setFiltered}
+            onCountySelect={(county) => updateFilters({ county })}
+          />
 
-        <MunicipalityList data={effectiveData} selectedIds={selectedIds} onSelect={(id) => {
-          setSelectedIds((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
-        }} />
-        <div className="text-xs text-gray-500">Tip: Click a municipality to open its profile.</div>
-      </section>
-      <aside>
-        <FilterPanel
-          data={allData}
-          filters={filters}
-          onFilterChange={(partial) => setFilters((prev) => ({ ...prev, ...partial }))}
-          clearFilters={() => setFilters(defaultFilters)}
-        />
-      </aside>
-    </main>
+          <MunicipalityList data={effectiveData} selectedIds={selectedIds} onSelect={(id) => {
+            setSelectedIds((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
+          }} />
+          <div className="text-xs text-gray-500">Tip: Use the checkboxes to add municipalities to your comparison list, then click a name to open its profile.</div>
+        </section>
+        <aside>
+          <FilterPanel
+            data={allData}
+            filters={filters}
+            onFilterChange={(partial) => updateFilters(partial)}
+            clearFilters={() => updateFilters(defaultFilters)}
+          />
+        </aside>
+      </main>
+    </Suspense>
   );
 }

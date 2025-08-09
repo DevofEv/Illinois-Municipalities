@@ -19,6 +19,8 @@ interface FilterPanelProps {
 
 export function FilterPanel({ data, filters, onFilterChange, clearFilters }: FilterPanelProps) {
   const counties = Array.from(new Set(data.map((d) => d.county))).sort();
+  const minPopulation = Math.min(0, ...data.map((d) => d.population.current || 0));
+  const maxPopulation = Math.max(3000000, ...data.map((d) => d.population.current || 0));
 
   function handleTypeToggle(type: Municipality["type"], checked: boolean) {
     const set = new Set(filters.types);
@@ -26,15 +28,6 @@ export function FilterPanel({ data, filters, onFilterChange, clearFilters }: Fil
     else set.delete(type);
     onFilterChange({ types: Array.from(set) });
   }
-
-  const filteredData = data.filter((m) => {
-    if (filters.county && m.county !== filters.county) return false;
-    if (filters.types.length && !filters.types.includes(m.type)) return false;
-    if (m.population.current < filters.populationMin || m.population.current > filters.populationMax) return false;
-    return true;
-  });
-
-  const totalPopulation = filteredData.reduce((sum, m) => sum + (m.population.current || 0), 0);
 
   const formatNumber = (n: number) => n.toLocaleString();
 
@@ -84,8 +77,8 @@ export function FilterPanel({ data, filters, onFilterChange, clearFilters }: Fil
             <span className="text-sm">Min: {formatNumber(filters.populationMin)}</span>
             <input
               type="range"
-              min={0}
-              max={3000000}
+              min={minPopulation}
+              max={maxPopulation}
               step={1000}
               value={filters.populationMin}
               onChange={(e) => onFilterChange({ populationMin: parseInt(e.target.value, 10) })}
@@ -97,8 +90,8 @@ export function FilterPanel({ data, filters, onFilterChange, clearFilters }: Fil
             <span className="text-sm">Max: {formatNumber(filters.populationMax)}</span>
             <input
               type="range"
-              min={0}
-              max={3000000}
+              min={minPopulation}
+              max={maxPopulation}
               step={1000}
               value={filters.populationMax}
               onChange={(e) => onFilterChange({ populationMax: parseInt(e.target.value, 10) })}
@@ -123,21 +116,7 @@ export function FilterPanel({ data, filters, onFilterChange, clearFilters }: Fil
         </select>
       </fieldset>
 
-      <div className="mt-6 p-3 bg-gray-50 rounded">
-        <h3 className="font-medium mb-2">Summary</h3>
-        <dl className="text-sm space-y-1">
-          <div className="flex justify-between">
-            <dt>Municipalities:</dt>
-            <dd className="font-medium">{filteredData.length}</dd>
-          </div>
-          <div className="flex justify-between">
-            <dt>Total Population:</dt>
-            <dd className="font-medium">{formatNumber(totalPopulation)}</dd>
-          </div>
-        </dl>
-      </div>
-
-      <button onClick={clearFilters} className="mt-2 w-full py-2 text-sm text-blue-600 hover:bg-blue-50 rounded">
+      <button onClick={clearFilters} className="mt-6 w-full py-2 text-sm text-blue-600 hover:bg-blue-50 rounded">
         Clear all filters
       </button>
     </aside>

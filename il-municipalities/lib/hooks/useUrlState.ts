@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 
 type Primitive = string | number | boolean;
 
-export function useUrlState<T extends Record<string, Primitive | Primitive[]>>(
+export function useUrlState<T extends object>(
   defaultState: T
 ): [T, (updates: Partial<T>) => void] {
   const router = useRouter();
@@ -17,7 +17,7 @@ export function useUrlState<T extends Record<string, Primitive | Primitive[]>>(
     searchParams.forEach((value, key) => {
       if (key in defaultState) {
         try {
-          const defaultValue = defaultState[key as keyof T];
+          const defaultValue = (defaultState as Record<string, unknown>)[key];
           if (typeof defaultValue === "number") {
             (state as Record<string, unknown>)[key] = Number(value);
           } else if (typeof defaultValue === "boolean") {
@@ -50,11 +50,11 @@ export function useUrlState<T extends Record<string, Primitive | Primitive[]>>(
 
         const params = new URLSearchParams();
         (Object.entries(newState) as [keyof T, T[keyof T]][]).forEach(([key, value]) => {
-          if (value !== defaultState[key]) {
+          if (value !== (defaultState as Record<string, unknown>)[key as string]) {
             if (Array.isArray(value)) {
-              params.set(String(key), (value as Primitive[]).join(","));
+              params.set(String(key), (value as unknown as Primitive[]).join(","));
             } else {
-              params.set(String(key), String(value));
+              params.set(String(key), String(value as unknown as Primitive));
             }
           }
         });
